@@ -17,6 +17,6 @@ Auth::routes();
 
 Route::resource('/', 'HomeController');
 
-Route::resource('/posts', 'PostsController');
+Route::resource('posts', 'PostsController');
 
-Route::resource('/developers', 'DevelopersController');
+Route::resource('developers', 'DevelopersController');
