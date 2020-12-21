@@ -57,16 +57,14 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('developers.index') }}">
+                                    Developers
+                                </a>
                                 <a class="dropdown-item" href="{{ route('posts.index') }}">
-                                   Publicações
+                                    Publicações
                                 </a>
                             </div>
 
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('developers.index') }}">
-                                   Developers
-                                </a>
-                            </div>
                         </li>
 
                         <li class="nav-item dropdown">
