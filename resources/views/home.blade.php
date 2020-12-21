@@ -14,7 +14,7 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    Bem vindo á Yamitec <b>{{Auth::user()->name}}</b>
                 </div>
             </div>
         </div>
