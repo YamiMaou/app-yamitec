@@ -57,13 +57,13 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('posts') }}">
+                                <a class="dropdown-item" href="{{ route('posts.index') }}">
                                    Publicações
                                 </a>
                             </div>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('developers') }}">
+                                <a class="dropdown-item" href="{{ route('developers.index') }}">
                                    Developers
                                 </a>
                             </div>
