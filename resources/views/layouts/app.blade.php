@@ -53,15 +53,15 @@
                         @else
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Gerênciar <span class="caret"></span>
+                                @lang('general.manage') <span class="caret"></span>
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('developers.index') }}">
-                                    Developers
+                                    @lang('general.developers')
                                 </a>
                                 <a class="dropdown-item" href="{{ route('posts.index') }}">
-                                    Publicações
+                                    @lang('general.posts')
                                 </a>
                             </div>
 
@@ -69,7 +69,7 @@
 
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ __('general.welcome', ['name' => Auth::user()->name]) }} <span class="caret"></span>
+                                {{ __('general.welcome', ['name' => Auth::user()->name]) }} <span class="caret"></span>
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
