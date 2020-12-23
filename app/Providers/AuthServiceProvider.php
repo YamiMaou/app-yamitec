@@ -27,12 +27,12 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes();
-        Passport::enableImplicitGrant();
         Passport::tokensCan([
             'view-posts' => 'Vizualizar Publicações',
             'view-profile' => 'Vizualizar perfil',
             'view-user' => 'Visualizar usuários',
         ]);
+        Passport::enableImplicitGrant();
         Passport::cookie('yamitec_token');
 
         // Passport::tokensExpireIn(now()->addSeconds(10));
