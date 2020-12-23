@@ -25,9 +25,9 @@ class UsersController extends Controller
                 'token' => $user->createToken('Yamitec')->accessToken,
                 'data' => $user
             ];
-            return response()->json([$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } else {
-            return response()->json(['error' => 'Acesso não autorizado'], 401);
+            return response()->json(['success' => false, 'message' => 'Acesso não autorizado'], 401);
         }
     }
     /**
