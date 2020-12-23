@@ -22,7 +22,7 @@ class UsersController extends Controller
             $user = \App\User::find(Auth::id());
             $success = [ 
                 'success' => true,
-                'token' => $user->createToken('Yamitec')->accessToken,
+                'token' => $user->createToken('Yamitec',['view-posts', 'view-profile'])->accessToken,
                 'data' => $user
             ];
             return response()->json($success, $this->successStatus);
