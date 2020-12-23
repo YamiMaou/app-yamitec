@@ -19,10 +19,11 @@ class UsersController extends Controller
     public function login()
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            $user = Auth::user()->find(1);
+            $user = \App\User::find(Auth::id());
             $success = [ 
                 'success' => true,
                 'token' => $user->createToken('Yamitec')->accessToken,
+                'data' => $user
             ];
             return response()->json([$success], $this->successStatus);
         } else {
@@ -47,9 +48,12 @@ class UsersController extends Controller
         }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
-        $success['token'] =  $user->createToken('Yamitec')->accessToken;
-        $success['name'] =  $user->name;
+        $user = \App\User::create($input);
+        $success = [ 
+            'success' => true,
+            'token' => $user->createToken('Yamitec')->accessToken,
+            'data' => $user
+        ];
         return response()->json(['success' => $success], $this->successStatus);
     }
     /**
