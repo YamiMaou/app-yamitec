@@ -1,6 +1,6 @@
 # Projeto APP YAMITEC
 
-#Instalação
+# Instalação
 
 para iniciar o projeto basta clonar o repositorio e utilizar o branch ```dev```
 
