@@ -49,7 +49,7 @@ está classe é responsavel por tratar os métodos padrões de um Controller Bá
 
  há métodos adicionais nesta classe, que permite o trabalho com mais de um Model, o mesmo será apresentado a seguir.
 
- # Trabalhando com Models
+# Trabalhando com Models
 
  Para trabalhar com mais de um Model em um controller, basta declarar o método em seu controller e chamar o método da classe pai ``` withAndChange() ``` passando um array informando os models e seus dados como valor ex:
 
@@ -67,7 +67,7 @@ está classe é responsavel por tratar os métodos padrões de um Controller Bá
  
 ```
 
- # Validações
+# Validações
 
  A Classe ControllerExtends também oeferece o método setValidate(Array $validate), que é responsável por definir as validações dos campos de formulários, para utiliza-la basta chama-la no fim método ```__construct()``` da seguinte forma :
 
