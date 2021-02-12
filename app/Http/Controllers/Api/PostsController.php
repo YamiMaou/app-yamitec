@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Extensions\ControllersExtends;
 use App\Models\Post;
-use Illuminate\Http\Request;
 
 class PostsController extends ControllersExtends
 {
