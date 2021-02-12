@@ -1,0 +1,6 @@
+button#employee-edit:hover , button#employee-delete:hover, button#employee-view:hover
+{
+    background-color: rgba(0,0,0,.1);
+    border-radius: 5px;
+    transition: ease-in .2s;
+}
