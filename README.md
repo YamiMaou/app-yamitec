@@ -32,7 +32,7 @@ class NovoController extends ControllersExtends
     parent::__construct(MyModel::class,"template");
   }
 }
-?>
+
 ```
 
 neste exemplo estamos extentendo a classe : ControllerExtension
@@ -53,8 +53,9 @@ está classe é responsavel por tratar os métodos padrões de um Controller Bá
 
  Para trabalhar com mais de um Model em um controller, basta declarar o método em seu controller e chamar o método da classe pai ``` withAndChange() ``` passando um array informando os models e seus dados como valor ex:
 
- ```
- public function store(){
+```
+<?php
+public function store(){
     parent::withAndChange(
       [
         MyModel::class => ["nome" => "item 1", "descricao" => "item de teste"], // o primeiro model a ser informado, deve ser o model principal
@@ -71,7 +72,8 @@ está classe é responsavel por tratar os métodos padrões de um Controller Bá
 
  A Classe ControllerExtends também oeferece o método setValidate(Array $validate), que é responsável por definir as validações dos campos de formulários, para utiliza-la basta chama-la no fim método ```__construct()``` da seguinte forma :
 
- ``` 
+``` 
+<?php
  public function __construct($model = null, $template = null)
  {
    parent::__construct(MyModel::class, "template")
@@ -81,4 +83,4 @@ está classe é responsavel por tratar os métodos padrões de um Controller Bá
       "imagem" => "required]"
     ]);
  }
- ```
+```
