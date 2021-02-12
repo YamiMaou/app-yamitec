@@ -23,7 +23,10 @@ class UsersController extends Controller
             $success = [ 
                 'success' => true,
                 'token' => $user->createToken('Yamitec',['view-posts', 'view-profile'])->accessToken,
-                'data' => $user
+                'data' => [
+                    'user' => $user,
+                    'contributor' => $user->contributor
+                ]
             ];
             return response()->json($success, $this->successStatus);
         } else {

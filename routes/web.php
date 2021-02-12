@@ -13,10 +13,14 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Auth::routes();
+//Auth::routes();
 
+Route::get( '/{path?}', function(){
+    return view( 'react.index' );
+} )->where('path', '.*');
+/*
 Route::resource('/', 'HomeController');
 
 Route::resource('posts', 'PostsController');
 
-Route::resource('developers', 'DevelopersController');
+Route::resource('developers', 'DevelopersController');*/

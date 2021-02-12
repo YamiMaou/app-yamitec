@@ -39,7 +39,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function cotntributor(){
-        return $this->hasMany(Models\Contributors::class);
+    public function contributor(){
+        return $this->hasOne(\App\Models\Contributors::class,'user_id', 'id');
     }
 }
