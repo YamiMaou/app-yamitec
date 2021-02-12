@@ -37,3 +37,7 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
 Route::get('/contributors', 'Api\ContributorsController@index')
     ->middleware(['auth:api', 'scope:view-posts']);
 
+// PROVIDERS
+Route::get('/providers', 'Api\ProvidersController@index')
+    ->middleware(['auth:api', 'scope:view-posts']);
+
