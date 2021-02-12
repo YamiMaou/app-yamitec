@@ -21,8 +21,8 @@ class CreateAudits extends Migration
             ->onDelete('cascade');
 
             $table->text('justification');
-            $table->text('to')->default("[]");
-            $table->text('from')->default("[]");
+            $table->text('to')->nullable();
+            $table->text('from')->nullable();
             $table->timestamps();
             $table->engine = 'InnoDB';
         });
