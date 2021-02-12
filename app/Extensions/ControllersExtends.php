@@ -9,18 +9,22 @@ use App\Interfaces\ControllersInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+//
+use App\Models\Audit;
 
 abstract class ControllersExtends extends Controller implements ControllersInterface
 {
     private $model = null;
     private $template = null;
+    private $isApi = true;
     private $with = [];
     private $validate = [];
 
-    public function __construct($model = null, $template = null)
+    public function __construct($model = null, $template = null, $isApi = true)
     {
         $this->model = $model;
         $this->template = $template;
+        $this->isApi = $isApi;
     }
 
     public function index()
@@ -30,7 +34,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         }
 
         $data = $this->model::all();
-        return view("{$this->template}.index", ["data" => $data]);
+        return $this->isApi ? $data : view("{$this->template}.index", ["data" => $data]);
     }
 
     public function create()
@@ -41,7 +45,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     public function edit($id)
     {
         $data = $this->model::where("id", $id)->first();
-        return view("{$this->template}.edit", ["data" => $data]);
+        return $this->isApi ? $data : view("{$this->template}.edit", ["data" => $data]);
     }
 
     public function show(Request $request, $id, $with = [])
@@ -50,7 +54,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         if (count($with) > 0) {
             $data = $this->model::with($with)->where("id", $id)->first();
         }
-        return view("{$this->template}.details", ["data" => $data]);
+        return $this->isApi ? $data : view("{$this->template}.details", ["data" => $data]);
     }
 
     public function store(Request $request)
@@ -99,15 +103,14 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 }
                 $this->validate[$k] = $regras;
             }
-            /*var_dump($this->validate);
-            exit;*/
             $request->validate($this->validate);
         }
-
         try {
             $data = $request->all();
+            $this->saveLog($id, $request);
             unset($data["_token"]);
             unset($data["_method"]);
+            unset($data["justification"]);
             if (count($this->with) > 0) {
                 $i = 0;
                 foreach ($this->with["data"] as $model => $fields) {
@@ -117,6 +120,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             } else {
                 $this->model::where('id', $id)->update($data);
             }
+           
             return response()->json(["type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch (Exception $error) {
             return response()->json(["type" => "error", "message" => "Problema ao Atualizar.", "error" => $error->getMessage()], 500);
@@ -125,6 +129,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function destroy(Request $request, $id)
     {
+        $this->saveLog($id, $request);
         try {
             $this->model::destroy($id);
             $break = isset($_COOKIE['url']) ? $_COOKIE['url'] : "/home";
@@ -144,5 +149,19 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     {
         $this->validate = $validate;
         return $this;
+    }
+
+    public function saveLog($id, $request){
+        $data =  $request->all();
+        $olderData = $this->model::where('id', $id )->first();
+        $to = json_encode($olderData);
+        $from = json_encode($olderData);
+        $audit = new Audit();
+        $audit->create([
+            'user_id' => $request->user()->id,
+            'justification'=> $data['justification'],
+            'from' => $from,
+            'to' => $to
+        ]); 
     }
 }

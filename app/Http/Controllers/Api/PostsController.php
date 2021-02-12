@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Extensions\ControllersExtends;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
-class PostsController extends Controller
+class PostsController extends ControllersExtends
 {
-    public function index()
+    public function __construct()
     {
-        return Post::all();
+        parent::__construct(Post::class, 'home');
     }
 }

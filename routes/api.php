@@ -25,6 +25,8 @@ Route::middleware(['auth:api', 'scope:view-user'])->get('/users', function (Requ
 
 Route::get('/posts', 'Api\PostsController@index')
     ->middleware(['auth:api', 'scope:view-posts']);
+Route::put('/posts/{id}', 'Api\PostsController@update')
+    ->middleware(['auth:api', 'scope:update-posts']);
 
 Route::get('/profile', 'Api\UsersController@show')
     ->middleware(['auth:api', 'scope:view-profile']);
