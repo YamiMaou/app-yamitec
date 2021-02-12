@@ -2,19 +2,25 @@
 
 # Instalação
 
-para iniciar o projeto basta clonar o repositorio e utilizar o branch ```dev```
+para iniciar o projeto basta clonar o repositorio e utilizar o branch ```server``` para servidor e ``` client ``` para o client web
 
 para baixar o repositório rode o comando no terminal :
 
-```git clone git@bitbucket.org:maouyami/app-yamitec.git```
+```git clone git@bitbucket.org:yamimaou/app-yamitec.git```
 
-e para alterar o branch para dev rode o comando :
+e para alterar o branch para rode o comando :
 
-```git checkout dev ``` 
+```git checkout server ``` ou ```git checkout client ```
 
 clone o arquivo .env.example renomeando a cópia para .env, e altere os dados de acesso ao banco de dados para o seu localhost MySql
 
 rode o comando ```composer update``` para atualizar as dependências do projeto.
+
+rode o comando ```php artisan passport:install``` para configurar o oauth.
+
+rode o comando ```php artisan passport:client``` para gerar as chaves do oauth.
+
+rode o comando ```php artisan migrate``` para gerar as bases de dados.
 
 # Controller 
 
