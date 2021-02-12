@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAudits extends Migration
+class CreateContributors extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,21 @@ class CreateAudits extends Migration
      */
     public function up()
     {
-        Schema::create('audits', function (Blueprint $table) {
+        Schema::create('contributors', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')
             ->references('id')->on('users')
             ->onDelete('cascade');
+            
+            $table->integer('active');
+            $table->string('username');
+            $table->string('name');
+            $table->string('function');
+            $table->text('address');
+            $table->text('social');
 
-            $table->text('justification');
-            $table->text('to')->default("[]");
-            $table->text('from')->default("[]");
             $table->timestamps();
-            $table->engine = 'InnoDB';
         });
     }
 
@@ -35,6 +38,6 @@ class CreateAudits extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('audits');
+        Schema::dropIfExists('contributors');
     }
 }
