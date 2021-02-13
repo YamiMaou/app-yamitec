@@ -9,6 +9,6 @@ class PostsController extends ControllersExtends
 {
     public function __construct()
     {
-        parent::__construct(Provider::class, 'home');
+        parent::__construct(Post::class, 'home');
     }
 }
