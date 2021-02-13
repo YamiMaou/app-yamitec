@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::get( '/{path?}', function(){
     return view( 'react.index' );
 } )->where('path', '.*');
+
+Auth::routes();
 /*
 Route::resource('/', 'HomeController');
 
