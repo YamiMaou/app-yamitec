@@ -44,3 +44,5 @@ Route::post('/contributors', 'Api\ContributorsController@store')
 Route::get('/providers', 'Api\ProvidersController@index')
     ->middleware(['auth:api', 'scope:view-posts']);
 
+Route::post('/providers/active', 'Api\ProvidersController@activate')
+    ->middleware(['auth:api', 'scope:view-posts']);
