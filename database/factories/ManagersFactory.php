@@ -2,16 +2,16 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\Provider;
+use App\Models\Manager;
 use Faker\Generator as Faker;
 
-$factory->define(Provider::class, function (Faker $faker) {
+$factory->define(Manager::class, function (Faker $faker) {
         return [
             'active' => $faker->numberBetween(0,1),
             'type' => $faker->word,
-            'cnpj' => $faker->word,
-            'company_name' => $faker->company,
-            'fantasy_name' => $faker->company,
+            'cpf' => $faker->word,
+            'name' => $faker->firstName(),
+            'role' => $faker->word,
             'address' => json_encode([
                 'city' => $faker->city,
                 'state' => $faker->state,
@@ -25,5 +25,12 @@ $factory->define(Provider::class, function (Faker $faker) {
                 'linkedin' => $faker->username,
                 'instagram' => $faker->username,
             ]),
+            'drugstore_group' => $faker->company,
+            'drugstore' => $faker->company,
+            'phone' => $faker->phoneNumber,
+            'email' => $faker->email,
+            'type' => $faker->word,
+            'condition' => $faker->word,
+            'user' => $faker->word,
     ];
 });
