@@ -9,6 +9,7 @@ use App\Interfaces\ControllersInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
 //
 use App\Models\Audit;
 
@@ -27,13 +28,19 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         $this->isApi = $isApi;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $params = $request->all();
+        unset($params['page']);
         if ($this->model === null || $this->template === null) {
             return response()->json(["message" => "parametros incorretos", "error" => "é necessário informar o Model e o Diretório de template do módulo para continuar."], 500);
         }
+        $data = $this->model::paginate(10)->withQueryString();
+        if(count($params) > 0){
+            $data = $this->model::where($params)->paginate(10);
+        }
 
-        $data = $this->model::all();
+        
         return $this->isApi ? $data : view("{$this->template}.index", ["data" => $data]);
     }
 
