@@ -19,9 +19,9 @@ class CreateProviderFilesTable extends Migration
             $table->text('path');
             $table->text('name');
 
-            $table->integer('provider_id')->unsigned();
+            $table->unsignedBigInteger('provider_id');
             $table->foreign('provider_id')
-            ->references('id')->on('provider')
+            ->references('id')->on('providers')
             ->onDelete('cascade');
 
             $table->timestamps();

@@ -32,12 +32,13 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     {
         $params = $request->all();
         unset($params['page']);
+        unset($params['pageSize']);
         if ($this->model === null || $this->template === null) {
             return response()->json(["message" => "parametros incorretos", "error" => "é necessário informar o Model e o Diretório de template do módulo para continuar."], 500);
         }
-        $data = $this->model::paginate(10)->withQueryString();
+        $data = $this->model::paginate($request->pageSize)->withQueryString();
         if(count($params) > 0){
-            $data = $this->model::where($params)->paginate(10);
+            $data = $this->model::where($params)->paginate($request->pageSize);
         }
 
         
