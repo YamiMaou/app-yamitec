@@ -10,12 +10,12 @@ $factory->define(Provider::class, function (Faker $faker) {
             'active' => $faker->numberBetween(0,1),
             'type' => $faker->word,
             'cnpj' => $faker->word,
-            'company_name' => $faker->word,
-            'fantasy_name' => $faker->word,
+            'company_name' => $faker->company,
+            'fantasy_name' => $faker->company,
             'address' => json_encode([
                 'city' => $faker->city,
                 'state' => $faker->state,
-                'street' => $faker->address,
+                'street' => $faker->streetName,
                 'number' => $faker->randomDigit,
                 'zipcode' => $faker->postcode,
                 'complement'=> $faker->word
