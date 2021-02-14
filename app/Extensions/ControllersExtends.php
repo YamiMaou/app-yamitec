@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Input;
 //
 use App\Models\Audit;
 
+use function GuzzleHttp\json_encode;
+
 abstract class ControllersExtends extends Controller implements ControllersInterface
 {
     private $model = null;
@@ -23,7 +25,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function __construct($model = null, $template = null, $isApi = true)
     {
-        $this->model = $model;
+        $this->model = new $model;
         $this->template = $template;
         $this->isApi = $isApi;
     }
@@ -36,9 +38,16 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         if ($this->model === null || $this->template === null) {
             return response()->json(["message" => "parametros incorretos", "error" => "é necessário informar o Model e o Diretório de template do módulo para continuar."], 500);
         }
-        $data = $this->model::paginate($request->pageSize)->withQueryString();
+        $data = $this->model->paginate($request->pageSize)->withQueryString();
         if(count($params) > 0){
-            $data = $this->model::where($params)->paginate($request->pageSize);
+            $createdAt = $params['created_at'] ?? '';
+            unset($params['created_at']);
+            $data = $this->model->where($params)->where(function($query) use($createdAt){
+                if(strlen($createdAt) > 8){
+                    $query->where('created_at','like', $createdAt.'%');
+                }
+            })->paginate($request->pageSize);
+            //echo $data->toSql();
         }
 
         
@@ -52,15 +61,15 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function edit($id)
     {
-        $data = $this->model::where("id", $id)->first();
+        $data = $this->model->where("id", $id)->first();
         return $this->isApi ? $data : view("{$this->template}.edit", ["data" => $data]);
     }
 
     public function show(Request $request, $id, $with = [])
     {
-        $data = $this->model::where("id", $id)->first();
+        $data = $this->model->where("id", $id)->first();
         if (count($with) > 0) {
-            $data = $this->model::with($with)->where("id", $id)->first();
+            $data = $this->model->with($with)->where("id", $id)->first();
         }
         return $this->isApi ? $data : view("{$this->template}.details", ["data" => $data]);
     }
@@ -80,16 +89,16 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 $primary = null;
                 foreach ($this->with["data"] as $model => $fields) {
                     if ($i == 0) {
-                        $primary = $this->model::create($fields);
+                        $primary = $this->model->create($fields);
                         $i++;
                         continue;
                     }
                     $i++;
                     $fields[$this->with["changes"]->key] = $primary->id;
-                    $model::create($fields);
+                    $model->create($fields);
                 }
             } else {
-                $this->model::create($data);
+                $this->model->create($data);
             }
             return response()->json(["type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch (Exception $error) {
@@ -122,11 +131,11 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             if (count($this->with) > 0) {
                 $i = 0;
                 foreach ($this->with["data"] as $model => $fields) {
-                    $model::where($i == 0 ? 'id' : $this->with["changes"]->key, $id)->update($fields);
+                    $model->where($i == 0 ? 'id' : $this->with["changes"]->key, $id)->update($fields);
                     $i++;
                 }
             } else {
-                $this->model::where('id', $id)->update($data);
+                $this->model->where('id', $id)->update($data);
             }
            
             return response()->json(["type" => "update", "message" => "Atualizado com Sucesso!"]);
@@ -139,7 +148,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     {
         $this->saveLog($id, $request);
         try {
-            $this->model::destroy($id);
+            $this->model->destroy($id);
             $break = isset($_COOKIE['url']) ? $_COOKIE['url'] : "/home";
             $break = str_replace(['https', 'http', '://'], '', $break);
             $break = explode("/", $break);
@@ -161,7 +170,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function saveLog($id, $request){
         $data =  $request->all();
-        $olderData = $this->model::where('id', $id )->first();
+        $olderData = $this->model->where('id', $id )->first();
         $to = json_encode($olderData);
         $from = json_encode($olderData);
         $audit = new Audit();

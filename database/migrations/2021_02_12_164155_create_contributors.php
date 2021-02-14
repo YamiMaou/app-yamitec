@@ -23,6 +23,7 @@ class CreateContributors extends Migration
             $table->integer('active');
             $table->string('username');
             $table->string('name');
+            $table->string('cpf');
             $table->string('function');
             $table->text('address');
             $table->text('social');
