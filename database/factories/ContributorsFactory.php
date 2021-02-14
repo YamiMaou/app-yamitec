@@ -14,6 +14,7 @@ $factory->define(Contributors::class, function (Faker $faker) {
             'active' => $faker->numberBetween(0,1),
             'username' => $faker->userName,
             'name' => $faker->name,
+            'cpf' => $faker->numberBetween(40000000000,99999999999),
             'function' => $faker->word,
             'address' => json_encode([
                 'city' => $faker->city,
