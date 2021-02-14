@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class Contributors extends Seeder
+class ContributorsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,6 +12,6 @@ class Contributors extends Seeder
     public function run()
     {
         //
-        factory(App\Models\Post::class, 50)->create();
+        factory(App\Models\Contributors::class, 50)->create();
     }
 }
