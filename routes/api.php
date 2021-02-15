@@ -41,16 +41,20 @@ Route::post('/contributors', 'Api\ContributorsController@store')
     ->middleware(['auth:api', 'scope:view-posts']);
 
 // PROVIDERS
-Route::get('/providers', 'Api\ProvidersController@index')
-    ->middleware(['auth:api', 'scope:view-posts']);
+Route::resource('/providers', 'Api\ProvidersController@')->middleware(['auth:api', 'scope:view-posts']);
 
+// CONTRACT
+Route::resource('/contracts', 'Api\ContractController')->middleware(['auth:api', 'scope:view-posts']);
+
+// PROVIDER_FILES
+Route::resource('/provider/files', 'Api\ProviderFilesController')->middleware(['auth:api', 'scope:view-posts']);
+
+/** teste */
 Route::post('/providers/active', 'Api\ProvidersController@activate')
     ->middleware(['auth:api', 'scope:view-posts']);
 /** teste */
 Route::get('/providers/getname', 'Api\ProvidersController@getManagerNameOfProvider')
     ->middleware(['auth:api', 'scope:view-posts']);
-
-
 /** teste */
 Route::get('/managers/get', 'Api\ManagersController@getAll')
     ->middleware(['auth:api', 'scope:view-posts']);

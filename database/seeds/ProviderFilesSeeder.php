@@ -12,6 +12,6 @@ class ProviderFilesSeeder extends Seeder
     public function run()
     {
         //
-        factory(App\Models\ProviderFiles::class, 50)->create();
+        factory(App\Models\ProviderFiles::class, 7)->create();
     }
 }
