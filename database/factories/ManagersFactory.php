@@ -3,34 +3,29 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\Manager;
+use App\User;
 use Faker\Generator as Faker;
 
 $factory->define(Manager::class, function (Faker $faker) {
         return [
             'active' => $faker->numberBetween(0,1),
-            'type' => $faker->word,
-            'cpf' => $faker->word,
+            'cpf' => $faker->numerify('###########'),
             'name' => $faker->firstName(),
             'role' => $faker->word,
             'address' => json_encode([
+                'zipcode' => $faker->postcode,
                 'city' => $faker->city,
                 'state' => $faker->state,
                 'street' => $faker->streetName,
-                'number' => $faker->randomDigit,
-                'zipcode' => $faker->postcode,
                 'complement'=> $faker->word
             ]),
             'contact' => json_encode([
-                'facebook' => $faker->username,
                 'linkedin' => $faker->username,
+                'facebook' => $faker->username,
                 'instagram' => $faker->username,
             ]),
-            'drugstore_group' => $faker->company,
-            'drugstore' => $faker->company,
-            'phone' => $faker->phoneNumber,
-            'email' => $faker->email,
-            'type' => $faker->word,
-            'condition' => $faker->word,
-            'user' => $faker->word,
+            'user_id' => function () {
+                return factory(User::class)->create()->id;
+            }
     ];
 });

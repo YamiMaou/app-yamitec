@@ -13,10 +13,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PostsTableSeeder::class,
-            ManagersSeeder::class,
             ProvidersSeeder::class,
+            ManagersSeeder::class,
             Contributors::class,
-            ProviderFilesSeeder::class  
+            ProviderFilesSeeder::class,
+            ContractsSeeder::class  
         ]);
         //$this->call(PostsTableSeeder::class);
     }

@@ -16,12 +16,11 @@ class Manager extends Model
         'role',
         'address',
         'contact',
-        'drugstore_group',
-        'drugstore',
-        'address',
-        'email',
-        'type',
-        'condition',
-        'user'
+        'user_id'
     ];
+
+    public function providers()
+    {
+        return $this->hasMany(Provider::class);
+    }
 }

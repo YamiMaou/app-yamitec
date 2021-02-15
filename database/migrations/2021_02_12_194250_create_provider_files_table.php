@@ -16,13 +16,15 @@ class CreateProviderFilesTable extends Migration
         Schema::create('provider_files', function (Blueprint $table) {
             $table->id();
 
-            $table->text('path');
-            $table->text('name');
+            $table->string('title', 100);
+            $table->string('path');
+            $table->string('name');
 
-            $table->unsignedBigInteger('provider_id');
-            $table->foreign('provider_id')
-            ->references('id')->on('providers')
-            ->onDelete('cascade');
+            $table->unsignedBigInteger('provider_id'); // ID forecedor
+            $table->unsignedBigInteger('user_id'); // ID do usuário que executou operações em arquivo
+
+            $table->foreign('provider_id')->references('id')->on('providers')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });

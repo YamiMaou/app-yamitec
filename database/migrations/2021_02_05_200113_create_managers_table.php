@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Migration que cria o responsável pela farmácia
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,19 +20,15 @@ class CreateManagersTable extends Migration
         Schema::create('managers', function (Blueprint $table) {
             $table->id();
 
-            $table->boolean('active')->default(true);
-            $table->string('cpf', 14)->nullable();
-            $table->string('name', 50)->nullable();
-            $table->string('role', 50)->nullable();
+            $table->tinyInteger('active')->default(1);
+            $table->string('cpf', 14)->unique();
+            $table->string('name', 50);
+            $table->string('role', 50);
             $table->longText('address');
             $table->longText('contact');
-            $table->text('drugstore_group');
-            $table->longText('drugstore');
-            $table->text('phone');
-            $table->string('email', 50);
-            $table->string('type', 50);
-            $table->string('condition', 50);
-            $table->string('user', 50);
+            
+            $table->unsignedBigInteger('user_id'); // ID do usuário que executou o cadastro do responsável
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });

@@ -4,16 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProviderFiles extends Model
+class Contract extends Model
 {
-    protected $table = "provider_files";
+    protected $table = "contracts";
 
     protected $fillable = [
         'title',
-        'path',
-        'name',
+        'value',
         'provider_id',
-        'user_id'
     ];
 
     public function provider()
