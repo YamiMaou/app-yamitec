@@ -35,7 +35,12 @@ class Provider extends Model
 
     public function managers()
     {
-        return $this->belongsToMany(Manager::class);
+        return $this->belongsToMany(
+            Manager::class,
+            'manager_providers',
+            'provider_id',
+            'manager_id'
+        );
     }
 
     public function matriz()

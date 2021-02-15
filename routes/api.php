@@ -46,3 +46,11 @@ Route::get('/providers', 'Api\ProvidersController@index')
 
 Route::post('/providers/active', 'Api\ProvidersController@activate')
     ->middleware(['auth:api', 'scope:view-posts']);
+/** teste */
+Route::get('/providers/getname', 'Api\ProvidersController@getManagerNameOfProvider')
+    ->middleware(['auth:api', 'scope:view-posts']);
+
+
+/** teste */
+Route::get('/managers/get', 'Api\ManagersController@getAll')
+    ->middleware(['auth:api', 'scope:view-posts']);

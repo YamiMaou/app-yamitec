@@ -12,4 +12,10 @@ class ProvidersController extends ControllersExtends
     {
         parent::__construct(Provider::class, 'home');
     }
+
+    public function getAll()
+    {
+        $provider = Provider::find(201)->first();
+        return ['manager_list' => $provider];
+    }
 }

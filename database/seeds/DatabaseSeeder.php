@@ -15,9 +15,11 @@ class DatabaseSeeder extends Seeder
             PostsTableSeeder::class,
             ProvidersSeeder::class,
             ManagersSeeder::class,
-            Contributors::class,
+            ContributorsTableSeeder::class,
             ProviderFilesSeeder::class,
-            ContractsSeeder::class  
+            ContractsSeeder::class,
+            ContractsSeeder::class,
+            ManagerProvidersSeeder::class  
         ]);
         //$this->call(PostsTableSeeder::class);
     }

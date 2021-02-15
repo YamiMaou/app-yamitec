@@ -40,4 +40,12 @@ class ProvidersController extends ControllersExtends
             return response()->json(["message" => "Erro: Não foi possível efeturar a operação", "error" => $error->getMessage(), 500]);
         }
     }
+
+    // TESTE
+    public function getManagerNameOfProvider()
+    {
+        $manager = Provider::find(201)->managers;
+
+        return ['manager_name' => $manager[0]->name];
+    }
 }

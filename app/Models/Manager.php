@@ -21,6 +21,11 @@ class Manager extends Model
 
     public function providers()
     {
-        return $this->hasMany(Provider::class);
+        return $this->belongsToMany(
+            Provider::class,
+            'manager_providers',
+            'manager_id',
+            'provider_id'
+        );
     }
 }
