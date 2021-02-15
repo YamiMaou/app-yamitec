@@ -76,12 +76,19 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function store(Request $request)
     {
+        echo "<pre>";
+        var_dump($request->all());
+        exit;
+
         if (count($this->validate) > 0) {
             $request->validate($this->validate);
         }
 
         try {
             $data = $request->all();
+            $data['user_id'] = $request->user()->id;
+            $data['username'] = $request->user()->email;
+           
             unset($data["_token"]);
             unset($data["_method"]);
             if (count($this->with) > 0) {
