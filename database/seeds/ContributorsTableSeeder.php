@@ -12,6 +12,6 @@ class ContributorsTableSeeder extends Seeder
     public function run()
     {
         //
-        factory(App\Models\Contributors::class, 50)->create();
+        factory(App\Models\Contributors::class, 7)->create();
     }
 }

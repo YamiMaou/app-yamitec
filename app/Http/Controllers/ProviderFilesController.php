@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Contract;
 use App\Extensions\ControllersExtends;
+use App\Models\ProviderFiles;
 
-class ContractController extends ControllersExtends
+class ProviderFilesController extends ControllersExtends
 {
     public function __construct()
     {
-        parent::__construct(Contract::class, 'home');
+        parent::__construct(ProviderFiles::class, 'home');
     }
 }

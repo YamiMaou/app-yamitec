@@ -12,6 +12,6 @@ class ManagerProvidersSeeder extends Seeder
     public function run()
     {
         //
-        factory(App\Models\ManagerProvider::class, 50)->create();
+        factory(App\Models\ManagerProvider::class, 7)->create();
     }
 }

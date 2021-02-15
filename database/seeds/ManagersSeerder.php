@@ -12,6 +12,6 @@ class ManagersSeeder extends Seeder
     public function run()
     {
         //
-        factory(App\Models\Manager::class, 50)->create();
+        factory(App\Models\Manager::class, 7)->create();
     }
 }
