@@ -15,7 +15,9 @@ class Contributors extends Model
         'name',
         'function',
         'address',
-        'social'
+        'contact',
+        'anexo',
+        'birthdate'
     ];
 
 }

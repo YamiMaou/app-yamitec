@@ -88,7 +88,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $data = $request->all();
             $data['user_id'] = $request->user()->id;
             $data['username'] = $request->user()->email;
-           
+            
             unset($data["_token"]);
             unset($data["_method"]);
             if (count($this->with) > 0) {

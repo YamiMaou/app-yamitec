@@ -14,6 +14,8 @@ $factory->define(Contributors::class, function (Faker $faker) {
             'active' => $faker->numberBetween(0,1),
             'username' => $faker->userName,
             'name' => $faker->name,
+            'birthdate' => $faker->date(),
+            'anexo' => $faker->numberBetween(1,50),
             'cpf' => $faker->numberBetween(40000000000,99999999999),
             'function' => $faker->word,
             'address' => json_encode([
@@ -23,7 +25,7 @@ $factory->define(Contributors::class, function (Faker $faker) {
                 'cep' => $faker->postcode,
                 'complement'=> $faker->word
             ]),
-            'social' => json_encode([
+            'contact' => json_encode([
                 'facebook' => $faker->username,
                 'linkedin' => $faker->username,
                 'instagram' => $faker->username,

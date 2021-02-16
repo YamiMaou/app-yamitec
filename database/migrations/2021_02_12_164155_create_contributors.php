@@ -26,8 +26,9 @@ class CreateContributors extends Migration
             $table->string('cpf');
             $table->string('function');
             $table->text('address');
-            $table->text('social');
-
+            $table->text('contact');
+            $table->text('birthdate')->default(date('Y-m-d'));
+            $table->integer('anexo')->nullable();
             $table->timestamps();
         });
     }
