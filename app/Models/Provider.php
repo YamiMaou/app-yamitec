@@ -43,6 +43,16 @@ class Provider extends Model
         );
     }
 
+    public function clients()
+    {
+        return $this->belongsToMany(
+            Client::class,
+            'client_providers',
+            'provider_id',
+            'client_id'
+        );
+    }
+
     public function matriz()
     {
         return $this->hasMany(Provider::class, 'filial_id');
