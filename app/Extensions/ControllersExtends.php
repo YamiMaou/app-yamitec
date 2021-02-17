@@ -76,9 +76,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function store(Request $request)
     {
-        echo "<pre>";
+        /*echo "<pre>";
         var_dump($request->all());
-        exit;
+        exit;*/
 
         if (count($this->validate) > 0) {
             $request->validate($this->validate);
@@ -88,7 +88,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $data = $request->all();
             $data['user_id'] = $request->user()->id;
             $data['username'] = $request->user()->email;
-           
+            
             unset($data["_token"]);
             unset($data["_method"]);
             if (count($this->with) > 0) {
@@ -107,9 +107,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             } else {
                 $this->model->create($data);
             }
-            return response()->json(["type" => "store", "message" => "Cadastrado com Sucesso!"]);
+            return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch (Exception $error) {
-            return response()->json(["type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 500);
+            return response()->json(["success"=> true, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
     }
 
