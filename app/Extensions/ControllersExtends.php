@@ -32,6 +32,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function index(Request $request)
     {
+        //return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => "problema ao cadastrarr"], 503);
         $params = $request->all();
         unset($params['page']);
         unset($params['pageSize']);
