@@ -27,7 +27,7 @@ class CreateContributors extends Migration
             $table->string('function');
             $table->text('address');
             $table->text('contact');
-            $table->text('birthdate')->default(date('Y-m-d'));
+            $table->date('birthdate')->default(date('Y-m-d'));
             $table->integer('anexo')->nullable();
             $table->timestamps();
         });
