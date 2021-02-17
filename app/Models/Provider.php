@@ -53,4 +53,9 @@ class Provider extends Model
         return $this->belongsTo(Provider::class, 'filial_id');
     }
 
+    public function files()
+    {
+        return $this->hasMany(Files::class);
+    }
+
 }

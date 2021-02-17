@@ -28,4 +28,9 @@ class Manager extends Model
             'provider_id'
         );
     }
+
+    public function files()
+    {
+        return $this->hasMany(Files::class);
+    }
 }
