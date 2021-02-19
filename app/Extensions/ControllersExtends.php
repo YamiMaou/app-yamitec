@@ -32,8 +32,8 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function index(Request $request)
     {
-        //return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => "problema ao cadastrarr"], 503);
         $params = $request->all();
+        unset($params['queryType']);
         unset($params['page']);
         unset($params['pageSize']);
         if ($this->model === null || $this->template === null) {
@@ -45,9 +45,18 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         if(count($params) > 0){
             $createdAt = $params['created_at'] ?? '';
             unset($params['created_at']);
-            $data = $this->model->where($params)->where(function($query) use($createdAt){
+            $data = $this->model->where(function($query) use($createdAt){
                 if(strlen($createdAt) > 8){
                     $query->where('created_at','like', $createdAt.'%');
+                }
+            })->where(function($query) use($params, $request){
+                foreach($params as $k=>$v){
+                    if($request->queryType == "like"){
+                        $query->where($k,'like', '%'.$v.'%');
+                    }else{
+                        $query->where($k,'=', $v);
+                    }
+                   
                 }
             })->paginate($request->pageSize);
             //echo $data->toSql();
@@ -112,7 +121,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             }
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch (Exception $error) {
-            return response()->json(["success"=> true, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
     }
 
@@ -148,9 +157,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 $this->model->where('id', $id)->update($data);
             }
            
-            return response()->json(["type" => "update", "message" => "Atualizado com Sucesso!"]);
+            return response()->json(["success"=> true,"type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch (Exception $error) {
-            return response()->json(["type" => "error", "message" => "Problema ao Atualizar.", "error" => $error->getMessage()], 500);
+            return response()->json(["success"=> false,"type" => "error", "message" => "Problema ao Atualizar.", "error" => $error->getMessage(), "trace" => $error->getTraceAsString()], 500);
         }
     }
 
