@@ -35,12 +35,11 @@ class EditContributors extends Component {
             this.props.setSnackbar({ open: false, message: "" });
         };
         const flexBasis = '30%';
-        const request = async (data) => {
+        const request = async (state, data) => {
 
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
-
-            if (data.address) data.address = JSON.stringify(data.address);
-            if (data.contact) data.contact = JSON.stringify(data.contact);
+            if (data.address) data.address = JSON.stringify(Object.assign(JSON.parse(state.address),data.address));
+            if (data.contact) data.contact = JSON.stringify(Object.assign(JSON.parse(state.contact),data.contact));
             if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await putApiContributors(this.props.match.params.id, data);
             //console.log(response);
@@ -165,7 +164,7 @@ class EditContributors extends Component {
                 </AppBar>
                 {
                     <LForms forms={forms}
-                        request={request}
+                        request={(data) => {request(this.state.contributor,data)}}
                         validate={(values) => { return validateFields(forms, values) }}
                     />
                 }
