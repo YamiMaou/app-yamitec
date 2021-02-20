@@ -1,0 +1,152 @@
+import axios from 'axios';
+
+let hostname = window === undefined ? "yamitec.yamitec.com" : window.location.hostname;
+let apiHost = ""
+hostname = "/api";
+apiHost = hostname; //"http://localhost:8000/api"
+apiHost = "http://localhost:8000/api"
+
+let token = localStorage.getItem("token");
+export const Api = () => {
+  return axios.create({
+    baseURL: apiHost,
+  }).get("/");
+}
+
+/// COMON METHODS
+
+export const JWT_Decode = (token) => {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(jsonPayload);
+}
+/// Lower Keys from object
+function lower(obj) {
+  for (let prop in obj) {
+    console.log(prop)
+    if (obj[prop] !== "type")
+      continue;
+    obj[prop.toLowerCase()] = obj[prop];
+  }
+  return obj;
+}
+/// new API METHOD
+/// Auth API Methods
+
+export const postAuth = async (params = {}) => {
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: params,
+    url: apiHost + '/login',
+  };
+  try {
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  }
+};
+/// list products
+export const getApiContributors = async (params = '',id = undefined) => {
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/contributors/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwib3JnYW5pemF0aW9uX2lkIjoxLCJpYXQiOjE2MTIzMDIyNTYsImV4cCI6MTYxMjkwNzA1Nn0.mnNuXdmqF487x_K4zfOkhhrkdJ6rwLB61NaSPhGZyJo'//localStorage.getItem('token')
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+/// create products
+export const postApiContributors = async (params = {}) => {
+  /*var formBody = [];
+  for (var property in params) {
+    var encodedKey = encodeURIComponent(property);
+    var encodedValue = encodeURIComponent(JSON.stringify(params[property]));
+    formBody.push(encodedKey + "=" + encodedValue);
+  }
+  let data = formBody.join("&");*/
+
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  const options = {
+    method: 'POST',
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Accept': '*/*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost + '/contributors',
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+/// update products
+export const putApiContributors = async (id,params = {}) => {
+  params.justification = "Update";
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  const options = {
+    method: 'PUT',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Accept': '*/*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost +  `/contributors/${id}`,
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+// get address ViaCep
+export const getAddressByCepla = async (params = '') => {
+  if (params.length >= 8) {
+    const data = Object.entries(params)
+      .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+      .join('&');
+    const options = {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      data,
+      url: `http://cep.la/${params}`,
+    };
+    const response = await axios(options);  // wrap in async function
+    console.log(response.data);
+    return response;
+  }
+}
