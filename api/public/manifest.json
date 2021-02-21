@@ -1,0 +1,15 @@
+{
+  "display": "standalone",
+  "lang": "en",
+  "name": "Farmácia Fácil",
+  "short_name": "Farmácia Fácil",
+  "start_url": "/?utm_source=web_app_manifest",
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "http://play.google.com/store/apps/details?id=com.yamitec.erp_client",
+      "id": "com.yamitec.erp_client"
+    }
+  ],
+  "prefer_related_applications": true
+}

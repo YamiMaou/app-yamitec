@@ -1,0 +1,14 @@
+{
+  "files": {
+    "app.js": "/static/js/bundle.js",
+    "app.js.map": "/static/js/bundle.js.map",
+    "fonts/FontAwesome.ttf": "/./fonts/FontAwesome.ttf",
+    "index.html": "/index.html",
+    "manifest.json": "/manifest.json",
+    "static/media/empty_box.png": "/static/media/empty_box.c879cb18.png",
+    "static/media/logo.png": "/static/media/logo.50030955.png"
+  },
+  "entrypoints": [
+    "static/js/bundle.js"
+  ]
+}
