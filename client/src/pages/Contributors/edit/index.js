@@ -47,7 +47,7 @@ class EditContributors extends Component {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
-                this.props.setSnackbar({ open: true, message: "Problema ao Cadastrar" });
+                this.props.setSnackbar({ open: true, message: "Problema ao Atualizar" });
             }
 
         }
