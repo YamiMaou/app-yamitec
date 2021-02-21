@@ -100,7 +100,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         try {
             $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
             $files = new FilesController();
-            $files = $files->multUpload($request, $modelName, 0);
+            $files = $files->multUpload($request, $modelName);
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
             $data['username'] = $request->user()->email;

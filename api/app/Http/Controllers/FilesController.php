@@ -61,7 +61,7 @@ class FilesController extends Controller
         }
     }
 
-    public function multUpload(Request $request, $model, $id)
+    public function multUpload(Request $request, $model, $id = 0)
     {
         try {
             $lrequest = [];
