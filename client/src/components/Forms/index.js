@@ -63,6 +63,36 @@ function TextMaskCustom(props) {
     );
 }
 
+// File Input
+const FileInput = (props) => {
+    const [value, setValue] = useState(props.value ?? undefined);
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(value)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        
+        props.onChange({target: {id, value: e.target.files[0], type: 'file'}})
+        setValue(e.target.value);
+    }
+    return (
+        <FormControl>
+            <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
+                {props.label}
+                <input type="file" hidden
+                    onChange={handleChange}
+                    onBlur={handleChange}
+                    name={props.id}
+                    id={props.id}
+                />
+            </Button>
+        </FormControl>)
+}
 //
 function TextInputCustom(props) {
     const { inputRef, ...other } = props;
@@ -82,7 +112,7 @@ function TextInputCustom(props) {
             }
         }
         props.onChange(e)
-        
+
     }
     //console.log(value);
     if (props.mask === undefined)
@@ -130,7 +160,7 @@ const DateInput = (props) => {
     const [error, setError] = useState(false);
     function handleChange(value) {
         try {
-            let e = {target: {id: props.id, value: `${value.toJSON().split('T')[0]}` }}
+            let e = { target: { id: props.id, value: `${value.toJSON().split('T')[0]}` } }
             if (props.validate !== undefined) {
                 if (props.validate(value)) {
                     setError(false);
@@ -223,7 +253,7 @@ class LForms extends Component {
                 formValidate[input.column] = input.value ?? '';
             });
         });
-        this.setState({ ...this.state, inputVal: inputValues, formValidate  });
+        this.setState({ ...this.state, inputVal: inputValues, formValidate });
 
         //console.log(this.state)
     }
@@ -240,11 +270,11 @@ class LForms extends Component {
                 value = value.replace(/[^\d]+/g, '');
             }
 
-            if (value.length == 0 || value == '' || value == 'Todos') {
+            if (e.target.type !== "file" && (value.length == 0 || value == '' || value == 'Todos')) {
                 if (params.json === undefined) {
                     inputValues[id] = ''
                 } else {
-                    if(inputValues[params.json] == undefined){
+                    if (inputValues[params.json] == undefined) {
                         inputValues[params.json] = {};
                     }
                     inputValues[params.json][id] = '';
@@ -266,14 +296,14 @@ class LForms extends Component {
                 if (params.json === undefined) {
                     inputValues[id] = value
                 } else {
-                    if(inputValues[params.json] == undefined){
+                    if (inputValues[params.json] == undefined) {
                         inputValues[params.json] = {};
                     }
                     inputValues[params.json][id] = value;
                 }
             }
             formValidate[id] = value;
-            this.setState({ ...this.state, inputVal: inputValues, formValidate  });
+            this.setState({ ...this.state, inputVal: inputValues, formValidate });
             console.log(this.state.inputVal);
         }
 
@@ -323,21 +353,17 @@ class LForms extends Component {
                                                         return (<SelectInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
-                                                            <FormControl key={`input-${ind1}`} >
-                                                                <Button style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 , fontSize: '.6em'}} variant="outlined" component="label" endIcon={ <Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                                                                    {input.label} 
-                                                                <input type="file" hidden
-                                                                        onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
-                                                                        onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
-                                                                        name={input.column}
-                                                                        id={input.column}
-                                                                    />
-                                                                </Button>
-                                                            </FormControl>
+                                                            <FileInput key={`input-${ind1}`}
+                                                                style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
+                                                                onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                                onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                                label={input.label}
+                                                                id={input.column}
+                                                            />
                                                         )
-                                                    }else{
-                                                        return <TextInputCustom key={`input-${ind1}`} 
-                                                            id={input.column} 
+                                                    } else {
+                                                        return <TextInputCustom key={`input-${ind1}`}
+                                                            id={input.column}
                                                             type={input.type}
                                                             value={input.value}
                                                             style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }}
@@ -356,7 +382,7 @@ class LForms extends Component {
                             </div>
                         )
                     })
-                    
+
                 }
                 <Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
                     if (this.props.validate === undefined) {

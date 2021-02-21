@@ -110,15 +110,20 @@ export const postApiContributors = async (params = {}) => {
 /// update products
 export const putApiContributors = async (id,params = {}) => {
   params.justification = "Update";
-  const data = Object.entries(params)
-    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
-    .join('&');
+  const data = new FormData();
+  data.append("_method", "put");
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, val);
+      //`${key}=${encodeURIComponent(val)}`
+    });
+    //.join('&');
+    
   const options = {
-    method: 'PUT',
+    method: 'POST',
     //mode: 'cors', // pode ser cors ou basic(default)
     headers: {
-      'Accept': '*/*',
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'multipart/form-data',
       'Authorization': 'Bearer ' + token
     },
     data,
