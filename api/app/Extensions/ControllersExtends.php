@@ -35,6 +35,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     {
         $params = $request->all();
         unset($params['queryType']);
+        unset($params['withId']);
         unset($params['page']);
         unset($params['pageSize']);
         if ($this->model === null || $this->template === null) {
@@ -53,7 +54,11 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             })->where(function($query) use($params, $request){
                 foreach($params as $k=>$v){
                     if($request->queryType == "like"){
-                        $query->where($k,'like', '%'.$v.'%');
+                        if($k == $request->withId){
+                            $query->where([$k,'like', '%'.$v.'%'],['id','like', '%'.$v.'%']);
+                        }else{
+                            $query->where($k,'like', '%'.$v.'%');
+                        }
                     }else{
                         $query->where($k,'=', $v);
                     }

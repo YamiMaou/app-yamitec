@@ -149,7 +149,7 @@ class LDataGrid extends Component {
             }
             
         });
-        let query = Object.assign({queryType : 'like'}, cleanfilters);
+        let query = Object.assign({queryType : 'like', withId: "name"}, cleanfilters);
         console.log(query);
         const data = await this.props.pageRequest(query);
         if (data !== undefined) {
@@ -196,8 +196,8 @@ class LDataGrid extends Component {
                 if (e.target.id == 'created_at') {
                     value = `${value.toJSON().split('T')[0]}`
                 }
-                if (e.target.id == 'cpf') {
-                    //console.log(validaCpf(value))
+                if (e.target.id == 'nome') {
+                    //filters["withId"] = "name"
                 }
                 if (idNumbers.includes(e.target.id)) {
                     value = value.replace(/[^\d]+/g, '');

@@ -4,7 +4,7 @@ let hostname = window === undefined ? "yamitec.yamitec.com" : window.location.ho
 let apiHost = ""
 hostname = "/api";
 apiHost = hostname; //"http://localhost:8000/api"
-apiHost = "http://localhost:8000/api"
+//apiHost = "http://localhost:8000/api"
 
 let token = localStorage.getItem("token");
 export const Api = () => {
@@ -76,23 +76,19 @@ export const getApiContributors = async (params = '',id = undefined) => {
 }
 /// create products
 export const postApiContributors = async (params = {}) => {
-  /*var formBody = [];
-  for (var property in params) {
-    var encodedKey = encodeURIComponent(property);
-    var encodedValue = encodeURIComponent(JSON.stringify(params[property]));
-    formBody.push(encodedKey + "=" + encodedValue);
-  }
-  let data = formBody.join("&");*/
-
-  const data = Object.entries(params)
-    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
-    .join('&');
+  const data = new FormData();
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, val);
+      //`${key}=${encodeURIComponent(val)}`
+    });
+    //.join('&');
+    
   const options = {
     method: 'POST',
-    mode: 'cors', // pode ser cors ou basic(default)
+    //mode: 'cors', // pode ser cors ou basic(default)
     headers: {
-      'Accept': '*/*',
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'multipart/form-data',
       'Authorization': 'Bearer ' + token
     },
     data,
