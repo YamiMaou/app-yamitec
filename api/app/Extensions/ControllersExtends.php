@@ -54,16 +54,14 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             })->where(function($query) use($params, $request){
                 foreach($params as $k=>$v){
                     if($request->queryType == "like"){
-                        /*if($k == $request->withId){
-                            $query->where([$k,'like', '%'.$v.'%'],['id','like', '%'.$v.'%']);
+                        if($k == $request->withId){
+                            $query->where([[$k,'like', '%'.$v.'%'],['id','like', '%'.$v.'%']]);
                         }else{
-                           
-                        }*/
-                        $query->where($k,'like', '%'.$v.'%');
+                            $query->where($k,'like', '%'.$v.'%');
+                        }
                     }else{
                         $query->where($k,'=', $v);
                     }
-                   
                 }
             })->paginate($request->pageSize);
             //echo $data->toSql();

@@ -51,7 +51,15 @@ class CreateContributors extends Component {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
-                this.props.setSnackbar({ open: true, message: "Problema ao Cadastrar" });
+                let {errors} = response.data.error.response.data
+                let message = '';
+                console.log(errors)
+                Object.keys(errors).map(err => {
+                    console.log(err);
+                    message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
+                })
+                //response.data.error.response.data.errors
+                this.props.setSnackbar({ open: true, message});
             }
 
         }
@@ -100,7 +108,7 @@ class CreateContributors extends Component {
                 fields: [
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', flexBasis, style:{maxWidth: '160px'} },
+                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '160px'} },
                     { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '160px'} },
                     {
                         column: 'function', label: 'Função', type: 'select',

@@ -4,7 +4,7 @@ let hostname = window === undefined ? "yamitec.yamitec.com" : window.location.ho
 let apiHost = ""
 hostname = "/api";
 apiHost = hostname; //"http://localhost:8000/api"
-//apiHost = "http://localhost:8000/api"
+apiHost = "http://localhost:8000/api"
 
 let token = localStorage.getItem("token");
 export const Api = () => {
@@ -99,7 +99,7 @@ export const postApiContributors = async (params = {}) => {
     return response;
   } catch (error) {
     console.log('Whoops! Houve um erro.', error.message || error)
-    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+    return { data: { success: false, error ,message: "problema ao se conectar com o servidor!" } }
   }
 }
 
@@ -130,7 +130,7 @@ export const putApiContributors = async (id,params = {}) => {
     return response;
   } catch (error) {
     console.log('Whoops! Houve um erro.', error.message || error)
-    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+    return { data: { success: false, error, message: "problema ao se conectar com o servidor!" } }
   }
 }
 

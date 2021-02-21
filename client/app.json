@@ -12,6 +12,7 @@
     ]
   },
   "web": {
+    "publicPath": "../api/public",
     "name": "Farmácia Fácil",
     "favicon": "https://yamitec.com/latest/images/favicon.ico"
   }

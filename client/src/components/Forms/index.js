@@ -304,7 +304,7 @@ class LForms extends Component {
             }
             formValidate[id] = value;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
-            console.log(this.state.inputVal);
+            //console.log(this.state.inputVal);
         }
 
         const classes = {

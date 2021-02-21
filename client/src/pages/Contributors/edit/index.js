@@ -47,7 +47,15 @@ class EditContributors extends Component {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
-                this.props.setSnackbar({ open: true, message: "Problema ao Atualizar" });
+                let {errors} = response.data.error.response.data
+                let message = '';
+                console.log(errors)
+                Object.keys(errors).map(err => {
+                    console.log(err);
+                    message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
+                })
+                //response.data.error.response.data.errors
+                this.props.setSnackbar({ open: true, message});
             }
 
         }
