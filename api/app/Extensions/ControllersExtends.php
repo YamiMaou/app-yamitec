@@ -125,7 +125,8 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                     $model->create($fields);
                 }
             } else {
-                $this->model->create($data);
+                $obj = $this->model->create($data);
+                //FilesController::upload($request, $this->model, $obj->id);
             }
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch (Exception $error) {
