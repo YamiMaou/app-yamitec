@@ -34,12 +34,8 @@ class CreateContributors extends Component {
             }
             this.props.setSnackbar({ open: false, message: "" });
         };
-
-        const authData = JSON.parse(localStorage.getItem("user"));
-
         const flexBasis = '30%';
         const request = async (data) => {
-
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
 
             data.address = JSON.stringify(data.address);
@@ -101,7 +97,6 @@ class CreateContributors extends Component {
 
                 return campo === undefined ? true : false
         }
-
         const forms = [
             {
                 title: 'Dados Básicos',

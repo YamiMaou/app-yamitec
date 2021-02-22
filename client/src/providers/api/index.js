@@ -3,8 +3,11 @@ import axios from 'axios';
 let hostname = window === undefined ? "yamitec.yamitec.com" : window.location.hostname;
 let apiHost = ""
 hostname = "/api";
-apiHost = hostname; //"http://localhost:8000/api"
-apiHost = "http://localhost:8000/api"
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  apiHost = "http://localhost:8000/api"
+} else {
+  apiHost = hostname;
+}
 
 let token = localStorage.getItem("token");
 export const Api = () => {
