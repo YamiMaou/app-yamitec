@@ -19,11 +19,13 @@ import Snackbar from '@material-ui/core/Snackbar';
 //
 import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
@@ -62,6 +64,33 @@ function TextMaskCustom(props) {
         />
     );
 }
+// CheckBox
+
+const CheckBoxInput = (props) => {
+    const [value, setValue] = useState(props.value ?? false);
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(value)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        
+        props.onChange({target: {id, value: event.target.checked ? 1 : 0, type: 'checkbox'}})
+        setValue(e.target.checked);
+    }
+    return (
+        <div key={`check-${props.id}`} style={{...props.style}}>
+        <FormControlLabel 
+        control={<Checkbox checked={value} disabled={props.disabled ?? false}onChange={handleChange} name={props.id} id={props.id} />}
+        label={props.label}
+      />
+      </div>
+      )
+}
 
 // File Input
 const FileInput = (props) => {
@@ -83,7 +112,7 @@ const FileInput = (props) => {
     return (
         <FormControl>
             <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                {props.label}
+                { value !== undefined ? <b style={{color: 'red'}}> Arquivo Selecionado! </b> : props.label}
                 <input type="file" hidden
                     onChange={handleChange}
                     onBlur={handleChange}
@@ -156,7 +185,7 @@ function TextInputCustom(props) {
 //
 const DateInput = (props) => {
     let valueDate = new Date(props.value)
-    const [value, setValue] = useState(props.value ? valueDate.setDate(valueDate.getDate() + 1) : new Date());
+    const [value, setValue] = useState(props.value ? valueDate.setDate(valueDate.getDate() + 1) : '');
     const [error, setError] = useState(false);
     function handleChange(value) {
         try {
@@ -187,6 +216,7 @@ const DateInput = (props) => {
                 error={error}
                 helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
                 format="dd/MM/yyyy"
+                disableFuture
                 value={value}
                 onChange={handleChange}
                 onBlur={handleChange}
@@ -223,6 +253,7 @@ const SelectInput = (props) => {
                 name={props.name}
                 value={value}
                 error={error}
+                placeholder="Selecione"
                 //helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
                 onChange={handleChange}
                 onBlur={handleChange}
@@ -348,13 +379,26 @@ class LForms extends Component {
 
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "date") {
-                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
                                                         return (<SelectInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
-                                                                style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
+                                                                style={{ ...classes.m5, ...input.style, flexBasis: input.flexBasis, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
+                                                                onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                                onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                                label={input.label}
+                                                                id={input.column}
+                                                            />
+                                                        )
+                                                    }else if (input.type == "checkbox") {
+                                                        return (
+                                                            <CheckBoxInput 
+                                                                key={`input-${ind1}`}
+                                                                disabled={input.disabled ?? false}
+                                                                value={input.value}
+                                                                style={{ ...classes.m5, ...input.style, flexBasis: input.flexBasis, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}

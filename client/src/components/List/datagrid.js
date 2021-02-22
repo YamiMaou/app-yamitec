@@ -7,7 +7,7 @@ import { DataGrid, RowsProp, ColDef } from '@material-ui/data-grid';
 import { setSnackbar } from '../../actions/appActions'
 import { DEFAULT_LOCALE_TEXT } from '../../providers/langs/datagrid'
 //const classes = useStyles();
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
@@ -130,6 +130,19 @@ const SelectInput = (props) => {
             </Select>
         </FormControl>)
 }
+const StyledDataGrid = withStyles({
+    window:  {
+          overflowX: 'hidden'
+      }
+  })(DataGrid);
+  const useStyles = makeStyles(theme => ({
+    root: {
+      "& div.react-grid-Container": {
+        color: "red",
+        // color: theme.palette.text.color
+      }
+    }
+  }));
 class LDataGrid extends Component {
     state = {
         data: [],
@@ -190,7 +203,7 @@ class LDataGrid extends Component {
             if (idNumbers.includes(e.target.id)) {
                 value = value.replace(/[^\d]+/g, '');
             }
-            if (value.length == 0 || e.target.value == 'Todos') {
+            if (value.length == 0 ) {
                 delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {
@@ -215,7 +228,9 @@ class LDataGrid extends Component {
 
             this.setState({...this.state, filters});
         }
-
+        const rows: RowsProp = this.state.data.data ?? [];
+          
+        const columns: ColDef[] = this.props.columns;
         return (
             <div>
                 <Card className={classes.root} style={{ marginBottom: 15 }}>
@@ -276,15 +291,16 @@ class LDataGrid extends Component {
                 </Card>
                 <Card>
                     <CardContent>
-                        <div style={{ height: 300, width: '100%' }}>
-                            <DataGrid rows={this.state.data.data ?? []} columns={this.props.columns}
+                        <div style={{ height: 450, width: '100%' }}>
+                            <StyledDataGrid rows={rows} columns={columns}
+                                columnBuffer={4}
                                 disableClickEventBubbling
                                 disableColumnMenu={true}
                                 loading={this.state.loading}
                                 localeText={DEFAULT_LOCALE_TEXT}
                                 paginationMode="server"
                                 rowCount={this.state.data.total ?? 0}
-                                pageSize={10} rowsPerPageOptions={[10, 20, 50]} pagination
+                                pageSize={10} rowsPerPageOptions={[10]} pagination
                                 onPageSizeChange={(params) => {
                                     //console.log(params);
                                     this.setPage({ page: params.page, pageSize: params.pageSize });

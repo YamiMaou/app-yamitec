@@ -54,10 +54,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             })->where(function($query) use($params, $request){
                 foreach($params as $k=>$v){
                     if($request->queryType == "like"){
+                        $query->where($k,'like', '%'.$v.'%');
                         if($k == $request->withId){
-                            $query->where([[$k,'like', '%'.$v.'%'],['id','like', '%'.$v.'%']]);
-                        }else{
-                            $query->where($k,'like', '%'.$v.'%');
+                            $query->orWhere('id','like', '%'.$v.'%');
                         }
                     }else{
                         $query->where($k,'=', $v);

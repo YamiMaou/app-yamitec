@@ -9,19 +9,76 @@ import HomeIcon from '@material-ui/icons/Home';
 import BlockIcon from '@material-ui/icons/Block';
 import EditIcon from '@material-ui/icons/Edit';
 
+//
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+//
 import Typography from '@material-ui/core/Typography';
 import LDataGrid from '../../components/List/datagrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiContributors } from '../../providers/api'
+import { getApiContributors, putApiContributors } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
 import { IconButton, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
+import { DataGrid, RowsProp, ColDef } from '@material-ui/data-grid';
+
+function BlockDialog(props) {
+    const [open, setOpen] = React.useState(props.open);
+    const [justfy, setjustfy] = React.useState("");
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
+    
+    const send = async () => {
+        await putApiContributors( props.id, {active: 0 ?? undefined, justification: justfy});
+        props.handleClose();
+    }
+    return (
+      <div>
+        <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Justificativa</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Escreva um motivo para o bloqueio do colaborador :
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="jistification"
+              label="Jistificativa"
+              type="text"
+              fullWidth
+              value={justfy}
+              onChange={(e) => {
+                setjustfy(e.target.value)
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={props.handleClose} color="primary">
+              Cancelar
+            </Button>
+            <Button onClick={send} color="primary">
+              Justificar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
+  }
+
 class Contributors extends Component {
     state = {
         contributors: [],
+        blockDialog: {open: false, id: undefined}
     }
     
     async componentDidMount() {
@@ -38,8 +95,8 @@ class Contributors extends Component {
                 height: 140,
             },
         }
-        const rows = this.state.contributors.data ?? [];
-        const columns = [
+        const rows : RowsProp = this.state.contributors.data ?? [];
+        const columns: ColDef[] = [
             { field: 'cpf', headerName: 'Cpf', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return stringCpf(params.value);
@@ -73,8 +130,8 @@ class Contributors extends Component {
                         variant="contained"
                         color="primary"
                         size="small"
-                        onClick={()=> {
-                            console.log(`ID : ${params.value} `)
+                        onClick={async ()=> {
+                            this.setState({...this.state, blockDialog: {open: true, id: params.value}})
                         }}
                         style={{ marginLeft: 16 }}
                       >
@@ -86,7 +143,7 @@ class Contributors extends Component {
         ];
         const flexBasis = '25%';
         const filter = [
-            { column: 'cpf', label: 'Cpf', type: 'text', 
+            { column: 'cpf', label: 'CPF', type: 'text', 
             mask: InputCpf, 
             flexBasis },
             { column: 'name', label: 'Nome', type: 'text', flexBasis },
@@ -127,7 +184,21 @@ class Contributors extends Component {
                     </Toolbar>
                     
                 </AppBar>
-                    <LDataGrid rows={rows} columns={columns} filterInputs={filter} pageRequest={getApiContributors} />
+                    <LDataGrid rows={rows} columns={columns} filterInputs={filter} 
+                    pageRequest={
+                        (params) => {
+                            if(params.active !== undefined){
+                                params.active = params.active == "Ativo" ? 1: 0;
+                            }
+                            return getApiContributors(params)
+                    }} />
+                        <BlockDialog 
+                            open={this.state.blockDialog.open} 
+                            id={this.state.blockDialog.id}
+                            handleClose={() => {
+                                this.setState({...this.state, blockDialog: { open : false, id: undefined }})
+                            }}
+                            />
             </Fragment>
         )
     }

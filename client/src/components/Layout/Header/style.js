@@ -21,13 +21,6 @@ const clientStyles = cliente === null ? [
     ] }
 ] : JSON.parse(cliente.styles_obj);
 export const themeStyle = {
-  MuiDataGrid: {
-    root: {
-      '& .MuiDataGrid-window': {
-        overFlow: 'hidden'
-      }
-    }
-  },
   props: {
     MuiTypography: {
       variantMapping: {

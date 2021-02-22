@@ -17,7 +17,10 @@ import { validaEmail, validaCpf, stringToDate } from '../../../providers/commonM
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
+
+import { withSnackbar  } from 'notistack';
 class CreateContributors extends Component {
+    
     state = {
         contributors: [],
         states: []
@@ -28,23 +31,25 @@ class CreateContributors extends Component {
     }
 
     render() {
+        
+         // to use snackbar Provider
         const closeSnack = (event, reason) => {
             if (reason === 'clickaway') {
                 return;
             }
             this.props.setSnackbar({ open: false, message: "" });
         };
-        const flexBasis = '30%';
+        const flexBasis = '26%';
         const request = async (data) => {
-            this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
-
+            this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
             data.address = JSON.stringify(data.address,null,2);
             data.contact = JSON.stringify(data.contact,null,2);
             data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await postApiContributors(data);
             //console.log(response);
             if (response.data.success) {
-                this.props.setSnackbar({ open: true, message: response.data.message });
+                this.props.enqueueSnackbar( response.data.message, { variant: 'success' });
+                //this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
                 let {errors} = response.data.error.response.data
@@ -55,7 +60,8 @@ class CreateContributors extends Component {
                     message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
                 })
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, message});
+                this.props.enqueueSnackbar( message, { variant: 'error' });
+                //this.props.setSnackbar({ open: true, message});
             }
 
         }
@@ -93,7 +99,7 @@ class CreateContributors extends Component {
                     })
                 })
                 //console.log(campo)
-                campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message }) : '';
+                campo !== undefined ? this.props.enqueueSnackbar( campo.message, {variant: 'error'}) : '';
 
                 return campo === undefined ? true : false
         }
@@ -101,10 +107,10 @@ class CreateContributors extends Component {
             {
                 title: 'Dados Básicos',
                 fields: [
+                    { column: 'active', label: 'Ativo', type: 'checkbox',  value: true, disabled: true, flexBasis : "100%" },
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '160px'} },
-                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '160px'} },
+                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '210px'} },
                     {
                         column: 'function', label: 'Função', type: 'select',
                         values: [
@@ -115,11 +121,11 @@ class CreateContributors extends Component {
                             "Operador de marketing", 
                             "Vendedor"
                         ],
-                        value: "Coordenador de usuários",
-                        flexBasis
+                        //value: "Coordenador de usuários",
+                        flexBasis: '35%', style:{width: '220px'}
                     },
+                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
                     //
-                    { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Ativo", flexBasis },
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]
             },
@@ -138,7 +144,7 @@ class CreateContributors extends Component {
                     {
                         column: 'state', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        value: "São Paulo", flexBasis, flexGrow: 2, style:{minWidth: "192px"}
+                        flexBasis, flexGrow: 2, style:{minWidth: "192px"}
                     },
                     { column: 'city', label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
                 ]
@@ -192,4 +198,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ setSnackbar }, dispatch);
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateContributors))
+export default withSnackbar(withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateContributors)))

@@ -17,6 +17,7 @@ import { validaEmail, validaCpf, stringToaddDate } from '../../../providers/comm
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
+import { withSnackbar  } from 'notistack';
 class EditContributors extends Component {
     state = {
         contributor: undefined,
@@ -37,7 +38,7 @@ class EditContributors extends Component {
         const flexBasis = '30%';
         const request = async (state, data) => {
 
-            this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
+            this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
             let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
             let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
             if (data.address) data.address = address;
@@ -46,7 +47,7 @@ class EditContributors extends Component {
             let response = await putApiContributors(this.props.match.params.id, data);
             //console.log(response);
             if (response.data.success) {
-                this.props.setSnackbar({ open: true, message: response.data.message });
+                this.props.enqueueSnackbar(response.data.message, {variant: 'success'});
                 this.props.history.goBack();
             } else {
                 let {errors} = response.data.error.response.data
@@ -57,7 +58,7 @@ class EditContributors extends Component {
                     message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
                 })
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, message});
+                this.props.enqueueSnackbar(message, {variant: 'error'});
             }
 
         }
@@ -97,7 +98,7 @@ class EditContributors extends Component {
                 })
             })
             //console.log(campo)
-            campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message }) : '';
+            campo !== undefined ?  this.props.enqueueSnackbar( campo.message, {variant: 'error'}) : '';
 
             return campo === undefined ? true : false
         }
@@ -106,10 +107,10 @@ class EditContributors extends Component {
             {
                 title: 'Dados Básicos',
                 fields: [
+                    { column: 'active', label: 'Ativo', type: 'checkbox',  value: this.state.contributor['active'] == 1 ? true : false, disabled: false, flexBasis : "100%" },
                     { column: 'cpf', value: this.state.contributor['cpf'], label: 'CPF', type: 'text', mask: InputCpf, validate: { min: 11, number: true, required: true }, validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     { column: 'name', value: this.state.contributor['name'], label: 'Nome', type: 'text', validate: { max: 50, required: true }, flexBasis },
                     { column: 'birthdate', value: this.state.contributor['birthdate'], label: 'Data de Nascimento', type: 'date', flexBasis, style: { maxWidth: '160px' } },
-                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis: '15%', style: { maxWidth: '160px' } },
                     {
                         column: 'function', label: 'Função', type: 'select',
                         values: [
@@ -123,9 +124,7 @@ class EditContributors extends Component {
                         value: this.state.contributor['function'],
                         flexBasis
                     },
-                    //
-                    { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: this.state.contributor['active'] == 1 ? "Ativo" : "Inativo", flexBasis },
-                    //{ column: 'created_at', label: 'Data', type: 'date' },
+                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
                 ]
             },
             {
@@ -216,4 +215,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ setSnackbar }, dispatch);
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(EditContributors))
+export default withSnackbar(withRouter(connect(mapStateToProps, mapDispatchToProps)(EditContributors)))
