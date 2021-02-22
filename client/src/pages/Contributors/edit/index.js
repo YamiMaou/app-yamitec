@@ -38,8 +38,8 @@ class EditContributors extends Component {
         const request = async (state, data) => {
 
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
-            if (data.address) data.address = Object.assign(JSON.parse(state.address),data.address);
-            if (data.contact) data.contact = Object.assign(JSON.parse(state.contact),data.contact);
+            if (data.address) data.address = Object.assign({},JSON.parse(state.address),data.address);
+            if (data.contact) data.contact = Object.assign({},JSON.parse(state.contact),data.contact);
             if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await putApiContributors(this.props.match.params.id, data);
             //console.log(response);
