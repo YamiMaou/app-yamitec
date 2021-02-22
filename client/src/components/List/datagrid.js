@@ -278,14 +278,6 @@ class LDataGrid extends Component {
                     <CardContent>
                         <div style={{ height: 300, width: '100%' }}>
                             <DataGrid rows={this.state.data.data ?? []} columns={this.props.columns}
-                                className={{
-                                    MuiDataGrid: {
-                                        root: {
-                                          '& .MuiDataGrid-window': {
-                                            overFlow: 'hidden'
-                                        }
-                                    }}
-                                }}
                                 disableClickEventBubbling
                                 disableColumnMenu={true}
                                 loading={this.state.loading}
