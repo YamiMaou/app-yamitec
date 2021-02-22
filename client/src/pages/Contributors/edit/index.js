@@ -38,8 +38,10 @@ class EditContributors extends Component {
         const request = async (state, data) => {
 
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
-            if (data.address) data.address = Object.assign({},JSON.parse(state.address),data.address);
-            if (data.contact) data.contact = Object.assign({},JSON.parse(state.contact),data.contact);
+            let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
+            let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
+            if (data.address) data.address = address;
+            if (data.contact) data.contact = contact
             if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await putApiContributors(this.props.match.params.id, data);
             //console.log(response);
@@ -167,7 +169,7 @@ class EditContributors extends Component {
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Typography variant="h6">
-                        <HomeIcon />  <span>Cadastro / Colaboradores</span>
+                        <HomeIcon />  <span>Editar / Colaboradores</span>
                     </Typography>
                 </AppBar>
                 {

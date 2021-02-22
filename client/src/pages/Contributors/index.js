@@ -60,7 +60,7 @@ class Contributors extends Component {
                 flex: 1,
                 renderCell: (params: ValueFormatterParams) => (
                     <div>
-                    <Link to={`colaboradores/${params.value}`} style={{textDecoration: 'none'}} >
+                    <Link to={`/colaboradores/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
                             variant="contained"
                             color="primary"

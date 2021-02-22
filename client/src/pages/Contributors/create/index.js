@@ -38,8 +38,8 @@ class CreateContributors extends Component {
         const request = async (data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
 
-            //data.address = JSON.stringify(data.address);
-            //data.contact = JSON.stringify(data.contact);
+            data.address = JSON.stringify(data.address,null,2);
+            data.contact = JSON.stringify(data.contact,null,2);
             data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await postApiContributors(data);
             //console.log(response);

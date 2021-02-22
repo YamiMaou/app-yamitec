@@ -12,10 +12,10 @@ class ContributorsController extends ControllersExtends
     {
         parent::__construct(Contributors::class, 'home');
         parent::setValidate([
-            "active" => "required",
+            //"active" => "required",
             "name" => "required|max:50",
             "cpf" => "required|unique:contributors|max:11",
-            'anexo' => 'required|mimes:jpg,png,pdf,xlx,csv|max:2048',
+            'anexo' => 'mimes:jpg,png,pdf,xlx,csv|max:2048',
         ]);
     }
 }
