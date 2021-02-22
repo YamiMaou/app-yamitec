@@ -7,7 +7,7 @@ use App\Models\Contributors;
 use App\Models\Post;
 
 class ContributorsController extends ControllersExtends
-{
+{   
     public function __construct()
     {
         parent::__construct(Contributors::class, 'home');

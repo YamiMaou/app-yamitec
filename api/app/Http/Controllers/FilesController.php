@@ -33,8 +33,11 @@ class FilesController extends Controller
     }
 
     /** model e id do model */
-    public function upload(Request $request, $model, $id)
+    static public function upload(Request $request, $model, $id)
     {
+        $function = new \ReflectionClass($model);
+        $modelName = $function->getShortName();
+
         try {
             $request->validate([
                 'file' => 'required|mimes:jpg,png,pdf,xlx,csv|max:2048',
@@ -44,7 +47,7 @@ class FilesController extends Controller
     
             $path = $request->file("file")->storeAs("uploads", $fileName);
         
-            $foreign  = isset($model) ?? strtolower($model).'_id';
+            $foreign  = strtolower($modelName).'_id';
             $model = $this->pathClass.$model;
 
             if ($model::find($id)->first()):
