@@ -171,7 +171,7 @@ class LDataGrid extends Component {
 
     }
     async componentDidMount() {
-        this.setPage();
+        //this.setPage();
         let filters = {};
         this.props.filterInputs.map(input => { 
             filters[input.column] = input.value ?? "";
@@ -289,8 +289,10 @@ class LDataGrid extends Component {
                         </div>
                     </CardContent>
                 </Card>
+
                 <Card>
                     <CardContent>
+                        {rows.length > 0 &&
                         <div style={{ height: 450, width: '100%' }}>
                             <StyledDataGrid rows={rows} columns={columns}
                                 columnBuffer={4}
@@ -301,16 +303,15 @@ class LDataGrid extends Component {
                                 paginationMode="server"
                                 rowCount={this.state.data.total ?? 0}
                                 pageSize={10} rowsPerPageOptions={[10]} pagination
-                                onPageSizeChange={(params) => {
-                                    //console.log(params);
+                                /*onPageSizeChange={(params) => {
                                     this.setPage({ page: params.page, pageSize: params.pageSize });
-                                }}
+                                }}*/
                                 onPageChange={(params) => {
-                                    //console.log(params);
+                                    console.log("CARREGOU");
                                     this.setPage({ page: params.page, pageSize: params.pageSize });
                                 }}
                             />
-                        </div>
+                        </div> }
                     </CardContent>
                     <CardActionArea>
                     </CardActionArea>

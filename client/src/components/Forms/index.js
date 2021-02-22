@@ -67,20 +67,20 @@ function TextMaskCustom(props) {
 // CheckBox
 
 const CheckBoxInput = (props) => {
-    const [value, setValue] = useState(props.value ?? false);
+    const [value, setValue] = useState(props.value == 1 ? true : false ?? false);
     const [error, setError] = useState(false);
     function handleChange(e) {
-        const { value, id } = e.target;
+        const { checked, id } = e.target;
         if (props.validate !== undefined) {
-            if (props.validate(value)) {
+            if (props.validate(checked)) {
                 setError(false);
             } else {
                 setError(true)
             }
         }
-        
-        props.onChange({target: {id, value: event.target.checked ? 1 : 0, type: 'checkbox'}})
-        setValue(e.target.checked);
+        let target = {id, value: checked ? 1 : 0 , type: 'checkbox'};
+        props.onChange({target, type: 'checkbox'})
+        setValue(checked);
     }
     return (
         <div key={`check-${props.id}`} style={{...props.style}}>
@@ -112,7 +112,7 @@ const FileInput = (props) => {
     return (
         <FormControl>
             <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                { value !== undefined ? <b style={{color: 'red'}}> Arquivo Selecionado! </b> : props.label}
+                { value !== undefined ? <b style={{color: 'red'}}> {value.split(/(\\|\/)/g).pop()} </b> : props.label}
                 <input type="file" hidden
                     onChange={handleChange}
                     onBlur={handleChange}
@@ -230,7 +230,7 @@ const DateInput = (props) => {
 //
 
 const SelectInput = (props) => {
-    const [value, setValue] = useState(props.value ?? props.values[0]);
+    const [value, setValue] = useState(props.value ?? "Selecione");
     const [error, setError] = useState(false);
     function handleChange(e) {
         const { value, id } = e.target;
@@ -258,6 +258,7 @@ const SelectInput = (props) => {
                 onChange={handleChange}
                 onBlur={handleChange}
             >
+                <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
                 {
                     props.values.map((val, ind) => {
                         return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
@@ -335,7 +336,7 @@ class LForms extends Component {
             }
             formValidate[id] = value;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
-            //console.log(this.state.inputVal);
+            console.log(this.state.inputVal);
         }
 
         const classes = {
@@ -381,7 +382,7 @@ class LForms extends Component {
                                                     if (input.type == "date") {
                                                         return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}

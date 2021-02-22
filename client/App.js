@@ -4,7 +4,11 @@ import { connect, Provider } from 'react-redux'
 import { SnackbarProvider, useSnackbar } from 'notistack';
 import store from './store'
 const App = () => (
-  <SnackbarProvider maxSnack={3}>
+  <SnackbarProvider maxSnack={3} 
+    anchorOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+  }}>
     <Provider store={store}>
       <AppRouter />
     </Provider>

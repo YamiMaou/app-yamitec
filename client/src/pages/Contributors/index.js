@@ -44,10 +44,10 @@ function BlockDialog(props) {
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Justificativa</DialogTitle>
+          <DialogTitle id="form-dialog-title">Bloqueio de Colaborador</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Escreva um motivo para o bloqueio do colaborador :
+                Confirma o bloqueio do registro selecionado?
             </DialogContentText>
             <TextField
               autoFocus
@@ -64,10 +64,10 @@ function BlockDialog(props) {
           </DialogContent>
           <DialogActions>
             <Button onClick={props.handleClose} color="primary">
-              Cancelar
+              NÃO
             </Button>
             <Button onClick={send} color="primary">
-              Justificar
+              SIM
             </Button>
           </DialogActions>
         </Dialog>

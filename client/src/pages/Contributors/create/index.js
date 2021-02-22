@@ -89,7 +89,7 @@ class CreateContributors extends Component {
 
                             if (v1.validate.required !== undefined) {
                                 if (value.length == 0)
-                                    campo = {id: v1.column, message: `o campo ${v1.label} obrigatório` };
+                                    campo = {id: v1.column, message: `o campo ${v1.label} é obrigatório` };
                             }
                         }
                         if(v1.validateHandler !== undefined){
@@ -107,7 +107,7 @@ class CreateContributors extends Component {
             {
                 title: 'Dados Básicos',
                 fields: [
-                    { column: 'active', label: 'Ativo', type: 'checkbox',  value: true, disabled: true, flexBasis : "100%" },
+                    { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
                     { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '210px'} },

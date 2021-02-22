@@ -86,7 +86,7 @@ class EditContributors extends Component {
 
                             if (v1.validate.required !== undefined) {
                                 if (value.length == 0)
-                                    campo = { id: v1.column, message: `o campo ${v1.label} obrigatório` };
+                                    campo = { id: v1.column, message: `o campo ${v1.label} é obrigatório` };
                             }
                         }
 
@@ -181,10 +181,10 @@ class EditContributors extends Component {
                     <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Data de Adesão:  <b>{stringToaddDate(this.state.contributor.created_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>&nbsp;
+                                Data de Cadastro:  <b>{stringToaddDate(this.state.contributor.created_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>&nbsp;
                             </Typography>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Ultima alteração:  <b>{stringToaddDate(this.state.contributor.updated_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>
+                                Última alteração:  <b>{stringToaddDate(this.state.contributor.updated_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>
                             </Typography>
                         </div>
                         <div style={{ float: 'left', maxWidth: 350 }}>
@@ -192,7 +192,7 @@ class EditContributors extends Component {
                                 Id:  <b>{this.state.contributor.id}</b>
                             </Typography>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Username:  <b>{this.state.contributor.name}</b>
+                                Usuário:  <b>{this.state.contributor.name}</b>
                             </Typography>
                         </div>
                     </Paper>
