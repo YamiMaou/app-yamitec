@@ -111,7 +111,7 @@ const FileInput = (props) => {
     }
     return (
         <FormControl style={props.style}>
-            <Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" style={{fontSize: '.6em'}} />}>
+            <Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
                 { value !== undefined ? <b style={{color: 'red'}}><a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a></b> : props.label}
                 <input type="file" hidden
                     onChange={handleChange}
