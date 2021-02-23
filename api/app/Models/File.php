@@ -22,7 +22,7 @@ class File extends Model
         return $this->belongsTo(Provider::class);
     }
 
-    public function contributor()
+    public function contributors()
     {
         return $this->belongsTo(Contributors::class);
     }

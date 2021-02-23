@@ -20,4 +20,14 @@ class Contributors extends Model
         'birthdate'
     ];
 
+    public function address()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class);
+    }
+
 }
