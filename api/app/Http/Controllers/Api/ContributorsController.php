@@ -42,8 +42,8 @@ class ContributorsController extends ControllersExtends
             "anexo" => 1
         ];
 
-        $request['name'] = $data['name'];
-        $request['anexo'] = $data['file'];
+        $request['name'] = $data['name'] ?? null;
+        $request['anexo'] = $data['file'] ?? null;
 
         $address = [
             "uf" => $request->uf,

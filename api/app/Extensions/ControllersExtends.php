@@ -163,6 +163,10 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             if (count($this->with) > 0) {
                 $i = 0;
                 foreach ($this->with["data"] as $model => $fields) {
+                    foreach($fields as $k => $field){
+                        if($field == null)
+                            unset($fields[$k]);
+                    }
                 // echo ($i == 0 ? 'id' : $this->with["changes"]->key) . $id;
                    $model::where(($i == 0 ? 'id' : $this->with["changes"]->key), $id)->update($fields);
                     $i++;
