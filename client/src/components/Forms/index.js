@@ -39,9 +39,10 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { getApiDownloadFile } from '../../providers/api'
 import MaskedInput from 'react-text-mask';
 const idNumbers = [
-    'cpf', 'cnpj', 'cep'
+    'cpf', 'cnpj', 'zipcode'
 ];
 
 // MASKED INPUTS 
@@ -95,6 +96,7 @@ const CheckBoxInput = (props) => {
 // File Input
 const FileInput = (props) => {
     const [value, setValue] = useState(props.value ?? undefined);
+    const [file, setFile] = useState(props.file ?? undefined);
     const [error, setError] = useState(false);
     function handleChange(e) {
         const { value, id } = e.target;
@@ -111,15 +113,27 @@ const FileInput = (props) => {
     }
     return (
         <FormControl style={props.style}>
-            <Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                { value !== undefined ? <b style={{color: 'red'}}><a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a></b> : props.label}
+            { file === undefined ?
+            (<Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
+                { value !== undefined ? 
+                <b style={{color: 'red'}}>
+                    <a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a>
+                </b> : props.label}
                 <input type="file" hidden
                     onChange={handleChange}
                     onBlur={handleChange}
                     name={props.id}
                     id={props.id}
                 />
-            </Button>
+            </Button>) : 
+            (<Button  variant="outlined" component="label" 
+                onClick={() => {
+                    getApiDownloadFile(file);
+                }}
+                endIcon={<Icon name="arrow-circle-down" 
+                size={18} color="#025ea2" />}>
+                Baixar Arquivo
+            </Button>)}
         </FormControl>)
 }
 //
@@ -187,11 +201,13 @@ const DateInput = (props) => {
     let valueDate = new Date(props.value)
     const [value, setValue] = useState(props.value ? valueDate.setDate(valueDate.getDate() + 1) : '');
     const [error, setError] = useState(false);
-    function handleChange(value) {
+    function handleChange(e) {
+        setValue(e.target.value);
+        console.log(e)
         try {
-            let e = { target: { id: props.id, value: `${value.toJSON().split('T')[0]}` } }
+            //let e = { target: { id: props.id, value: `${selectvalue.toJSON().split('T')[0]}` } }
             if (props.validate !== undefined) {
-                if (props.validate(value)) {
+                if (props.validate(e.target.value)) {
                     setError(false);
                 } else {
                     setError(true)
@@ -203,9 +219,24 @@ const DateInput = (props) => {
             console.log(err);
         }
         //props.onChange(value);
-        setValue(new Date(value));
+        
     }
-
+    return (
+            <form  noValidate style={{ ...props.style, marginTop: 20 }}>
+              <TextField
+                id={props.id}
+                label={props.label ?? 'Data'}
+                type="date"
+                defaultValue={value}
+                onChange={handleChange}
+                onBlur={handleChange}
+                
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </form>
+    );
     return (<MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
         <Grid style={{ ...props.style, marginTop: 18 }}>
             <KeyboardDatePicker
@@ -219,6 +250,7 @@ const DateInput = (props) => {
                 autoOk={true}
                 disableFuture
                 value={value}
+                allowKeyboardControl={false}
                 cancelLabel="Cancelar"
                 onChange={handleChange}
                 onBlur={handleChange}
@@ -338,7 +370,7 @@ class LForms extends Component {
             }
             formValidate[id] = value;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
-            console.log(this.state.inputVal);
+            //console.log(this.state.inputVal);
         }
         
         const classes = {
@@ -391,6 +423,7 @@ class LForms extends Component {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
                                                                 style={{ ...classes.m5, fontSize: '.6em', width:'190px' }}
+                                                                file={input.file}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}

@@ -16,14 +16,110 @@ class ContributorsController extends ControllersExtends
     {
         parent::__construct(Contributors::class, 'home');
         parent::setValidate([
-            //"active" => "required",
             "name" => "required|max:50",
             "cpf" => "required|unique:contributors|max:11",
-            'anexo' => 'required|mimes:jpg,png,pdf,xlx,csv|max:2048',
+            'file' => 'required|mimes:jpg,png,pdf,xlx,csv|max:2048',
         ]);
     }
     public function show(Req $request, $id, $with=[])
     {
-       return  parent::show($request, $id, ['user', 'file']);
+       return  parent::show($request, $id, ['user', 'file', 'addresses', 'contacts']);
+    }
+
+    public function update(Req $request, $id)
+    {
+        $validate = $request;
+        $files = new \App\Http\Controllers\FilesController();
+        $files = $files->multUpload($request, 'contributors');
+        $data = $files->request;
+
+        $contributors = [
+            "cpf" => $request->cpf,
+            "name" => $request->name,
+            "birthdate"=> $request->birthdate,
+            "function"=>$request->function,
+            "active" => $request->active,
+            "anexo" => 1
+        ];
+
+        $request['name'] = $data['name'];
+        $request['anexo'] = $data['file'];
+
+        $address = [
+            "uf" => $request->uf,
+            "city" => $request->city,
+            "additional" => $request->additional,
+            "street" => $request->street,
+            "zipcode" => $request->zipcode,
+        ];
+
+        $contact = [
+            "phone1" => $request->phone1,
+            "phone2" => $request->phone2,
+            "email" => $request->email,
+            "linkedin" => $request->linkedin,
+            "facebook" => $request->facebook,
+            "instagram" => $request->instagram,
+        ];
+        parent::withAndChange([
+            \App\Models\Contributors::class => $contributors,
+            \App\Models\Address::class => $address,
+            \App\Models\Contact::class => $contact,
+        ],
+        ["permiss" => true, "key" => "contributors_id"]);
+
+        return parent::update($validate, $id);
+    }   
+
+    public function store(Req $request){
+        $validate = $request;
+        $files = new \App\Http\Controllers\FilesController();
+        $files = $files->multUpload($request, 'contributors');
+        $data = $files->request;
+        //var_dump($request);
+        $contributors = [
+            "cpf" => $request->cpf,
+            "name" => $data['name'],
+            "birthdate"=> $request->birthdate,
+            "function"=>$request->function,
+            "active" => $request->active,
+            "anexo" => $data['file'],
+            "address" => "[]",
+            "contact" => "[]",
+            'user_id' => $request->user()->id,
+            'username' => $request->user()->email,
+        ];
+        $request['name'] = $data['name'];
+        $request['anexo'] = $data['file'];
+
+        $address = [
+            "uf" => $request->uf,
+            "city" => $request->city,
+            "additional" => $request->additional,
+            "street" => $request->street,
+            "zipcode" => $request->zipcode,
+        ];
+
+        $contact = [
+            "phone1" => $request->phone1,
+            "phone2" => $request->phone2,
+            "email" => $request->email,
+            "linkedin" => $request->linkedin,
+            "facebook" => $request->facebook,
+            "instagram" => $request->instagram,
+        ];
+        parent::withAndChange([
+            \App\Models\Contributors::class => $contributors,
+            \App\Models\Address::class => $address,
+            \App\Models\Contact::class => $contact,
+        ],
+        ["permiss" => true, "key" => "contributors_id"]);
+        return parent::store($validate);
+    }
+
+    public function Download(Req $request)
+    {
+        $files = new \App\Http\Controllers\FilesController();
+        return $files->download($request);
     }
 }

@@ -12,7 +12,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiContributors, getAddressByCepla } from '../../../providers/api'
+import { postApiContributors, getApiDownloadFile } from '../../../providers/api'
 import { validaEmail, validaCpf, stringToDate } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
@@ -31,7 +31,6 @@ class CreateContributors extends Component {
     }
 
     render() {
-        
          // to use snackbar Provider
         const closeSnack = (event, reason) => {
             if (reason === 'clickaway') {
@@ -41,10 +40,12 @@ class CreateContributors extends Component {
         };
         
         const request = async (data) => {
-            //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
-            data.address = JSON.stringify(data.address,null,2);
-            data.contact = JSON.stringify(data.contact,null,2);
-            //data.active = data.active == 'Ativo' ? 1 : 0;
+            //data = Object.assign({},state.addresses,data);
+            //data = Object.assign({},state.contacts,data);
+            //data = Object.assign({},state,data);
+            //delete data.addresses;
+           // delete data.contacts;
+
             let response = await postApiContributors(data);
             //console.log(response);
             if (response.data.success) {
@@ -52,16 +53,22 @@ class CreateContributors extends Component {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
-                let {errors} = response.data.error.response.data
-                let message = '';
-                console.log(errors)
-                Object.keys(errors).map(err => {
-                    console.log(err);
-                    message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
-                })
+                console.log(response)
+                let errors = response.data.error ?? undefined;
+
+                //let { errors } = response.data.error.response.data ?? {error: undefined}
+                let messages = '';
+                if(errors !== undefined && errors.response !== undefined  && errors.response.data.errors !== undefined){
+                    Object.keys(errors.response.data.errors).map(err => {
+                        console.log(err);
+                        messages += `Campo ${err.toUpperCase()} : ${errors.response.data.errors[err][0]} \n`;
+                    })
+                } else{
+                    messages = 'Houve um problema em sua requisição!'
+                }
                 //response.data.error.response.data.errors
                 //this.props.enqueueSnackbar( message, { variant: 'error' });
-                this.props.setSnackbar({ open: true, message});
+                this.props.setSnackbar({ open: true, message: messages});
             }
 
         }
@@ -137,16 +144,16 @@ class CreateContributors extends Component {
                 id: 'addr',
                 title: 'Endereço',
                 //flexFlow: 'row no-wrap',
-                json: "address",
+                //json: "address",
                 fields: [
                     {
-                        column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
+                        column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
                         //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis },
+                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
                     {
-                        column: 'state', label: 'Estado', type: 'select',
+                        column: 'uf', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
                         flexBasis, style:{minWidth: "192px"}
                     },
@@ -155,16 +162,16 @@ class CreateContributors extends Component {
             },
             {
                 title: 'Contato',
-                json: 'contact',
+                //json: 'contact',
                 fields: [
-                    { column: 'contact1', label: 'Contato', type: 'text', mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
-                    { column: 'contact2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
+                    { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
+                    { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
                     { column: 'email', label: 'E-mail', type: 'email', validate: {max: 100}, validateHandler: validaEmail, flexBasis: '20%' },
                 ]
             },
             {
                 title: 'Redes Sociais',
-                json: 'contact',
+                //json: 'contact',
                 fields: [
                     { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
                     { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },

@@ -34,6 +34,7 @@ Route::get('/profile', 'Api\UsersController@details')
     ->middleware(['auth:api', 'scope:view-posts']);
 Route::put('/posts/{id}', 'Api\PostsController@update')
     ->middleware(['auth:api', 'scope:update-posts']);*/
+Route::post('/contributors/downloads', 'Api\ContributorsController@download');
 Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // POSTS
     Route::resource('/posts', 'Api\PostsController');

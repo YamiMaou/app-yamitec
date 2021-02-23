@@ -38,26 +38,35 @@ class EditContributors extends Component {
         const request = async (state, data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
-            let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
-            let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
-            if (data.address) data.address = address;
-            if (data.contact) data.contact = contact
+            //let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
+            //let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
+            //if (data.address) data.address = address;
+            //if (data.contact) data.contact = contact
             //if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
+            data = Object.assign({},state.addresses,data);
+            data = Object.assign({},state.contacts,data);
+            data = Object.assign({},state,data);
+            delete data.addresses;
+            delete data.contacts;
             let response = await putApiContributors(this.props.match.params.id, data);
             //console.log(response);
             if (response.data.success) {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
-                let {errors} = response.data.error.response.data
-                let message = '';
+                let {errors, message} = response.data.error.response.data
+                let messages = '';
                 console.log(errors)
-                Object.keys(errors).map(err => {
-                    console.log(err);
-                    message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
-                })
+                if(errors !== undefined ){
+                    Object.keys(errors).map(err => {
+                        console.log(err);
+                        messages += `Campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
+                    });
+                } else{
+                    messages = 'Houve um problema em sua requisição!'
+                }
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, message});
+                this.props.setSnackbar({ open: true, messages});
             }
 
         }
@@ -126,42 +135,42 @@ class EditContributors extends Component {
                         value: this.state.contributor['function'],
                         flexBasis
                     },
-                    { column: 'file', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', file: this.state.contributor['file'].name, type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
                 ]
             },
             {
                 id: 'addr',
                 title: 'Endereço',
                 //flexFlow: 'row no-wrap',
-                json: "address",
+                //json: "address",
                 fields: [
-                    { column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: JSON.parse(this.state.contributor['address']).cep },
-                    { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: JSON.parse(this.state.contributor['address']).street },
-                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis, value: JSON.parse(this.state.contributor['address']).complement },
+                    { column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: this.state.contributor['addresses'].zipcode },
+                    { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: this.state.contributor['addresses'].street },
+                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.contributor['addresses'].additional },
                     {
-                        column: 'state', label: 'Estado', type: 'select',
+                        column: 'uf', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        value: JSON.parse(this.state.contributor['address']).state, flexBasis, flexGrow: 2, style: { minWidth: "192px" }
+                        value:this.state.contributor['addresses'].uf, flexBasis, flexGrow: 2, style: { minWidth: "192px" }
                     },
-                    { column: 'city', label: 'Cidade', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['address']).city },
+                    { column: 'city', label: 'Cidade', type: 'text', validate: { max: 100, required: true }, flexBasis, value:this.state.contributor['addresses'].city },
                 ]
             },
             {
                 title: 'Contato',
-                json: 'contact',
+                //json: 'contact',
                 fields: [
-                    { column: 'contact1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).contact1 },
-                    { column: 'contact2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis, value: JSON.parse(this.state.contributor['contact']).contact2 },
-                    { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: JSON.parse(this.state.contributor['contact']).email },
+                    { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: this.state.contributor['contacts'].phone1 },
+                    { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis, value: this.state.contributor['contacts'].phone2 },
+                    { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: this.state.contributor['contacts'].email },
                 ]
             },
             {
                 title: 'Redes Sociais',
-                json: 'contact',
+                //json: 'contact',
                 fields: [
-                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).linkedin },
-                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).facebook },
-                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).instagram },
+                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: { max: 100, required: true }, flexBasis, value: this.state.contributor['contacts'].linkedin },
+                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: { max: 100, required: true }, flexBasis, value: this.state.contributor['contacts'].facebook },
+                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', validate: { max: 100, required: true }, flexBasis, value: this.state.contributor['contacts'].instagram },
                 ]
             }
         ]

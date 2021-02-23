@@ -92,14 +92,12 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function store(Request $request)
     {
-        /*echo "<pre>";
-        var_dump($request->all());
-        exit;*/
-
+        
         if (count($this->validate) > 0) {
             $request->validate($this->validate);
         }
-
+        //var_dump( $request->all());
+           // exit;
         try {
             $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
             $files = new FilesController();
@@ -107,7 +105,6 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
             $data['username'] = $request->user()->email;
-            $data['anexo'] = 1;
             unset($data["file"]);
             unset($data["_token"]);
             unset($data["_method"]);
@@ -122,10 +119,11 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                     }
                     $i++;
                     $fields[$this->with["changes"]->key] = $primary->id;
-                    $model->create($fields);
+                    //var_dump($fields);
+                    $model::create($fields);
                 }
             } else {
-                $obj = $this->model->create($data);
+                $this->model->create($data);
                 //FilesController::upload($request, $this->model, $obj->id);
             }
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
@@ -165,7 +163,8 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             if (count($this->with) > 0) {
                 $i = 0;
                 foreach ($this->with["data"] as $model => $fields) {
-                    $model->where($i == 0 ? 'id' : $this->with["changes"]->key, $id)->update($fields);
+                // echo ($i == 0 ? 'id' : $this->with["changes"]->key) . $id;
+                   $model::where(($i == 0 ? 'id' : $this->with["changes"]->key), $id)->update($fields);
                     $i++;
                 }
             } else {
