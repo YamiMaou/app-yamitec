@@ -108,7 +108,7 @@ export const postApiContributors = async (params = {}) => {
 
 /// update products
 export const putApiContributors = async (id,params = {}) => {
-  params.justification = "Update";
+  params.justification = params.justification  ?? "Update";
   const data = new FormData();
   data.append("_method", "put");
   Object.entries(params)

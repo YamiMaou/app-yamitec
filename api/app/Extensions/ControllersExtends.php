@@ -54,10 +54,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             })->where(function($query) use($params, $request){
                 foreach($params as $k=>$v){
                     if($request->queryType == "like"){
+                        $query->where($k,'like', '%'.$v.'%');
                         if($k == $request->withId){
-                            $query->where([[$k,'like', '%'.$v.'%'],['id','like', '%'.$v.'%']]);
-                        }else{
-                            $query->where($k,'like', '%'.$v.'%');
+                            $query->orWhere('id','like', '%'.$v.'%');
                         }
                     }else{
                         $query->where($k,'=', $v);
@@ -108,7 +107,8 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
             $data['username'] = $request->user()->email;
-            
+            $data['anexo'] = 1;
+            unset($data["file"]);
             unset($data["_token"]);
             unset($data["_method"]);
             if (count($this->with) > 0) {
@@ -155,7 +155,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = new FilesController();
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
+            $data['user_id'] = $request->user()->id;
             $this->saveLog($id, $request);
+            
             unset($data["_token"]);
             unset($data["_method"]);
             unset($data["justification"]);

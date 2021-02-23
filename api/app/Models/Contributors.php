@@ -29,5 +29,14 @@ class Contributors extends Model
     {
         return $this->hasMany(Contact::class);
     }
+    public function user()
+    {
+        return $this->hasOne(\App\User::class, 'id','user_id');
+    }  
+
+    public function file()
+    {
+        return $this->hasOne(\App\Models\File::class, 'id','anexo');
+    }  
 
 }

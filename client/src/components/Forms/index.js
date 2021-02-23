@@ -19,11 +19,13 @@ import Snackbar from '@material-ui/core/Snackbar';
 //
 import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
@@ -62,6 +64,33 @@ function TextMaskCustom(props) {
         />
     );
 }
+// CheckBox
+
+const CheckBoxInput = (props) => {
+    const [value, setValue] = useState(props.value == "1" ? true : false ?? false);
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { checked, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(checked)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        let target = {id, value: checked ? "1" : "0" , type: 'checkbox'};
+        props.onChange({target, type: 'checkbox'})
+        setValue(checked);
+    }
+    return (
+        <div key={`check-${props.id}`} style={{...props.style}}>
+        <FormControlLabel 
+        control={<Checkbox checked={value} disabled={props.disabled ?? false}onChange={handleChange} name={props.id} id={props.id} />}
+        label={props.label}
+      />
+      </div>
+      )
+}
 
 // File Input
 const FileInput = (props) => {
@@ -81,9 +110,9 @@ const FileInput = (props) => {
         setValue(e.target.value);
     }
     return (
-        <FormControl>
-            <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                {props.label}
+        <FormControl style={props.style}>
+            <Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
+                { value !== undefined ? <b style={{color: 'red'}}><a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a></b> : props.label}
                 <input type="file" hidden
                     onChange={handleChange}
                     onBlur={handleChange}
@@ -156,7 +185,7 @@ function TextInputCustom(props) {
 //
 const DateInput = (props) => {
     let valueDate = new Date(props.value)
-    const [value, setValue] = useState(props.value ? valueDate.setDate(valueDate.getDate() + 1) : new Date());
+    const [value, setValue] = useState(props.value ? valueDate.setDate(valueDate.getDate() + 1) : '');
     const [error, setError] = useState(false);
     function handleChange(value) {
         try {
@@ -174,7 +203,7 @@ const DateInput = (props) => {
             console.log(err);
         }
         //props.onChange(value);
-        setValue(value);
+        setValue(new Date(value));
     }
 
     return (<MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
@@ -187,7 +216,10 @@ const DateInput = (props) => {
                 error={error}
                 helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
                 format="dd/MM/yyyy"
+                autoOk={true}
+                disableFuture
                 value={value}
+                cancelLabel="Cancelar"
                 onChange={handleChange}
                 onBlur={handleChange}
                 KeyboardButtonProps={{
@@ -200,7 +232,7 @@ const DateInput = (props) => {
 //
 
 const SelectInput = (props) => {
-    const [value, setValue] = useState(props.value ?? props.values[0]);
+    const [value, setValue] = useState(props.value ?? "Selecione");
     const [error, setError] = useState(false);
     function handleChange(e) {
         const { value, id } = e.target;
@@ -223,10 +255,12 @@ const SelectInput = (props) => {
                 name={props.name}
                 value={value}
                 error={error}
+                placeholder="Selecione"
                 //helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
                 onChange={handleChange}
                 onBlur={handleChange}
             >
+                <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
                 {
                     props.values.map((val, ind) => {
                         return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
@@ -304,13 +338,14 @@ class LForms extends Component {
             }
             formValidate[id] = value;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
-            //console.log(this.state.inputVal);
+            console.log(this.state.inputVal);
         }
-
+        
         const classes = {
             m5: {
                 margin: 5,
                 marginTop: 25,
+                width: window.innerWidth > 780 ? '30%' :'100%'
                 //flexBasis: '30%'
 
             },
@@ -322,6 +357,7 @@ class LForms extends Component {
                 height: 140,
             },
         }
+        const flexBasis  = '22%'
         return (
             <div>
                 {
@@ -348,13 +384,26 @@ class LForms extends Component {
 
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "date") {
-                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : '14%'}} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : '20%'}} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
-                                                                style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
+                                                                style={{ ...classes.m5, fontSize: '.6em', width:'190px' }}
+                                                                onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                                onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                                label={input.label}
+                                                                id={input.column}
+                                                            />
+                                                        )
+                                                    }else if (input.type == "checkbox") {
+                                                        return (
+                                                            <CheckBoxInput 
+                                                                key={`input-${ind1}`}
+                                                                disabled={input.disabled ?? false}
+                                                                value={input.value}
+                                                                style={{ ...classes.m5, flexBasis: input.flexBasis}}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}
@@ -366,7 +415,7 @@ class LForms extends Component {
                                                             id={input.column}
                                                             type={input.type}
                                                             value={input.value}
-                                                            style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }}
+                                                            style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : input.flexBasis}}
                                                             id={input.column} label={input.label}
                                                             mask={input.mask ?? undefined}
                                                             validate={input.validateHandler}

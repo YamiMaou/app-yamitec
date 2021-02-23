@@ -17,7 +17,10 @@ import { validaEmail, validaCpf, stringToDate } from '../../../providers/commonM
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
+
+import { withSnackbar  } from 'notistack';
 class CreateContributors extends Component {
+    
     state = {
         contributors: [],
         states: []
@@ -28,22 +31,24 @@ class CreateContributors extends Component {
     }
 
     render() {
+        
+         // to use snackbar Provider
         const closeSnack = (event, reason) => {
             if (reason === 'clickaway') {
                 return;
             }
             this.props.setSnackbar({ open: false, message: "" });
         };
-        const flexBasis = '30%';
+        
         const request = async (data) => {
-            this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ..." })
-
+            //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
             data.address = JSON.stringify(data.address,null,2);
             data.contact = JSON.stringify(data.contact,null,2);
-            data.active = data.active == 'Ativo' ? 1 : 0;
+            //data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await postApiContributors(data);
             //console.log(response);
             if (response.data.success) {
+                //this.props.enqueueSnackbar( response.data.message, { variant: 'success' });
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
@@ -55,6 +60,7 @@ class CreateContributors extends Component {
                     message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
                 })
                 //response.data.error.response.data.errors
+                //this.props.enqueueSnackbar( message, { variant: 'error' });
                 this.props.setSnackbar({ open: true, message});
             }
 
@@ -63,28 +69,31 @@ class CreateContributors extends Component {
             //console.log(fields);
             let campo = undefined;
             fields.reverse().map((v,k) => {
-                v.fields.reverse().map((v1,k1)=>{
+                v.fields.map((v1,k1)=>{
                         let value = values[v1.column];
                         if (v1.validate !== undefined) {
                             if (v1.validate.number !== undefined) {
                                 if (/^[-]?\d+$/.test(value) == false)
-                                    campo = {id: v1.column, message: `o campo ${v1.label} é somente números ` }
+                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
 
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
-                                    campo = {id: v1.column, message: `o campo ${v1.label}, tamanho máximo de ${v1.validate.max} caracteres exêdido` };
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, tamanho máximo de ${v1.validate.max} caracteres exêdido` };
                             }
 
                             if (v1.validate.min !== undefined) {
                                 if (value.length < v1.validate.min)
-                                    campo = {id: v1.column, message: `o campo ${v1.label}, tamanho minimo de ${v1.validate.min} caracteres.` };
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, tamanho minimo de ${v1.validate.min} caracteres.` };
                             }
 
                             if (v1.validate.required !== undefined) {
                                 if (value.length == 0)
-                                    campo = {id: v1.column, message: `o campo ${v1.label} obrigatório` };
+                                    campo = {id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
                             }
+                        }
+                        if(value == "Selecione"){
+                            campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                         }
                         if(v1.validateHandler !== undefined){
                             if (v1.validateHandler(value) == false)
@@ -93,18 +102,19 @@ class CreateContributors extends Component {
                     })
                 })
                 //console.log(campo)
-                campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message }) : '';
+                campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message}) : '';
 
                 return campo === undefined ? true : false
         }
+        const flexBasis = '22%';
         const forms = [
             {
                 title: 'Dados Básicos',
                 fields: [
-                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
+                    { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
+                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '160px'} },
-                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '160px'} },
+                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '210px'} },
                     {
                         column: 'function', label: 'Função', type: 'select',
                         values: [
@@ -115,30 +125,30 @@ class CreateContributors extends Component {
                             "Operador de marketing", 
                             "Vendedor"
                         ],
-                        value: "Coordenador de usuários",
-                        flexBasis
+                        //value: "Coordenador de usuários",
+                        flexBasis, style:{width: '220px'}
                     },
+                    { column: 'file', label: 'Anexar Documento', type: 'file', flexBasis, style:{maxWidth: '180'} },
                     //
-                    { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Ativo", flexBasis },
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]
             },
             {
                 id: 'addr',
                 title: 'Endereço',
-                flexFlow: 'row no-wrap',
+                //flexFlow: 'row no-wrap',
                 json: "address",
                 fields: [
                     {
-                        column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '10%',
+                        column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
                         //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis: '20%' },
+                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis },
                     {
                         column: 'state', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        value: "São Paulo", flexBasis, flexGrow: 2, style:{minWidth: "192px"}
+                        flexBasis, style:{minWidth: "192px"}
                     },
                     { column: 'city', label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
                 ]
@@ -173,13 +183,6 @@ class CreateContributors extends Component {
                 <LForms forms={forms}
                     request={request} 
                     validate={(values) => { return validateFields(forms,values)}}
-                />
-                <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                    open={this.props.snackbar.open}
-                    onClose={closeSnack}
-                    autoHideDuration={3000}
-                    message={this.props.snackbar.message}
                 />
             </Fragment>
         )

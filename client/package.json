@@ -12,6 +12,7 @@
     "expo": "~39.0.0",
     "moment": "^2.29.1",
     "mongoose": "^5.11.13",
+    "notistack": "^1.0.3",
     "react": "~16.13.0",
     "react-dom": "~16.13.0",
     "react-input-mask": "^2.0.4",
@@ -43,8 +44,8 @@
   },
   "private": true,
   "proxy": {
-    "/api":  {
-        "target": "http://localhost:8000"
+    "/api": {
+      "target": "http://localhost:8000"
     }
   }
 }

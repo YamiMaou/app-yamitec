@@ -33,7 +33,7 @@ class FilesController extends Controller
     }
 
     /** model e id do model */
-    static public function upload(Request $request, $model, $id)
+    public function upload(Request $request, $model, $id)
     {
         $function = new \ReflectionClass($model);
         $modelName = $function->getShortName();
@@ -48,13 +48,13 @@ class FilesController extends Controller
             $path = $request->file("file")->storeAs("uploads", $fileName);
         
             $foreign  = strtolower($modelName).'_id';
-            $model = $this->pathClass.$model;
-
+                
             if ($model::find($id)->first()):
                 $request[$foreign] = $id;
                 $request['path'] = $path;
                 $request['name'] = $fileName;
-
+                print_r($request);
+                //$request['file'] = $request['anexo'];
                 $this->file->create($request->all());
             endif;
     
