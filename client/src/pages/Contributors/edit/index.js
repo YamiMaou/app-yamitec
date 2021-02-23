@@ -35,7 +35,6 @@ class EditContributors extends Component {
             }
             this.props.setSnackbar({ open: false, message: "" });
         };
-        const flexBasis = '30%';
         const request = async (state, data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
@@ -105,13 +104,13 @@ class EditContributors extends Component {
 
             return campo === undefined ? true : false
         }
-
+        const flexBasis = '22%';
         const forms = !this.state.contributor ? [] : [
             {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: this.state.contributor['active'] == 1 ? true : false, disabled: false, flexBasis : "100%" },
-                    { column: 'cpf', value: this.state.contributor['cpf'], label: 'CPF', type: 'text', mask: InputCpf, validate: { min: 11, number: true, required: true }, validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
+                    { column: 'cpf', value: this.state.contributor['cpf'], label: 'CPF', type: 'text', mask: InputCpf, validate: { min: 11, number: true, required: true }, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', value: this.state.contributor['name'], label: 'Nome', type: 'text', validate: { max: 50, required: true }, flexBasis },
                     { column: 'birthdate', value: this.state.contributor['birthdate'], label: 'Data de Nascimento', type: 'date', flexBasis, style: { maxWidth: '160px' } },
                     {
@@ -127,18 +126,18 @@ class EditContributors extends Component {
                         value: this.state.contributor['function'],
                         flexBasis
                     },
-                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
                 ]
             },
             {
                 id: 'addr',
                 title: 'Endereço',
-                flexFlow: 'row no-wrap',
+                //flexFlow: 'row no-wrap',
                 json: "address",
                 fields: [
-                    { column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '10%', value: JSON.parse(this.state.contributor['address']).cep },
+                    { column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: JSON.parse(this.state.contributor['address']).cep },
                     { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: JSON.parse(this.state.contributor['address']).street },
-                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis: '20%', value: JSON.parse(this.state.contributor['address']).complement },
+                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis, value: JSON.parse(this.state.contributor['address']).complement },
                     {
                         column: 'state', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
@@ -151,18 +150,18 @@ class EditContributors extends Component {
                 title: 'Contato',
                 json: 'contact',
                 fields: [
-                    { column: 'contact1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis: '20%', value: JSON.parse(this.state.contributor['contact']).contact1 },
-                    { column: 'contact2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis: '20%', value: JSON.parse(this.state.contributor['contact']).contact2 },
-                    { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis: '20%', value: JSON.parse(this.state.contributor['contact']).email },
+                    { column: 'contact1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).contact1 },
+                    { column: 'contact2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis, value: JSON.parse(this.state.contributor['contact']).contact2 },
+                    { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: JSON.parse(this.state.contributor['contact']).email },
                 ]
             },
             {
                 title: 'Redes Sociais',
                 json: 'contact',
                 fields: [
-                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: { max: 100, required: true }, flexBasis: '20%', value: JSON.parse(this.state.contributor['contact']).linkedin },
-                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: { max: 100, required: true }, flexBasis: '20%', value: JSON.parse(this.state.contributor['contact']).facebook },
-                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', validate: { max: 100, required: true }, flexBasis: '20%', value: JSON.parse(this.state.contributor['contact']).instagram },
+                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).linkedin },
+                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).facebook },
+                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', validate: { max: 100, required: true }, flexBasis, value: JSON.parse(this.state.contributor['contact']).instagram },
                 ]
             }
         ]
@@ -181,7 +180,7 @@ class EditContributors extends Component {
                     />
                 }
                 { this.state.contributor !== undefined &&
-                    <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: 90 }}>
+                    <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 768 ? 210 : 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
                                 Data de Cadastro:  <b>{stringToaddDate(this.state.contributor.created_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>&nbsp;

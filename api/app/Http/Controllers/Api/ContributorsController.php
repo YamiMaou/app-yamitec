@@ -24,6 +24,6 @@ class ContributorsController extends ControllersExtends
     }
     public function show(Req $request, $id, $with=[])
     {
-       return  parent::show($request, $id, ['user']);
+       return  parent::show($request, $id, ['user', 'file']);
     }
 }

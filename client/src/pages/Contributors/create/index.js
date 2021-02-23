@@ -39,7 +39,7 @@ class CreateContributors extends Component {
             }
             this.props.setSnackbar({ open: false, message: "" });
         };
-        const flexBasis = '26%';
+        
         const request = async (data) => {
             //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
             data.address = JSON.stringify(data.address,null,2);
@@ -106,12 +106,13 @@ class CreateContributors extends Component {
 
                 return campo === undefined ? true : false
         }
+        const flexBasis = '22%';
         const forms = [
             {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
-                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '20%', helperText: "o valor digitado é inválido" },
+                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
                     { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '210px'} },
                     {
@@ -125,9 +126,9 @@ class CreateContributors extends Component {
                             "Vendedor"
                         ],
                         //value: "Coordenador de usuários",
-                        flexBasis: '35%', style:{width: '220px'}
+                        flexBasis, style:{width: '220px'}
                     },
-                    { column: 'anexo', label: 'Anexar Documento', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', type: 'file', flexBasis, style:{maxWidth: '180'} },
                     //
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]
@@ -135,19 +136,19 @@ class CreateContributors extends Component {
             {
                 id: 'addr',
                 title: 'Endereço',
-                flexFlow: 'row no-wrap',
+                //flexFlow: 'row no-wrap',
                 json: "address",
                 fields: [
                     {
-                        column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '10%',
+                        column: 'cep', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
                         //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis: '20%' },
+                    { column: 'complement', label: 'Complemento', type: 'text', flexBasis },
                     {
                         column: 'state', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        flexBasis, flexGrow: 2, style:{minWidth: "192px"}
+                        flexBasis, style:{minWidth: "192px"}
                     },
                     { column: 'city', label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
                 ]

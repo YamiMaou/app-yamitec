@@ -110,9 +110,9 @@ const FileInput = (props) => {
         setValue(e.target.value);
     }
     return (
-        <FormControl>
-            <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                { value !== undefined ? <b style={{color: 'red'}}> {value.split(/(\\|\/)/g).pop()} </b> : props.label}
+        <FormControl style={props.style}>
+            <Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" style={{fontSize: '.6em'}} />}>
+                { value !== undefined ? <b style={{color: 'red'}}><a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a></b> : props.label}
                 <input type="file" hidden
                     onChange={handleChange}
                     onBlur={handleChange}
@@ -203,7 +203,7 @@ const DateInput = (props) => {
             console.log(err);
         }
         //props.onChange(value);
-        setValue(value);
+        setValue(new Date(value));
     }
 
     return (<MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
@@ -216,8 +216,10 @@ const DateInput = (props) => {
                 error={error}
                 helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
                 format="dd/MM/yyyy"
+                autoOk={true}
                 disableFuture
                 value={value}
+                cancelLabel="Cancelar"
                 onChange={handleChange}
                 onBlur={handleChange}
                 KeyboardButtonProps={{
@@ -338,11 +340,12 @@ class LForms extends Component {
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
             console.log(this.state.inputVal);
         }
-
+        
         const classes = {
             m5: {
                 margin: 5,
                 marginTop: 25,
+                width: window.innerWidth > 780 ? '30%' :'100%'
                 //flexBasis: '30%'
 
             },
@@ -354,6 +357,7 @@ class LForms extends Component {
                 height: 140,
             },
         }
+        const flexBasis  = '22%'
         return (
             <div>
                 {
@@ -380,13 +384,13 @@ class LForms extends Component {
 
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "date") {
-                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : '14%'}} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0 }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : '20%'}} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
-                                                                style={{ ...classes.m5, ...input.style, flexBasis: input.flexBasis, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
+                                                                style={{ ...classes.m5, fontSize: '.6em', width:'190px' }}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}
@@ -399,7 +403,7 @@ class LForms extends Component {
                                                                 key={`input-${ind1}`}
                                                                 disabled={input.disabled ?? false}
                                                                 value={input.value}
-                                                                style={{ ...classes.m5, ...input.style, flexBasis: input.flexBasis, flexGrow: input.grow ?? 0, fontSize: '.6em' }}
+                                                                style={{ ...classes.m5, flexBasis: input.flexBasis}}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}
@@ -411,7 +415,7 @@ class LForms extends Component {
                                                             id={input.column}
                                                             type={input.type}
                                                             value={input.value}
-                                                            style={{ ...classes.m5, ...input.style, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }}
+                                                            style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : input.flexBasis}}
                                                             id={input.column} label={input.label}
                                                             mask={input.mask ?? undefined}
                                                             validate={input.validateHandler}

@@ -107,7 +107,8 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
             $data['username'] = $request->user()->email;
-            
+            $data['anexo'] = 1;
+            unset($data["file"]);
             unset($data["_token"]);
             unset($data["_method"]);
             if (count($this->with) > 0) {
