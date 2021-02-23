@@ -20,4 +20,9 @@ class Contributors extends Model
         'birthdate'
     ];
 
+    public function user()
+    {
+        return $this->hasOne(\App\User::class, 'id','user_id');
+    }  
+
 }

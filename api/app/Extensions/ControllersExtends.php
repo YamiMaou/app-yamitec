@@ -154,7 +154,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = new FilesController();
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
+            $data['user_id'] = $request->user()->id;
             $this->saveLog($id, $request);
+            
             unset($data["_token"]);
             unset($data["_method"]);
             unset($data["justification"]);

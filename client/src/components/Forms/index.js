@@ -67,7 +67,7 @@ function TextMaskCustom(props) {
 // CheckBox
 
 const CheckBoxInput = (props) => {
-    const [value, setValue] = useState(props.value == 1 ? true : false ?? false);
+    const [value, setValue] = useState(props.value == "1" ? true : false ?? false);
     const [error, setError] = useState(false);
     function handleChange(e) {
         const { checked, id } = e.target;
@@ -78,7 +78,7 @@ const CheckBoxInput = (props) => {
                 setError(true)
             }
         }
-        let target = {id, value: checked ? 1 : 0 , type: 'checkbox'};
+        let target = {id, value: checked ? "1" : "0" , type: 'checkbox'};
         props.onChange({target, type: 'checkbox'})
         setValue(checked);
     }

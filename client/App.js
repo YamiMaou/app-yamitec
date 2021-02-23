@@ -3,16 +3,12 @@ import AppRouter from "./src/router"
 import { connect, Provider } from 'react-redux'
 import { SnackbarProvider, useSnackbar } from 'notistack';
 import store from './store'
+console.reportErrorsAsExceptions = false;
 const App = () => (
-  <SnackbarProvider maxSnack={3} 
-    anchorOrigin={{
-      vertical: 'top',
-      horizontal: 'center',
-  }}>
-    <Provider store={store}>
-      <AppRouter />
-    </Provider>
-  </SnackbarProvider>
+  <Provider store={store}>
+    <AppRouter />
+  </Provider>
+
 );
 
 export default App;

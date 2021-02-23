@@ -43,11 +43,11 @@ class EditContributors extends Component {
             let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
             if (data.address) data.address = address;
             if (data.contact) data.contact = contact
-            if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
+            //if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
             let response = await putApiContributors(this.props.match.params.id, data);
             //console.log(response);
             if (response.data.success) {
-                this.props.enqueueSnackbar(response.data.message, {variant: 'success'});
+                this.props.setSnackbar({ open: true, message: response.data.message });
                 this.props.history.goBack();
             } else {
                 let {errors} = response.data.error.response.data
@@ -58,7 +58,7 @@ class EditContributors extends Component {
                     message += `Campo ${err.toUpperCase()} : ${errors[err][0]} \n`;
                 })
                 //response.data.error.response.data.errors
-                this.props.enqueueSnackbar(message, {variant: 'error'});
+                this.props.setSnackbar({ open: true, message});
             }
 
         }
@@ -71,22 +71,22 @@ class EditContributors extends Component {
                         if (v1.validate !== undefined) {
                             if (v1.validate.number !== undefined) {
                                 if (/^[-]?\d+$/.test(value) == false)
-                                    campo = { id: v1.column, message: `o campo ${v1.label} é somente números ` }
+                                    campo = { id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
 
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
-                                    campo = { id: v1.column, message: `o campo ${v1.label}, tamanho máximo de ${v1.validate.max} caracteres exêdido` };
+                                    campo = { id: v1.column, message: `O Campo ${v1.label}, tamanho máximo de ${v1.validate.max} caracteres exêdido` };
                             }
 
                             if (v1.validate.min !== undefined) {
                                 if (value.length < v1.validate.min)
-                                    campo = { id: v1.column, message: `o campo ${v1.label}, tamanho minimo de ${v1.validate.min} caracteres.` };
+                                    campo = { id: v1.column, message: `O Campo ${v1.label}, tamanho minimo de ${v1.validate.min} caracteres.` };
                             }
 
                             if (v1.validate.required !== undefined) {
                                 if (value.length == 0)
-                                    campo = { id: v1.column, message: `o campo ${v1.label} é obrigatório` };
+                                    campo = { id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
                             }
                         }
 
@@ -98,7 +98,7 @@ class EditContributors extends Component {
                 })
             })
             //console.log(campo)
-            campo !== undefined ?  this.props.enqueueSnackbar( campo.message, {variant: 'error'}) : '';
+            campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message}) : '';
 
             return campo === undefined ? true : false
         }
@@ -192,18 +192,11 @@ class EditContributors extends Component {
                                 Id:  <b>{this.state.contributor.id}</b>
                             </Typography>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Usuário:  <b>{this.state.contributor.name}</b>
+                                Usuário:  <b>{this.state.contributor.user.name}</b>
                             </Typography>
                         </div>
                     </Paper>
                 }
-                <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                    open={this.props.snackbar.open}
-                    onClose={closeSnack}
-                    autoHideDuration={3000}
-                    message={this.props.snackbar.message}
-                />
             </Fragment>
         )
     }
@@ -215,4 +208,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ setSnackbar }, dispatch);
 
-export default withSnackbar(withRouter(connect(mapStateToProps, mapDispatchToProps)(EditContributors)))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(EditContributors))
