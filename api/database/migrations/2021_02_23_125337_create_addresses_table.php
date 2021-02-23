@@ -18,7 +18,7 @@ class CreateAddressesTable extends Migration
 
             $table->string('zipcode', 8);
             $table->string('street', 100);
-            $table->string('additional', 8)->nullable(); // complemento
+            $table->string('additional', 20)->nullable(); // complemento
             $table->string('city', 100);
             $table->string('uf', 50);
 
