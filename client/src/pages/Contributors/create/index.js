@@ -92,6 +92,9 @@ class CreateContributors extends Component {
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
                             }
                         }
+                        if(value == "Selecione"){
+                            campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
+                        }
                         if(v1.validateHandler !== undefined){
                             if (v1.validateHandler(value) == false)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} não possui um conteúdo é válido ` }

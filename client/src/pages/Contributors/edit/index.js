@@ -37,8 +37,8 @@ class EditContributors extends Component {
         };
         const flexBasis = '30%';
         const request = async (state, data) => {
-
-            this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
+            this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
+            //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
             let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
             let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
             if (data.address) data.address = address;
@@ -88,6 +88,9 @@ class EditContributors extends Component {
                                 if (value.length == 0)
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
                             }
+                        }
+                        if(value == "Selecione"){
+                            campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                         }
 
                         if (v1.validateHandler !== undefined) {
