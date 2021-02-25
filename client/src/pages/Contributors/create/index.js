@@ -160,6 +160,7 @@ class CreateContributors extends Component {
                     { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
+                        validate: {required: true },
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
                         flexBasis, style:{minWidth: "192px"}
                     },

@@ -11,7 +11,7 @@ import empty from '../../../../assets/empty_box.png'
 
 class LauncherLoading extends Component {
     async componentDidMount() {
-        localStorage.setItem("sessionTime", 9000);
+        localStorage.setItem("sessionTime", 900);
     }
 
     render() {

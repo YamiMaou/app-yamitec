@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
 import { StyledBadge } from '../../Custom'
-import { setMenu, setLoading, setTimer } from '../../../actions/appActions'
+import { setMenu, setLoading } from '../../../actions/appActions'
 import { setDialog as authDialog, setAuth } from '../../../actions/authAction'
 import { checkImageUrl } from '../../../providers/commonMethods'
 /** Assets */
@@ -93,14 +93,14 @@ function Header(props) {
   const [second, setSecond] = useState('00');
   const [minute, setMinute] = useState('00');
   const [isActive, setIsActive] = useState(true);
-  const [counter, setCounter] = useState(props.timer); // sec to minute #900 to 15 minutes
+  const [counter, setCounter] = useState(parseInt(localStorage.getItem("sessionTime"))); // sec to minute #900 to 15 minutes
   
     useEffect(() => {
       let intervalId;
-      //localStorage.setItem("sessionTime", 9000);
+      //localStorage.setItem("sessionTime", 900);
       if (isActive) {
         intervalId = setInterval(() => {
-          let count = props.timer;
+          let count = parseInt(localStorage.getItem("sessionTime"));
           if(count <= 0){
             logoutClick();
           }
@@ -112,8 +112,8 @@ function Header(props) {
   
           setSecond(computedSecond);
           setMinute(computedMinute);
-          setCounter(counter => counter-1);
-          props.setTimer(counter);
+          setCounter(counter => parseInt(localStorage.getItem("sessionTime")));
+          localStorage.setItem("sessionTime", count -1)
         }, 1000)
       }
   
@@ -231,11 +231,10 @@ function Header(props) {
 }
 const mapStateToProps = store => ({
   open: store.appReducer.open,
-  timer: store.appReducer.timer,
   loading: store.appReducer.loading,
   auth: store.authReducer.data
 });
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setMenu, setLoading, authDialog, setAuth, setTimer }, dispatch);
+  bindActionCreators({ setMenu, setLoading, authDialog, setAuth }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)
