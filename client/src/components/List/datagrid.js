@@ -148,7 +148,8 @@ class LDataGrid extends Component {
         data: [],
         filters: {},
         filter: 'flex',
-        loading: true
+        loading: true,
+        firstLoad: true
     }
     async setPage(params = { page: 1 }) {
         this.setState({ ...this.state, loading: true })
@@ -283,7 +284,7 @@ class LDataGrid extends Component {
                                 })
                             }
                             <div>
-                                <Button size="small" style={{ margin: 5 }} startIcon={<SearchIcon />} variant="contained" color="primary" onClick={() => { this.setPage(this.state.filters) }}> Pesquisar</Button>
+                                <Button size="small" style={{ margin: 5 }} startIcon={<SearchIcon />} variant="contained" color="primary" onClick={() => { this.setPage(this.state.filters); this.setState({...this.state, firstLoad : false}) }}> Pesquisar</Button>
                                 <Button size="small" style={{ margin: 5 }} startIcon={<ReorderIcon />} variant="contained" color="primary" onClick={() => {onClearFilter()}} > Limpar</Button>
                             </div>
                         </div>
@@ -292,10 +293,11 @@ class LDataGrid extends Component {
 
                 <Card>
                     <CardContent>
-                        {rows.length > 0 &&
+                        {!this.state.firstLoad &&
                         <div style={{ height: 450, width: '100%' }}>
                             <StyledDataGrid rows={rows} columns={columns}
-                                columnBuffer={4}
+                                //columnBuffer={4}
+                                sortModel={this.props.sortModel}
                                 disableClickEventBubbling
                                 disableColumnMenu={true}
                                 loading={this.state.loading}
@@ -307,7 +309,6 @@ class LDataGrid extends Component {
                                     this.setPage({ page: params.page, pageSize: params.pageSize });
                                 }}*/
                                 onPageChange={(params) => {
-                                    console.log("CARREGOU");
                                     this.setPage({ page: params.page, pageSize: params.pageSize });
                                 }}
                             />

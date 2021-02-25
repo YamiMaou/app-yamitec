@@ -36,7 +36,12 @@ class Contributors extends Model
 
     public function file()
     {
-        return $this->hasOne(\App\Models\File::class, 'id','anexo');
+        return $this->hasOne(\App\Models\File::class, 'id','anexo')->latest();
+    }  
+
+    public function audits()
+    {
+        return $this->hasOne(\App\Models\Audit::class, 'contributors_id','id')->latest();
     }  
 
 }

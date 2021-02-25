@@ -13,7 +13,7 @@ import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
 import { postApiContributors, getApiDownloadFile } from '../../../providers/api'
-import { validaEmail, validaCpf, stringToDate } from '../../../providers/commonMethods'
+import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
@@ -26,7 +26,7 @@ class CreateContributors extends Component {
         states: []
     }
     async componentDidMount() {
-
+        localStorage.setItem("sessionTime", 9000)
 
     }
 
@@ -40,6 +40,8 @@ class CreateContributors extends Component {
         };
         
         const request = async (data) => {
+            this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
+            this.setState({ ...this.state, loading: true });
             //data = Object.assign({},state.addresses,data);
             //data = Object.assign({},state.contacts,data);
             //data = Object.assign({},state,data);
@@ -51,23 +53,26 @@ class CreateContributors extends Component {
             if (response.data.success) {
                 //this.props.enqueueSnackbar( response.data.message, { variant: 'success' });
                 this.props.setSnackbar({ open: true, message: response.data.message });
+                this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
                 console.log(response)
-                let errors = response.data.error ?? undefined;
+                let errors = response.data ?? undefined;
 
                 //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
-                if(errors !== undefined && errors.response !== undefined  && errors.response.data.errors !== undefined){
+                if(errors !== undefined && errors.data !== undefined && errors.data.response !== undefined  && errors.data.response.data.errors !== undefined){
                     Object.keys(errors.response.data.errors).map(err => {
                         console.log(err);
-                        messages += `Campo ${err.toUpperCase()} : ${errors.response.data.errors[err][0]} \n`;
+                        let field = err == "file" ? "Anexo" : err
+                        messages += `O campo ${field.toUpperCase()} ${errors.response.data.errors[err][0]} \n`;
                     })
                 } else{
                     messages = 'Houve um problema em sua requisição!'
                 }
                 //response.data.error.response.data.errors
                 //this.props.enqueueSnackbar( message, { variant: 'error' });
+                this.setState({ ...this.state, loading: false });
                 this.props.setSnackbar({ open: true, message: messages});
             }
 
@@ -76,7 +81,7 @@ class CreateContributors extends Component {
             //console.log(fields);
             let campo = undefined;
             fields.reverse().map((v,k) => {
-                v.fields.map((v1,k1)=>{
+                v.fields.reverse().map((v1,k1)=>{
                         let value = values[v1.column];
                         if (v1.validate !== undefined) {
                             if (v1.validate.number !== undefined) {
@@ -104,7 +109,7 @@ class CreateContributors extends Component {
                         }
                         if(v1.validateHandler !== undefined){
                             if (v1.validateHandler(value) == false)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} não possui um conteúdo é válido ` }
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}  é inválido ` }
                         }
                     })
                 })
@@ -121,7 +126,7 @@ class CreateContributors extends Component {
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'birthdate', label: 'Data de Nascimento', type: 'date', validate: {required: true},flexBasis, style:{maxWidth: '210px'} },
+                    { column: 'birthdate', label: 'Data de nascimento', type: 'date', validate: {required: true}, validateHandler: isFutureData, flexBasis, style:{maxWidth: '210px'} },
                     {
                         column: 'function', label: 'Função', type: 'select',
                         values: [
@@ -132,10 +137,11 @@ class CreateContributors extends Component {
                             "Operador de marketing", 
                             "Vendedor"
                         ],
+                        validate: {required: true },
                         //value: "Coordenador de usuários",
                         flexBasis, style:{width: '220px'}
                     },
-                    { column: 'file', label: 'Anexar Documento', type: 'file', flexBasis, style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', type: 'file', validate: {required: true}, flexBasis, style:{maxWidth: '180'} },
                     //
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]
@@ -190,6 +196,7 @@ class CreateContributors extends Component {
                 <LForms forms={forms}
                     request={request} 
                     validate={(values) => { return validateFields(forms,values)}}
+                    loading={this.state.loading}
                 />
             </Fragment>
         )

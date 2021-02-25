@@ -99,16 +99,16 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         //var_dump( $request->all());
            // exit;
         try {
-            $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
-            $files = new FilesController();
-            $files = $files->multUpload($request, $modelName);
-            $data = $files->request;
-            $data['user_id'] = $request->user()->id;
-            $data['username'] = $request->user()->email;
-            unset($data["file"]);
-            unset($data["_token"]);
-            unset($data["_method"]);
             if (count($this->with) > 0) {
+                $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
+                $files = new FilesController();
+                $files = $files->multUpload($request, $modelName);
+                $data = $files->request;
+                $data['user_id'] = $request->user()->id;
+                $data['username'] = $request->user()->email;
+                unset($data["file"]);
+                unset($data["_token"]);
+                unset($data["_method"]);
                 $i = 0;
                 $primary = null;
                 foreach ($this->with["data"] as $model => $fields) {
@@ -123,6 +123,12 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                     $model::create($fields);
                 }
             } else {
+                $data = $request->all();
+                $data['user_id'] = $request->user()->id;
+                $data['username'] = $request->user()->email;
+                unset($data["file"]);
+                unset($data["_token"]);
+                unset($data["_method"]);
                 $this->model->create($data);
                 //FilesController::upload($request, $this->model, $obj->id);
             }
@@ -154,7 +160,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
-            $this->saveLog($id, $request);
+            $this->saveLog($id, $request, $modelName);
             
             unset($data["_token"]);
             unset($data["_method"]);
@@ -205,14 +211,15 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         return $this;
     }
 
-    public function saveLog($id, $request){
+    public function saveLog($id, $request, $modelName = ""){
         $data =  $request->all();
         $olderData = $this->model->where('id', $id )->first();
-        $to = json_encode($olderData);
+        $to = json_encode($data);
         $from = json_encode($olderData);
         $audit = new Audit();
         $audit->create([
             'user_id' => $request->user()->id,
+            'contributors_id' => $id,
             'justification'=> $data['justification'],
             'from' => $from,
             'to' => $to

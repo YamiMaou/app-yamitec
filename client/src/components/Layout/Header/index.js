@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
 import { StyledBadge } from '../../Custom'
-import { setMenu, setLoading } from '../../../actions/appActions'
+import { setMenu, setLoading, setTimer } from '../../../actions/appActions'
 import { setDialog as authDialog, setAuth } from '../../../actions/authAction'
 import { checkImageUrl } from '../../../providers/commonMethods'
 /** Assets */
@@ -88,6 +88,40 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Header(props) {
+  // TIMER
+  const [timer, setTimer] = React.useState("");
+  const [second, setSecond] = useState('00');
+  const [minute, setMinute] = useState('00');
+  const [isActive, setIsActive] = useState(true);
+  const [counter, setCounter] = useState(props.timer); // sec to minute #900 to 15 minutes
+  
+    useEffect(() => {
+      let intervalId;
+      //localStorage.setItem("sessionTime", 9000);
+      if (isActive) {
+        intervalId = setInterval(() => {
+          let count = props.timer;
+          if(count <= 0){
+            logoutClick();
+          }
+          const secondCounter = counter % 60;
+          const minuteCounter = Math.floor(counter / 60);
+  
+          const computedSecond = String(secondCounter).length === 1 ? `0${secondCounter}`: secondCounter;
+          const computedMinute = String(minuteCounter).length === 1 ? `0${minuteCounter}`: minuteCounter;
+  
+          setSecond(computedSecond);
+          setMinute(computedMinute);
+          setCounter(counter => counter-1);
+          props.setTimer(counter);
+        }, 1000)
+      }
+  
+      return () => clearInterval(intervalId);
+    }, [isActive, counter])
+  
+
+  //END TIMER
   const authData = JSON.parse(localStorage.getItem("user"));
   
   const cliente = JSON.parse(localStorage.getItem("cliente")) === null ? { logo: undefined } :JSON.parse(localStorage.getItem("cliente"));
@@ -107,7 +141,6 @@ function Header(props) {
     setAnchorEl(event.currentTarget);
   };
 
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -123,6 +156,7 @@ function Header(props) {
   let hostUrl = "https://services.yamitec.com";
   //console.log(hostUrl+"/"+cliente.logo);
   let isLogo = checkImageUrl(cliente.logo) ? true :  false
+
   return (
     <div className={classes.root}>
       {props.loading === true ? <CircularProgress /> : null}
@@ -165,6 +199,10 @@ function Header(props) {
          
           {authData !== null ? (
             <div>
+              <Typography>
+                Sessão: {minute} : {second} 
+              </Typography>
+              
               <Button color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={usrClick}>
               <Avatar alt={authData.name}> {authData.name.charAt(0)} </Avatar> &nbsp; { window.innerWidth >= 767 && authData.name }
               </Button>
@@ -193,10 +231,11 @@ function Header(props) {
 }
 const mapStateToProps = store => ({
   open: store.appReducer.open,
+  timer: store.appReducer.timer,
   loading: store.appReducer.loading,
   auth: store.authReducer.data
 });
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setMenu, setLoading, authDialog, setAuth }, dispatch);
+  bindActionCreators({ setMenu, setLoading, authDialog, setAuth, setTimer }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)

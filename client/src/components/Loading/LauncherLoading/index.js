@@ -11,7 +11,7 @@ import empty from '../../../../assets/empty_box.png'
 
 class LauncherLoading extends Component {
     async componentDidMount() {
-        
+        localStorage.setItem("sessionTime", 9000);
     }
 
     render() {
@@ -23,9 +23,6 @@ class LauncherLoading extends Component {
                 , 5000);
         }
         //doFail();
-        const client = localStorage.getItem("cliente") == null ? {
-            logo: undefined
-        } :JSON.parse(localStorage.getItem("cliente"));
         const styles = {
             backgroundColor: "#fff",
             borderRadius: 3,
@@ -41,7 +38,6 @@ class LauncherLoading extends Component {
             }}>
                 {failed === undefined, failed !== true ? (
                     <div>
-                        <Image source={  "https://services.yamitec.com/"+client.logo } />
                         <CircularProgress />
                     </div>
                 ) : (

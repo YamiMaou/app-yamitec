@@ -28,7 +28,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { Redirect } from "react-router-dom";
 
 import { setAuth } from './actions/authAction';
-import { setSnackbar } from './actions/appActions';
+import { setSnackbar, setTimer } from './actions/appActions';
 // Theme
 const YamiTheme = createMuiTheme(themeStyle)
   //background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
@@ -46,6 +46,7 @@ function TransitionDown(props) {
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
+
   const authData = JSON.parse(localStorage.getItem("user"));
   const isAuth = authData !== null ? true : false;
   return props.products !== undefined ? (<LauncherDialog />) : (
@@ -101,9 +102,10 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = store => ({
   auth: store.authReducer.data,
+  timer: store.appReducer.timer,
   snackbar: store.appReducer.snackbar
 });
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setAuth, setSnackbar }, dispatch);
+  bindActionCreators({ setAuth, setSnackbar, setTimer }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppRouter);

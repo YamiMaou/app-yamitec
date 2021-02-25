@@ -12,3 +12,8 @@ export const setLoading = (loading) => ({
   type: 'SET_LOADING', 
   payload: loading
 });
+
+export const setTimer = (value) => ({
+  type: 'SET_TIMER', 
+  payload: value
+});

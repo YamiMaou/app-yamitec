@@ -8,6 +8,10 @@ export const stringToaddDate = (_date,_format,add = { qtd : 1, period : 'M'}) =>
   return moment(_date).add(add.qtd, add.period).format(_format);
 }
 
+export const isFutureData = (_value) => {
+  let today = Date.now()
+  return new Date(_value) < today;
+}
 export const formatToBRL = (_valor) => {
   
   _valor = _valor + '';
@@ -32,7 +36,9 @@ export const checkImageUrl = (imageUrl) => {
   }
 }
 export function validaEmail(email){
-  let emailCheck = /^([a-z]){1,}([a-z0-9._-]){1,}([@]){1}([a-z]){2,}([.]){1}([a-z]){2,}([.]?){1}([a-z]?){2,}$/i;
+  //let emailCheck = /^([a-z]){1,}([a-z0-9._-]){1,}([@]){1}([a-z]){2,}([.]){1}([a-z]){2,}([.]?){1}([a-z]?){2,}$/i;
+  let emailCheck = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+  
   return emailCheck.test(email);
 }
 export function validaCpf(strCPF = "") {

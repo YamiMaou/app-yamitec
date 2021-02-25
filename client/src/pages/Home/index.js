@@ -10,13 +10,14 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 //
 
-import { setSnackbar } from '../../actions/appActions'
+import { setSnackbar, setTimer} from '../../actions/appActions'
 class Home extends Component {
     state = {
         item: undefined,
     }
 
-    async componentDidMount() {
+    componentDidMount() {
+        //this.props.setTimer(9000);
     }
 
     dialogHandler(item) {
@@ -70,6 +71,6 @@ const mapStateToProps = store => ({
     session: store.authReducer.data,
 });
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ setSnackbar }, dispatch);
+    bindActionCreators({ setSnackbar, setTimer }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

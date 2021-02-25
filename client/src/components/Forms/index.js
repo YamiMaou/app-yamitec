@@ -16,6 +16,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 import Snackbar from '@material-ui/core/Snackbar';
+import CircularProgress from '@material-ui/core/CircularProgress';
 //
 import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
@@ -79,24 +80,39 @@ const CheckBoxInput = (props) => {
                 setError(true)
             }
         }
-        let target = {id, value: checked ? "1" : "0" , type: 'checkbox'};
-        props.onChange({target, type: 'checkbox'})
+        let target = { id, value: checked ? "1" : "0", type: 'checkbox' };
+        props.onChange({ target, type: 'checkbox' })
         setValue(checked);
     }
+
+    function JustChange(e) {
+        const { value, id } = e.target;
+        props.onChange(e)
+    }
     return (
-        <div key={`check-${props.id}`} style={{...props.style}}>
-        <FormControlLabel 
-        control={<Checkbox checked={value} disabled={props.disabled ?? false}onChange={handleChange} name={props.id} id={props.id} />}
-        label={props.label}
-      />
-      </div>
-      )
+        <div key={`check-${props.id}`} style={{ display: 'flex',flexBasis: '100%' }}>
+            <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '10%'  }}
+                control={<Checkbox checked={value} disabled={props.disabled ?? false} onChange={handleChange} name={props.id} id={props.id} />}
+                label={props.label}
+            />
+            { props.justification !== undefined && <TextInputCustom key={`input-just`}
+                id={'justification'}
+                disabled={value}
+                type={'text'}
+                value={props.justification}
+                style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '75%' }}
+                label={'Justificativa'}
+                onChange={JustChange}
+                onBlur={JustChange} /> }
+        </div>
+    )
 }
 
 // File Input
 const FileInput = (props) => {
     const [value, setValue] = useState(props.value ?? undefined);
     const [file, setFile] = useState(props.file ?? undefined);
+    const [replace, setReplace] = useState(!props.file ?? true);
     const [error, setError] = useState(false);
     function handleChange(e) {
         const { value, id } = e.target;
@@ -107,33 +123,44 @@ const FileInput = (props) => {
                 setError(true)
             }
         }
-        
-        props.onChange({target: {id, value: e.target.files[0], type: 'file'}})
+
+        props.onChange({ target: { id, value: e.target.files[0], type: 'file' } })
         setValue(e.target.value);
     }
     return (
         <FormControl style={props.style}>
-            { file === undefined ?
-            (<Button  variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                { value !== undefined ? 
-                <b style={{color: 'red'}}>
-                    <a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a>
-                </b> : props.label}
-                <input type="file" hidden
-                    onChange={handleChange}
-                    onBlur={handleChange}
-                    name={props.id}
-                    id={props.id}
-                />
-            </Button>) : 
-            (<Button  variant="outlined" component="label" 
-                onClick={() => {
-                    getApiDownloadFile(file);
-                }}
-                endIcon={<Icon name="arrow-circle-down" 
-                size={18} color="#025ea2" />}>
-                Baixar Arquivo
-            </Button>)}
+            { file === undefined || replace ?
+                (<Button variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
+                    { value !== undefined ?
+                        <b style={{ color: 'red' }}>
+                            <a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a>
+                        </b> : props.label}
+                    <input type="file" hidden
+                        onChange={handleChange}
+                        onBlur={handleChange}
+                        name={props.id}
+                        id={props.id}
+                    />
+                </Button>) :
+                (
+                    <div>
+                        <Button variant="outlined" component="label"
+                            endIcon={
+                                <Icon name="remove" size={18} color="red" onClick={() => {
+                                    setReplace(true);
+                                }} />
+                            }>
+                            Baixar Arquivo
+                <Icon name="arrow-circle-down"
+                                size={18} color="#025ea2"
+                                onClick={() => {
+                                    getApiDownloadFile(file);
+                                }}
+                            />
+                        </Button>
+
+                    </div>
+                )}
         </FormControl>)
 }
 //
@@ -162,6 +189,7 @@ function TextInputCustom(props) {
         return (
             <TextField key={`input-${props.id}`} size="small" style={props.style}
                 required={props.required ?? false}
+                disabled={props.disabled ?? false}
                 error={error}
                 type={props.type ?? "text"}
                 value={value}
@@ -199,7 +227,7 @@ function TextInputCustom(props) {
 //
 const DateInput = (props) => {
     let valueDate = new Date(props.value)
-    const [value, setValue] = useState(props.value ? valueDate.setDate(valueDate.getDate() + 1) : '');
+    const [value, setValue] = useState(props.value);
     const [error, setError] = useState(false);
     function handleChange(e) {
         setValue(e.target.value);
@@ -219,23 +247,24 @@ const DateInput = (props) => {
             console.log(err);
         }
         //props.onChange(value);
-        
+
     }
     return (
-            <form  noValidate style={{ ...props.style, marginTop: 20 }}>
-              <TextField
+        <form noValidate style={{ ...props.style, marginTop: 20 }}>
+            <TextField
                 id={props.id}
                 label={props.label ?? 'Data'}
                 type="date"
                 defaultValue={value}
                 onChange={handleChange}
                 onBlur={handleChange}
-                
+                error={error}
+                helperText={error == true ? props.helperText ?? "Data inválida" : ""}
                 InputLabelProps={{
-                  shrink: true,
+                    shrink: true,
                 }}
-              />
-            </form>
+            />
+        </form>
     );
     return (<MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
         <Grid style={{ ...props.style, marginTop: 18 }}>
@@ -306,6 +335,7 @@ class LForms extends Component {
     state = {
         data: [],
         inputVal: {},
+        loading: false,
         filter: ['flex']
     }
     componentDidMount() {
@@ -336,7 +366,7 @@ class LForms extends Component {
                 value = value.replace(/[^\d]+/g, '');
             }
 
-            if (e.target.type !== "file" && (value.length == 0 || value == '' || value == 'Todos')) {
+            if (e.target.type !== "file" && (value.length == 0 || value == '' || value == 'Selecione')) {
                 if (params.json === undefined) {
                     inputValues[id] = ''
                 } else {
@@ -372,12 +402,12 @@ class LForms extends Component {
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
             //console.log(this.state.inputVal);
         }
-        
+
         const classes = {
             m5: {
                 margin: 5,
                 marginTop: 25,
-                width: window.innerWidth > 780 ? '30%' :'100%'
+                width: window.innerWidth > 780 ? '30%' : '100%'
                 //flexBasis: '30%'
 
             },
@@ -389,7 +419,7 @@ class LForms extends Component {
                 height: 140,
             },
         }
-        const flexBasis  = '22%'
+        const flexBasis = '22%'
         return (
             <div>
                 {
@@ -416,13 +446,13 @@ class LForms extends Component {
 
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "date") {
-                                                        return <DateInput value={input.value ?? ""} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : '14%'}} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                        return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : '14%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : '20%'}} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
-                                                                style={{ ...classes.m5, fontSize: '.6em', width:'190px' }}
+                                                                style={{ ...classes.m5, fontSize: '.6em', width: '190px' }}
                                                                 file={input.file}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
@@ -430,13 +460,14 @@ class LForms extends Component {
                                                                 id={input.column}
                                                             />
                                                         )
-                                                    }else if (input.type == "checkbox") {
+                                                    } else if (input.type == "checkbox") {
                                                         return (
-                                                            <CheckBoxInput 
+                                                            <CheckBoxInput
                                                                 key={`input-${ind1}`}
                                                                 disabled={input.disabled ?? false}
+                                                                justification={input.justification ?? undefined}
                                                                 value={input.value}
-                                                                style={{ ...classes.m5, flexBasis: input.flexBasis}}
+                                                                style={{ ...classes.m5, flexBasis: input.flexBasis }}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}
@@ -446,9 +477,10 @@ class LForms extends Component {
                                                     } else {
                                                         return <TextInputCustom key={`input-${ind1}`}
                                                             id={input.column}
+                                                            disabled={input.disabled ?? false}
                                                             type={input.type}
                                                             value={input.value}
-                                                            style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ?'100%' : input.flexBasis}}
+                                                            style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }}
                                                             id={input.column} label={input.label}
                                                             mask={input.mask ?? undefined}
                                                             validate={input.validateHandler}
@@ -466,7 +498,8 @@ class LForms extends Component {
                     })
 
                 }
-                <Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
+                {!this.props.loading ? 
+                (<div><Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
                     if (this.props.validate === undefined) {
                         this.props.request(this.state.inputVal);
                     } else {
@@ -477,7 +510,10 @@ class LForms extends Component {
                     }
                 }}> Salvar</Button>
                 <Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => { this.props.history.goBack(); }} > Cancelar</Button>
-            </div>
+                </div>) : (
+                <CircularProgress style={{display: 'flex', margin: 'auto'}} />
+                )}
+        </div>
         )
     }
 }

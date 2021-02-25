@@ -23,27 +23,33 @@ class ContributorsController extends ControllersExtends
     }
     public function show(Req $request, $id, $with=[])
     {
-       return  parent::show($request, $id, ['user', 'file', 'addresses', 'contacts']);
+       return  parent::show($request, $id, ['user', 'file', 'addresses', 'contacts', 'audits']);
     }
 
     public function update(Req $request, $id)
     {
         $validate = $request;
+        if(!isset($validate->cpf)){
+            $validate["user_id"] = $request->user()->id;
+            return parent::update($validate, $id);
+        }
+        
         $files = new \App\Http\Controllers\FilesController();
         $files = $files->multUpload($request, 'contributors');
         $data = $files->request;
-
+        //var_dump($data);
         $contributors = [
+            "user_id" => $request->user()->id,
             "cpf" => $request->cpf,
             "name" => $request->name,
             "birthdate"=> $request->birthdate,
             "function"=>$request->function,
             "active" => $request->active,
-            "anexo" => 1
+            "anexo" => $data['file'] == "[object Object]" ? $data['anexo'] : $data['file'],
         ];
 
         $request['name'] = $data['name'] ?? null;
-        $request['anexo'] = $data['file'] ?? null;
+        //$request['anexo'] = $data['anexo'] ?? null;
 
         $address = [
             "uf" => $request->uf,
@@ -83,14 +89,14 @@ class ContributorsController extends ControllersExtends
             "birthdate"=> $request->birthdate,
             "function"=>$request->function,
             "active" => $request->active,
-            "anexo" => $data['file'],
+            "anexo" =>  $data['file'],
             "address" => "[]",
             "contact" => "[]",
             'user_id' => $request->user()->id,
             'username' => $request->user()->email,
         ];
-        $request['name'] = $data['name'];
-        $request['anexo'] = $data['file'];
+        $request['name'] = $data['name'] ?? null;
+        $request['anexo'] = $data['file'] ?? null;
 
         $address = [
             "uf" => $request->uf,

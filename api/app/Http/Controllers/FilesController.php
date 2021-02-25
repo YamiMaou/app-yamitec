@@ -97,7 +97,7 @@ class FilesController extends Controller
 
     public function download(Request $request)
     {
-       return Storage::url($this->publicStorege.$request['file_name']);
+       return Storage::download($this->publicStorege.$request['file_name']);
     }
 
     public function delete(Request $request, $id)

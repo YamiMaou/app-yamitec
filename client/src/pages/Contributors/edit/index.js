@@ -21,8 +21,10 @@ import { withSnackbar  } from 'notistack';
 class EditContributors extends Component {
     state = {
         contributor: undefined,
+        loading: false
     }
     async componentDidMount() {
+        localStorage.setItem("sessionTime", 9000)
         let contributor = await getApiContributors({}, this.props.match.params.id);
         this.setState({ ...this.state, contributor });
 
@@ -36,6 +38,7 @@ class EditContributors extends Component {
             this.props.setSnackbar({ open: false, message: "" });
         };
         const request = async (state, data) => {
+            this.setState({ ...this.state, loading: true });
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
             //let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
@@ -52,6 +55,7 @@ class EditContributors extends Component {
             //console.log(response);
             if (response.data.success) {
                 this.props.setSnackbar({ open: true, message: response.data.message });
+                this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
                 let {errors, message} = response.data.error.response.data
@@ -60,11 +64,12 @@ class EditContributors extends Component {
                 if(errors !== undefined ){
                     Object.keys(errors).map(err => {
                         console.log(err);
-                        messages += `Campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
+                        messages += `O campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
                     });
                 } else{
                     messages = 'Houve um problema em sua requisição!'
                 }
+                this.setState({ ...this.state, loading: false });
                 //response.data.error.response.data.errors
                 this.props.setSnackbar({ open: true, messages});
             }
@@ -103,7 +108,7 @@ class EditContributors extends Component {
 
                         if (v1.validateHandler !== undefined) {
                             if (v1.validateHandler(value) == false)
-                                campo = { id: v1.column, message: `O Campo ${v1.label} não possui um conteúdo é válido ` }
+                                campo = { id: v1.column, message: `O Campo ${v1.label} não possui é inválido ` }
                         }
                     }
                 })
@@ -118,10 +123,14 @@ class EditContributors extends Component {
             {
                 title: 'Dados Básicos',
                 fields: [
-                    { column: 'active', label: 'Ativo', type: 'checkbox',  value: this.state.contributor['active'] == 1 ? true : false, disabled: false, flexBasis : "100%" },
+                    { 
+                        column: 'active', label: 'Ativo', type: 'checkbox',  value: this.state.contributor['active'] == 1 ? true : false, disabled: false, 
+                        justification: this.state.contributor['audits'] ? this.state.contributor['audits'].justification : '', 
+                        flexBasis : "10%" 
+                    },
                     { column: 'cpf', value: this.state.contributor['cpf'], label: 'CPF', type: 'text', mask: InputCpf, validate: { min: 11, number: true, required: true }, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', value: this.state.contributor['name'], label: 'Nome', type: 'text', validate: { max: 50, required: true }, flexBasis },
-                    { column: 'birthdate', value: this.state.contributor['birthdate'], label: 'Data de Nascimento', type: 'date', flexBasis, style: { maxWidth: '160px' } },
+                    { column: 'birthdate', value: this.state.contributor['birthdate'], label: 'Data de nascimento', type: 'date', flexBasis, style: { maxWidth: '160px' } },
                     {
                         column: 'function', label: 'Função', type: 'select',
                         values: [
@@ -133,9 +142,10 @@ class EditContributors extends Component {
                             "Vendedor"
                         ],
                         value: this.state.contributor['function'],
+                        validate: {required: true },
                         flexBasis
                     },
-                    { column: 'file', label: 'Anexar Documento', file: this.state.contributor['file'].name, type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', file: this.state.contributor['file'] ? this.state.contributor['file'].name : '', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
                 ]
             },
             {
@@ -186,13 +196,14 @@ class EditContributors extends Component {
                     <LForms forms={forms}
                         request={(data) => {request(this.state.contributor,data)}}
                         validate={(values) => { return validateFields(forms, values) }}
+                        loading={this.state.loading}
                     />
                 }
                 { this.state.contributor !== undefined &&
                     <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 768 ? 210 : 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Data de Cadastro:  <b>{stringToaddDate(this.state.contributor.created_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>&nbsp;
+                                Data de cadastro:  <b>{stringToaddDate(this.state.contributor.created_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>&nbsp;
                             </Typography>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
                                 Última alteração:  <b>{stringToaddDate(this.state.contributor.updated_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>

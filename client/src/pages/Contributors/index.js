@@ -27,40 +27,42 @@ import {InputCpf, stringCpf} from '../../providers/masks'
 import { IconButton, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-import { DataGrid, RowsProp, ColDef } from '@material-ui/data-grid';
+import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
-    const [justfy, setjustfy] = React.useState("");
-  
+    const [justfy, setjustfy] = React.useState(undefined);
+    
     const handleClose = () => {
       setOpen(false);
     };
     
     const send = async () => {
-        await putApiContributors( props.id, {active: 0 ?? undefined, justification: justfy});
+        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy ?? 'Nenhuma'});
+        props.handle(props.active)
         props.handleClose();
     }
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Bloqueio de Colaborador</DialogTitle>
+          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "desb" }loqueio de colaborador</DialogTitle>
           <DialogContent>
             <DialogContentText>
-                Confirma o bloqueio do registro selecionado?
+            
+                Confirma o { props.active == 0 ? "" : "des" }bloqueio do registro selecionado?
             </DialogContentText>
-            <TextField
+            { props.active == 0 &&<TextField
               autoFocus
               margin="dense"
-              id="jistification"
-              label="Jistificativa"
+              id="justification"
+              label="Justificativa"
               type="text"
               fullWidth
               value={justfy}
               onChange={(e) => {
                 setjustfy(e.target.value)
               }}
-            />
+            /> }
           </DialogContent>
           <DialogActions>
             <Button onClick={props.handleClose} color="primary">
@@ -78,7 +80,9 @@ function BlockDialog(props) {
 class Contributors extends Component {
     state = {
         contributors: [],
-        blockDialog: {open: false, id: undefined}
+        pageRequest: {},
+        blockDialog: {open: false, id: undefined,active: 0, handle: undefined},
+       
     }
     
     async componentDidMount() {
@@ -97,7 +101,7 @@ class Contributors extends Component {
         }
         const rows : RowsProp = this.state.contributors.data ?? [];
         const columns: ColDef[] = [
-            { field: 'cpf', headerName: 'Cpf', flex: 0.7,
+            { field: 'cpf', headerName: 'CPF', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return stringCpf(params.value);
                 }
@@ -115,7 +119,8 @@ class Contributors extends Component {
                 field: 'id',
                 headerName: 'Ações',
                 flex: 1,
-                renderCell: (params: ValueFormatterParams) => (
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => (
+                        
                     <div>
                     <Link to={`/colaboradores/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
@@ -130,12 +135,16 @@ class Contributors extends Component {
                         variant="contained"
                         color="primary"
                         size="small"
-                        onClick={async ()=> {
-                            this.setState({...this.state, blockDialog: {open: true, id: params.value}})
+                        onClick={async (e)=> {
+                            console.log(params)
+                            const handle = (status) => {
+                                params.row.active = status;
+                            }
+                            this.setState({...this.state, blockDialog: {open: true, id: params.value, active: params.getValue('active') === 1 ? 0 : 1,handle }})
                         }}
                         style={{ marginLeft: 16 }}
                       >
-                        <BlockIcon fontSize="small"/>
+                        {params.getValue('active') === 1 ? <BlockIcon fontSize="small"/> : <CheckCircleIcon fontSize="small" /> }
                       </Button>
                     </div>
                   ),
@@ -185,16 +194,25 @@ class Contributors extends Component {
                     
                 </AppBar>
                     <LDataGrid rows={rows} columns={columns} filterInputs={filter} 
+                    sortModel={[
+                        {
+                          field: 'name',
+                          sort: 'asc',
+                        },
+                    ]}
                     pageRequest={
                         (params) => {
                             if(params.active !== undefined){
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
+                            this.setState({...this.state, pageRequest: params})
                             return getApiContributors(params)
                     }} />
                         <BlockDialog 
                             open={this.state.blockDialog.open} 
                             id={this.state.blockDialog.id}
+                            handle={this.state.blockDialog.handle}
+                            active={this.state.blockDialog.active}
                             handleClose={() => {
                                 this.setState({...this.state, blockDialog: { open : false, id: undefined }})
                             }}
