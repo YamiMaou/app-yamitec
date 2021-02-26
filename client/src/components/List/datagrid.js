@@ -255,7 +255,7 @@ class LDataGrid extends Component {
                                 this.props.filterInputs.map(input => {
                                     if (input.type == "text") {
                                         if (input.mask === undefined)
-                                            return <TextField style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         else
                                             return (
                                                 <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
