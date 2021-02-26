@@ -3,8 +3,12 @@ import axios from 'axios';
 let hostname = window === undefined ? "yamitec.yamitec.com" : window.location.hostname;
 let apiHost = ""
 hostname = "/api";
-//apiHost = hostname;
-
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  apiHost = "http://localhost:8000/api"
+} else {
+  apiHost = hostname;
+}
+apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({
@@ -22,6 +26,7 @@ export const JWT_Decode = (token) => {
   }).join(''));
   return JSON.parse(jsonPayload);
 }
+/// Lower Keys from object
 function lower(obj) {
   for (let prop in obj) {
     console.log(prop)
@@ -31,7 +36,9 @@ function lower(obj) {
   }
   return obj;
 }
+/// new API METHOD
 /// Auth API Methods
+
 export const postAuth = async (params = {}) => {
   localStorage.setItem("sessionTime", 900)
   const data = Object.entries(params)
