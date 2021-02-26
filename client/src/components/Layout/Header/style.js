@@ -30,10 +30,12 @@ export const themeStyle = {
           // Some CSS
           fontSize: '1rem',
           viewport: {
-            maxWidth: 600
+            maxWidth: '600 px !important'
           }
         },
-        
+        viewport: {
+          maxWidth: '600 px !important'
+        }
       },
     },
   },
