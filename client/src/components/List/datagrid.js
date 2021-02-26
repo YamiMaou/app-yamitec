@@ -150,23 +150,24 @@ class LDataGrid extends Component {
     state = {
         data: [],
         filters: {},
+        page: 1,
         filter: 'flex',
         loading: true,
         firstLoad: true
     }
     async setPage(params = { page: 1 }) {
         this.setState({ ...this.state, loading: true })
-        let cleanfilters = {};
-        Object.entries(params).map((item) => { 
+        let cleanfilters = this.state.filters;
+        Object.entries(this.state.filters).map((item) => {
             if(item[1].length >= 1 ){
                 if(item[1] !== "Todos"){
                     cleanfilters[item[0]] = item[1];
                     console.log(item);
                 }
             }
-            
         });
-        let query = Object.assign({queryType : 'like', withId: "name"}, cleanfilters);
+
+        let query = Object.assign({queryType : 'like', withId: "name", page: params.page}, cleanfilters);
         console.log(query);
         const data = await this.props.pageRequest(query);
         if (data !== undefined) {
@@ -321,7 +322,9 @@ class LDataGrid extends Component {
                                     this.setPage({ page: params.page, pageSize: params.pageSize });
                                 }}*/
                                 onPageChange={(params) => {
-                                    this.setPage({ page: params.page, pageSize: params.pageSize });
+                                    let filters = Object.assign({}, this.state.filters,{ page: params.page, pageSize: params.pageSize });
+                                    this.setState({...this.state, filters});
+                                    this.setPage(filters);
                                 }}
                             />
                         </div> }

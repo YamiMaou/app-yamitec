@@ -117,7 +117,7 @@ export const putApiContributors = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, val);
+      data.append(key, `${val}`);
       //`${key}=${encodeURIComponent(val)}`
     });
     //.join('&');

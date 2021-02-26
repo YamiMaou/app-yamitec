@@ -54,7 +54,7 @@ class ContributorsController extends ControllersExtends
         $address = [
             "uf" => $request->uf,
             "city" => $request->city,
-            "additional" => $request->additional,
+            "additional" => $request->additional ?? "",
             "street" => $request->street,
             "zipcode" => $request->zipcode,
         ];

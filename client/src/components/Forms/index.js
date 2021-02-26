@@ -361,7 +361,7 @@ class LForms extends Component {
             let formValidate = this.state.formValidate;
             let value = e.target.value;
             let id = e.target.id ?? e.target.name;
-
+            
             if (idNumbers.includes(e.target.id)) {
                 value = value.replace(/[^\d]+/g, '');
             }
@@ -400,7 +400,6 @@ class LForms extends Component {
             }
             formValidate[id] = value;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
-            //console.log(this.state.inputVal);
         }
 
         const classes = {

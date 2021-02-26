@@ -56,7 +56,7 @@ class EditContributors extends Component {
             if (response.data.success) {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.setState({ ...this.state, loading: false });
-                this.props.history.goBack();
+                //this.props.history.goBack();
             } else {
                 let {errors, message} = response.data.error.response.data
                 let messages = '';
@@ -156,7 +156,7 @@ class EditContributors extends Component {
                 fields: [
                     { column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: this.state.contributor['addresses'].zipcode },
                     { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: this.state.contributor['addresses'].street },
-                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.contributor['addresses'].additional },
+                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.contributor['addresses'].additional != 'null' ? this.state.contributor['addresses'].additional : ''  },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
