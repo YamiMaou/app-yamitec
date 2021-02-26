@@ -38,7 +38,7 @@ function BlockDialog(props) {
     };
     
     const send = async () => {
-        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy ?? 'Nenhuma'});
+        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy ?? ''});
         props.handle(props.active)
         props.handleClose();
     }

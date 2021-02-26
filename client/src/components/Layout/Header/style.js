@@ -21,6 +21,22 @@ const clientStyles = cliente === null ? [
     ] }
 ] : JSON.parse(cliente.styles_obj);
 export const themeStyle = {
+  components: {
+    // Name of the component
+    MuiDataGrid: {
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          // Some CSS
+          fontSize: '1rem',
+          viewport: {
+            maxWidth: 600
+          }
+        },
+        
+      },
+    },
+  },
   props: {
     MuiTypography: {
       variantMapping: {

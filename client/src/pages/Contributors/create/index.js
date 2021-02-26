@@ -26,7 +26,7 @@ class CreateContributors extends Component {
         states: []
     }
     async componentDidMount() {
-        localStorage.setItem("sessionTime", 9000)
+        localStorage.setItem("sessionTime", 900)
 
     }
 

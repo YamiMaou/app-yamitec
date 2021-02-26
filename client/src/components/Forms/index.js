@@ -99,7 +99,7 @@ const CheckBoxInput = (props) => {
                 id={'justification'}
                 disabled={value}
                 type={'text'}
-                value={props.justification}
+                value={value ?? props.justification}
                 style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '75%' }}
                 label={'Justificativa'}
                 onChange={JustChange}

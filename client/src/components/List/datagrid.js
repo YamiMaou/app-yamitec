@@ -131,9 +131,12 @@ const SelectInput = (props) => {
         </FormControl>)
 }
 const StyledDataGrid = withStyles({
-    window:  {
-          overflowX: 'hidden'
-      }
+    root:{
+        '& div.MuiDataGrid-root .MuiDataGrid-viewport': {
+            width: "600px",
+            background: "blue"
+      },
+    }
   })(DataGrid);
   const useStyles = makeStyles(theme => ({
     root: {
@@ -295,8 +298,17 @@ class LDataGrid extends Component {
                     <CardContent>
                         {!this.state.firstLoad &&
                         <div style={{ height: 450, width: '100%' }}>
-                            <StyledDataGrid rows={rows} columns={columns}
-                                //columnBuffer={4}
+                            <DataGrid
+                            sx={{
+                                '& .MuiDataGrid-root':{
+                                    '& .MuiDataGrid-viewport': {
+                                  maxWidth: '600px',
+                                },
+                            }
+                              }}
+                             rows={rows} columns={columns}
+                                spacing={0}
+                                stickyHeader
                                 sortModel={this.props.sortModel}
                                 disableClickEventBubbling
                                 disableColumnMenu={true}

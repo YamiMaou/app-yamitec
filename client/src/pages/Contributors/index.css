@@ -1,3 +1,7 @@
+.MuiDataGrid-root .MuiDataGrid-dataContainer {
+  max-width: 600px !important; 
+}
+
 .App {
   text-align: center;
 }
