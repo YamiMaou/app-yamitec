@@ -55,7 +55,7 @@ export const postAuth = async (params = {}) => {
     return response;
   } catch (error) {
     console.log('Whoops! Houve um erro.', error.message || error)
-    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+    return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }
   }
 };
 /// list contributors
@@ -105,14 +105,14 @@ export const postApiContributors = async (params = {}) => {
     return response;
   } catch (error) {
     console.log('Whoops! Houve um erro.', error.message || error)
-    return { data: { success: false, error ,message: "problema ao se conectar com o servidor!" } }
+    return { data: {  data: [], success: false, error ,message: "problema ao se conectar com o servidor!" } }
   }
 }
 
 /// update contributors
 export const putApiContributors = async (id,params = {}) => {
   localStorage.setItem("sessionTime", 900)
-  params.justification = params.justification  ?? "Update";
+  params.justification = params.justification  ?? " ";
   const data = new FormData();
   data.append("_method", "put");
   Object.entries(params)
@@ -137,7 +137,7 @@ export const putApiContributors = async (id,params = {}) => {
     return response;
   } catch (error) {
     console.log('Whoops! Houve um erro.', error.message || error)
-    return { data: { success: false, error, message: "problema ao se conectar com o servidor!" } }
+    return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
   }
 }
 //Download Document
@@ -153,11 +153,11 @@ export const getApiDownloadFile = async (params = '') => {
     let blob = new Blob([response.data], { type: 'application/jpeg' })
     let link = document.createElement('a')
     link.href = window.URL.createObjectURL(blob)
-    link.download = 'Documento.jpg'
+    link.download = params
     link.click();
   }).catch((error) => {
     console.log('Whoops! Houve um erro.', error.message || error)
-    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+    return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }
   });
 }
 

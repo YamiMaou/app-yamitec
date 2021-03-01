@@ -19,37 +19,43 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 //
 import Typography from '@material-ui/core/Typography';
 import LDataGrid from '../../components/List/datagrid';
+import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
 import { getApiContributors, putApiContributors } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
-import { IconButton, Toolbar } from '@material-ui/core';
+import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
+    const [loading, setLoading] = React.useState(false);
     const [justfy, setjustfy] = React.useState(undefined);
     
     const handleClose = () => {
       setOpen(false);
+      setLoading(false);
     };
     
     const send = async () => {
-        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy ?? ''});
-        props.handle(props.active)
+        setLoading(true);
+        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy ?? ' '});
+        props.handle(props.active);
         props.handleClose();
+        setjustfy("");
+        setLoading(false);
     }
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "desb" }loqueio de colaborador</DialogTitle>
+          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "Desb" }loqueio de colaborador</DialogTitle>
           <DialogContent>
             <DialogContentText>
             
-                Confirma o { props.active == 0 ? "" : "des" }bloqueio do registro selecionado?
+                Confirma o { props.active == 0 ? "" : "Des" }bloqueio do registro selecionado?
             </DialogContentText>
             { props.active == 0 &&<TextField
               autoFocus
@@ -68,9 +74,15 @@ function BlockDialog(props) {
             <Button onClick={props.handleClose} color="primary">
               NÃO
             </Button>
+            { !loading ? (
             <Button onClick={send} color="primary">
               SIM
-            </Button>
+            </Button>):(
+                <Button color="primary">
+                     <CircularProgress style={{display: 'flex'}} />
+                </Button>
+               
+            )}
           </DialogActions>
         </Dialog>
       </div>
@@ -85,7 +97,11 @@ class Contributors extends Component {
        
     }
     
-    async componentDidMount() {
+    componentDidMount() {
+        if(JSON.parse(localStorage.getItem("user")) == null){
+            window.location.href = '/login';
+            return;
+        }
     }
 
     render() {
@@ -136,15 +152,14 @@ class Contributors extends Component {
                         color="primary"
                         size="small"
                         onClick={async (e)=> {
-                            console.log(params)
                             const handle = (status) => {
                                 params.row.active = status;
                             }
-                            this.setState({...this.state, blockDialog: {open: true, id: params.value, active: params.getValue('active') === 1 ? 0 : 1,handle }})
+                            this.setState({...this.state, blockDialog: {open: true, id: params.value, active: params.row.active === 1 ? 0 : 1,handle }})
                         }}
                         style={{ marginLeft: 16 }}
                       >
-                        {params.getValue('active') === 1 ? <BlockIcon fontSize="small"/> : <CheckCircleIcon fontSize="small" /> }
+                        {params.row.active === 1 ? <BlockIcon fontSize="small"/> : <CheckCircleIcon fontSize="small" /> }
                       </Button>
                     </div>
                   ),
@@ -193,6 +208,7 @@ class Contributors extends Component {
                     </Toolbar>
                     
                 </AppBar>
+                {window.innerWidth > 720 ? (
                     <LDataGrid rows={rows} columns={columns} filterInputs={filter} 
                     sortModel={[
                         {
@@ -207,7 +223,17 @@ class Contributors extends Component {
                             }
                             this.setState({...this.state, pageRequest: params})
                             return getApiContributors(params)
-                    }} />
+                    }} />) : (
+                        <LCardGrid rows={rows} columns={columns} filterInputs={filter}
+                        pageRequest={
+                            (params) => {
+                                if(params.active !== undefined){
+                                    params.active = params.active == "Ativo" ? 1: 0;
+                                }
+                                this.setState({...this.state, pageRequest: params})
+                                return getApiContributors(params)
+                        }}  />
+                    )}
                         <BlockDialog 
                             open={this.state.blockDialog.open} 
                             id={this.state.blockDialog.id}

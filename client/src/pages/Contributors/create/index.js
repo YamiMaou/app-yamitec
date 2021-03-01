@@ -141,7 +141,7 @@ class CreateContributors extends Component {
                         //value: "Coordenador de usuários",
                         flexBasis, style:{width: '220px'}
                     },
-                    { column: 'file', label: 'Anexar Documento', type: 'file', validate: {required: true}, flexBasis, style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', type: 'file', validate: {required: true}, flexBasis },
                     //
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]

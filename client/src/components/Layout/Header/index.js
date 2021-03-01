@@ -26,6 +26,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Avatar from '@material-ui/core/Avatar';
 import { styles, StyledAppBar } from './style.js'
 import { red } from '@material-ui/core/colors';
+import { PersonOutlined, Timer10Outlined, TimerOutlined } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -199,9 +200,10 @@ function Header(props) {
          
           {authData !== null ? (
             <div>
+              { window.innerWidth >= 720 && 
               <Typography>
                 Sessão: {minute} : {second} 
-              </Typography>
+              </Typography>}
               
               <Button color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={usrClick}>
               <Avatar alt={authData.name}> {authData.name.charAt(0)} </Avatar> &nbsp; { window.innerWidth >= 767 && authData.name }
@@ -213,7 +215,8 @@ function Header(props) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                 { window.innerWidth < 767 && <MenuItem disable={true}>{authData.name}</MenuItem>}
+                { window.innerWidth < 720 && <MenuItem disable={true}><TimerOutlined /> {minute} : {second}</MenuItem>}
+                { window.innerWidth < 720 && <MenuItem disable={true}><PersonOutlined />{authData.name}</MenuItem>}
                 <MenuItem onClick={logoutClick}>
                   <PowerSettingsNewIcon style={{ color: red[500] }}/>
                   Sair 

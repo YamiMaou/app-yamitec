@@ -20,10 +20,14 @@ import { Redirect } from 'react-router-dom';
 import { withSnackbar  } from 'notistack';
 class EditContributors extends Component {
     state = {
-        contributor: undefined,
+        contributor: {},
         loading: false
     }
     async componentDidMount() {
+        if(JSON.parse(localStorage.getItem("user")) == null){
+            window.location.href = '/login';
+            return;
+        }
         localStorage.setItem("sessionTime", 9000)
         let contributor = await getApiContributors({}, this.props.match.params.id);
         this.setState({ ...this.state, contributor });
@@ -56,7 +60,7 @@ class EditContributors extends Component {
             if (response.data.success) {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.setState({ ...this.state, loading: false });
-                //this.props.history.goBack();
+                this.props.history.goBack();
             } else {
                 let {errors, message} = response.data.error.response.data
                 let messages = '';
@@ -119,7 +123,7 @@ class EditContributors extends Component {
             return campo === undefined ? true : false
         }
         const flexBasis = '22%';
-        const forms = !this.state.contributor ? [] : [
+        const forms = this.state.contributor.id == undefined ? [] : [
             {
                 title: 'Dados Básicos',
                 fields: [
@@ -130,7 +134,7 @@ class EditContributors extends Component {
                     },
                     { column: 'cpf', value: this.state.contributor['cpf'], label: 'CPF', type: 'text', mask: InputCpf, validate: { min: 11, number: true, required: true }, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', value: this.state.contributor['name'], label: 'Nome', type: 'text', validate: { max: 50, required: true }, flexBasis },
-                    { column: 'birthdate', value: this.state.contributor['birthdate'], label: 'Data de nascimento', type: 'date', flexBasis, style: { maxWidth: '160px' } },
+                    { column: 'birthdate', value: this.state.contributor['birthdate'], label: 'Data de nascimento', type: 'date', flexBasis},
                     {
                         column: 'function', label: 'Função', type: 'select',
                         values: [
@@ -145,7 +149,7 @@ class EditContributors extends Component {
                         validate: {required: true },
                         flexBasis
                     },
-                    { column: 'file', label: 'Anexar Documento', file: this.state.contributor['file'] ? this.state.contributor['file'].name : '', type: 'file', flexBasis:'15%', style:{maxWidth: '180'} },
+                    { column: 'file', label: 'Anexar Documento', file: this.state.contributor['file'] ? this.state.contributor['file'].name : '', type: 'file', flexBasis:'15%' },
                 ]
             },
             {
@@ -199,8 +203,8 @@ class EditContributors extends Component {
                         loading={this.state.loading}
                     />
                 }
-                { this.state.contributor !== undefined &&
-                    <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 768 ? 210 : 90 }}>
+                { this.state.contributor.id !== undefined  &&
+                    <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 720 ? 210 : 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
                                 Data de cadastro:  <b>{stringToaddDate(this.state.contributor.created_at, 'DD/MM/YYYY', { qtd: 1, period: 'days' })}</b>&nbsp;

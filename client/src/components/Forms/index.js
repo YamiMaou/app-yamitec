@@ -95,7 +95,7 @@ const CheckBoxInput = (props) => {
                 control={<Checkbox checked={value} disabled={props.disabled ?? false} onChange={handleChange} name={props.id} id={props.id} />}
                 label={props.label}
             />
-            { props.justification !== undefined && <TextInputCustom key={`input-just`}
+           <TextInputCustom key={`input-just`}
                 id={'justification'}
                 disabled={value}
                 type={'text'}
@@ -103,7 +103,7 @@ const CheckBoxInput = (props) => {
                 style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '75%' }}
                 label={'Justificativa'}
                 onChange={JustChange}
-                onBlur={JustChange} /> }
+                onBlur={JustChange} />
         </div>
     )
 }
@@ -130,7 +130,7 @@ const FileInput = (props) => {
     return (
         <FormControl style={props.style}>
             { file === undefined || replace ?
-                (<Button variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
+                (<Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
                     { value !== undefined ?
                         <b style={{ color: 'red' }}>
                             <a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a>
@@ -143,22 +143,25 @@ const FileInput = (props) => {
                     />
                 </Button>) :
                 (
-                    <div>
-                        <Button variant="outlined" component="label"
+                    <div style={{display:'flex'}}>
+                        <Button style={props.style} variant="outlined" component="label"
+                            onClick={() => {
+                                getApiDownloadFile(file);
+                            }}
                             endIcon={
-                                <Icon name="remove" size={18} color="red" onClick={() => {
-                                    setReplace(true);
-                                }} />
+                                <Icon name="arrow-circle-down"
+                                size={22} color="#025ea2"
+                            />
                             }>
                             Baixar Arquivo
-                <Icon name="arrow-circle-down"
-                                size={18} color="#025ea2"
-                                onClick={() => {
-                                    getApiDownloadFile(file);
-                                }}
-                            />
                         </Button>
-
+                        <Button style={{marginTop: 25, height: 60}} variant="outlined" size="small"
+                           >
+                            <Icon name="remove" size={16} color="red"  onClick={() => {
+                                setReplace(true);
+                            }}/>
+                        </Button>
+                        
                     </div>
                 )}
         </FormControl>)
@@ -250,8 +253,9 @@ const DateInput = (props) => {
 
     }
     return (
-        <form noValidate style={{ ...props.style, marginTop: 20 }}>
+        <form noValidate style={{ ...props.style, marginTop: 20 }} >
             <TextField
+                style={{width: '100%'}} 
                 id={props.id}
                 label={props.label ?? 'Data'}
                 type="date"
@@ -445,13 +449,13 @@ class LForms extends Component {
 
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "date") {
-                                                        return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : '14%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                        return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
                                                         return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
-                                                                style={{ ...classes.m5, fontSize: '.6em', width: '190px' }}
+                                                                style={{ ...classes.m5,width: window.innerWidth > 720 ? '190px' : '100%' }}
                                                                 file={input.file}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}

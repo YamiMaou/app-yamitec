@@ -17,7 +17,10 @@ class Home extends Component {
     }
 
     componentDidMount() {
-        //this.props.setTimer(9000);
+        if(JSON.parse(localStorage.getItem("user")) == null){
+            window.location.href = '/login';
+            return;
+        }
     }
 
     dialogHandler(item) {
@@ -27,6 +30,10 @@ class Home extends Component {
 
     render() {
         const authData = JSON.parse(localStorage.getItem("user"));
+        if(JSON.parse(localStorage.getItem("user")) == null){
+            window.location.href = '/login';
+            return <div> Sessão Encerrada.</div>;
+        }
         const styles = {
             backgroundColor: "#fff",
             borderRadius: 3,
