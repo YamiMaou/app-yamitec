@@ -14,7 +14,8 @@ class Address extends Model
         'additional',
         'city',
         'uf',
-        'contributors_id'
+        'contributors_id',
+        'providers_id'
     ];
 
     public function contributors()

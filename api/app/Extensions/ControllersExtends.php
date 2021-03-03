@@ -62,7 +62,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate($request->pageSize);
+            })->paginate(10);
             //echo $data->toSql();
         }
 

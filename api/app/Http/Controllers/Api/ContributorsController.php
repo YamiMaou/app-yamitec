@@ -30,14 +30,13 @@ class ContributorsController extends ControllersExtends
     {
         $validate = $request;
         if(!isset($validate->cpf)){
+            //print_r($validate->all());
             $validate["user_id"] = $request->user()->id;
             return parent::update($validate, $id);
         }
-        
         $files = new \App\Http\Controllers\FilesController();
         $files = $files->multUpload($request, 'contributors');
         $data = $files->request;
-        //var_dump($data);
         $contributors = [
             "user_id" => $request->user()->id,
             "cpf" => $request->cpf,
@@ -47,7 +46,6 @@ class ContributorsController extends ControllersExtends
             "active" => $request->active,
             "anexo" => $data['file'] == "[object Object]" ? $data['anexo'] : $data['file'],
         ];
-
         $request['name'] = $data['name'] ?? null;
         //$request['anexo'] = $data['anexo'] ?? null;
 
@@ -125,6 +123,7 @@ class ContributorsController extends ControllersExtends
 
     public function Download(Req $request)
     {
+        ob_end_clean();
         $files = new \App\Http\Controllers\FilesController();
         return $files->download($request);
     }

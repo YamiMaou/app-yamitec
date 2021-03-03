@@ -40,13 +40,15 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/posts', 'Api\PostsController');
     // COLABORATORS
     Route::resource('/contributors', 'Api\ContributorsController');
+    
     // PROVIDERS
-    Route::resource('/providers', 'Api\ProvidersController@')->middleware(['auth:api', 'scope:view-posts']);
+    Route::resource('/providers', 'Api\ProvidersController')->middleware(['auth:api', 'scope:view-posts']);
     // CONTRACT
     Route::resource('/contracts', 'Api\ContractController')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_FILES
     Route::resource('/provider/files', 'Api\ProviderFilesController')->middleware(['auth:api', 'scope:view-posts']);
-
+    // AUDIT
+    Route::resource('/audits', 'Api\AuditsController');
 });
 /** teste */
 Route::post('/providers/active', 'Api\ProvidersController@activate')

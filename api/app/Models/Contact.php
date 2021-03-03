@@ -15,7 +15,8 @@ class Contact extends Model
         'linkedin',
         'facebook',
         'instagram',
-        'contributors_id'
+        'contributors_id',
+        'providers_id'
     ];
 
     public function contributors()

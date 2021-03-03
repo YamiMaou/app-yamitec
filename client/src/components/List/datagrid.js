@@ -298,7 +298,7 @@ class LDataGrid extends Component {
                 <Card>
                     <CardContent>
                         {!this.state.firstLoad &&
-                        <div style={{ height: 450, width: '100%' }}>
+                        <div style={{ height: 700, width: '100%' }}>
                             <DataGrid
                             sx={{
                                 '& .MuiDataGrid-root':{

@@ -71,6 +71,8 @@ function TextMaskCustom(props) {
 const CheckBoxInput = (props) => {
     const [value, setValue] = useState(props.value == "1" ? true : false ?? false);
     const [error, setError] = useState(false);
+    const [just, setJust] = useState(props.justification);
+   
     function handleChange(e) {
         const { checked, id } = e.target;
         if (props.validate !== undefined) {
@@ -80,6 +82,10 @@ const CheckBoxInput = (props) => {
                 setError(true)
             }
         }
+        if(checked == true){
+            props.onChange({target: {id: 'justification', value: ''}});
+            setJust("");
+        }
         let target = { id, value: checked ? "1" : "0", type: 'checkbox' };
         props.onChange({ target, type: 'checkbox' })
         setValue(checked);
@@ -87,23 +93,27 @@ const CheckBoxInput = (props) => {
 
     function JustChange(e) {
         const { value, id } = e.target;
-        props.onChange(e)
+        props.onChange(e);
+        setJust(value);
     }
     return (
-        <div key={`check-${props.id}`} style={{ display: 'flex',flexBasis: '100%' }}>
+        <div key={`check-${props.id}`} style={{ display: 'flex',...props.style }}>
             <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '10%'  }}
                 control={<Checkbox checked={value} disabled={props.disabled ?? false} onChange={handleChange} name={props.id} id={props.id} />}
                 label={props.label}
             />
-           <TextInputCustom key={`input-just`}
+            {value ? ('') : (
+                <TextInputCustom key={`input-just`}
                 id={'justification'}
                 disabled={value}
                 type={'text'}
-                value={value == true ? props.justification : ""}
+                value={props.justification ?? ""}
                 style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '75%' }}
                 label={'Justificativa'}
                 onChange={JustChange}
                 onBlur={JustChange} />
+            )}
+           
         </div>
     )
 }
@@ -326,10 +336,15 @@ const SelectInput = (props) => {
                 onBlur={handleChange}
             >
                 <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
-                {
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val.fantasy_name}</MenuItem>
+                    })
+                ) : (
                     props.values.map((val, ind) => {
                         return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
                     })
+                )
                 }
 
             </Select>
@@ -451,7 +466,7 @@ class LForms extends Component {
                                                     if (input.type == "date") {
                                                         return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return (<SelectInput json={input.json}value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}

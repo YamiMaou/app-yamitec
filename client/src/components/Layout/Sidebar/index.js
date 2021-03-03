@@ -59,7 +59,7 @@ function Sidebar(props) {
           </MenuItem>
           {
             authData !== null &&
-            (<MenuItem>
+            (<div><MenuItem>
               <Link style={styles.link} to="/colaboradores" >
                 <ListItemIcon>
                   <StyledBadge badgeContent={0} color="secondary">
@@ -68,7 +68,17 @@ function Sidebar(props) {
                 </ListItemIcon>
                 <Typography variant="inherit">Colaboradores</Typography>
               </Link>
-            </MenuItem>)
+            </MenuItem>
+            <MenuItem>
+            <Link style={styles.link} to="/fornecedores" >
+              <ListItemIcon>
+                <StyledBadge badgeContent={0} color="secondary">
+                  <PeopleIcon fontSize="small"/>
+                </StyledBadge>
+              </ListItemIcon>
+              <Typography variant="inherit">Fornecedores</Typography>
+            </Link>
+          </MenuItem></div>)
           }
         </MenuList>
         <Divider />

@@ -15,11 +15,20 @@ class CreateContractsTable extends Migration
     {
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->decimal('value', 8,2);
+            $table->date('accession_date');
+            $table->date('end_date')->nullable();
 
-            $table->unsignedBigInteger('provider_id'); // ID fornecedor
-            $table->foreign('provider_id')->references('id')->on('providers')->onDelete('cascade');
+            $table->decimal('rate', 8,2);
+            
+            $table->unsignedBigInteger('contributors_id')->nullable(); // ID fornecedor
+            $table->foreign('contributors_id')->references('id')->on('contributors')->onDelete('cascade');
+
+
+            $table->unsignedBigInteger('providers_id')->nullable(); // ID fornecedor
+            $table->foreign('providers_id')->references('id')->on('providers')->onDelete('cascade');
+            
+            $table->unsignedBigInteger('file_id'); // ID fornecedor
+            $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
 
             $table->timestamps();
         });

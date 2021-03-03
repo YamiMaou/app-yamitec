@@ -17,7 +17,8 @@ class Contributors extends Model
         'address',
         'contact',
         'anexo',
-        'birthdate'
+        'birthdate',
+        'justify'
     ];
 
     public function addresses()

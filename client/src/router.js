@@ -11,9 +11,15 @@ import MiniDrawer from './components/Layout/Sidebar/minidrawer'
 
 import Home from './pages/Home';
 import Login from './pages/Login';
+//import Audits from './pages/Audits';Providers
 import Contributors from './pages/Contributors';
 import CreateContributors from './pages/Contributors/create';
 import EditContributors from './pages/Contributors/edit';
+
+import Providers from './pages/Providers';
+import CreateProviders from './pages/Providers/create';
+import EditProviders from './pages/Providers/edit';
+
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
 import {themeStyle} from './components/Layout/Header/style'
@@ -30,7 +36,8 @@ import { Redirect } from "react-router-dom";
 import { setAuth } from './actions/authAction';
 import { setSnackbar, setTimer } from './actions/appActions';
 // Theme
-const YamiTheme = createMuiTheme(themeStyle)
+import * as locales from '@material-ui/core/locale';
+const YamiTheme = createMuiTheme(themeStyle,locales['ptbr'])
   //background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
 
 const AppRouter = (props) => {
@@ -71,6 +78,10 @@ function Alert(props) {
             <Route path="/colaboradores" exact={true} render={() => (isAuth ?  <Contributors /> : <Redirect push to="/login" />)} />
             <Route path="/colaboradores/novo" exact={true} render={() => (isAuth ?  <CreateContributors /> : <Redirect push to="/login" />)} />
             <Route path="/colaboradores/:id" exact={true} render={() => (isAuth ?  <EditContributors /> : <Redirect push to="/login" />)} />
+            <Route path="/fornecedores" exact={true} render={() => (isAuth ?  <Providers /> : <Redirect push to="/login" />)} />
+            <Route path="/fornecedores/novo" exact={true} render={() => (isAuth ?  <CreateProviders /> : <Redirect push to="/login" />)} />
+            <Route path="/fornecedores/:id" exact={true} render={() => (isAuth ?  <EditProviders /> : <Redirect push to="/login" />)} />
+
             <Route path="*">
               <Box>
                 <View> Pagina não encontrada.</View>

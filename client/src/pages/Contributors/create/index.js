@@ -61,11 +61,11 @@ class CreateContributors extends Component {
 
                 //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
-                if(errors !== undefined && errors.data !== undefined && errors.data.response !== undefined  && errors.data.response.data.errors !== undefined){
-                    Object.keys(errors.response.data.errors).map(err => {
+                if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
+                    Object.keys(errors.error.response.data.errors).map(err => {
                         console.log(err);
                         let field = err == "file" ? "Anexo" : err
-                        messages += `O campo ${field.toUpperCase()} ${errors.response.data.errors[err][0]} \n`;
+                        messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
                     })
                 } else{
                     messages = 'Houve um problema em sua requisição!'

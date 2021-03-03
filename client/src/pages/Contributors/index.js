@@ -33,7 +33,7 @@ import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-g
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
-    const [justfy, setjustfy] = React.useState(undefined);
+    const [justfy, setjustfy] = React.useState('');
     
     const handleClose = () => {
       setOpen(false);
@@ -42,10 +42,10 @@ function BlockDialog(props) {
     
     const send = async () => {
         setLoading(true);
-        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy ?? ' '});
+        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy});
         props.handle(props.active);
         props.handleClose();
-        setjustfy("");
+        setjustfy('');
         setLoading(false);
     }
     return (
