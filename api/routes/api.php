@@ -47,6 +47,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/provider/files', 'Api\ProviderFilesController')->middleware(['auth:api', 'scope:view-posts']);
     // CLIENTS
     Route::resource('/clients', 'Api\ClientsController')->middleware(['auth:api', 'scope:view-posts']);
+    // MANAGERS
+    Route::resource('/managers', 'Api\ManagersController')->middleware(['auth:api', 'scope:view-posts']);
 });
 /** teste */
 Route::post('/providers/active', 'Api\ProvidersController@activate')
