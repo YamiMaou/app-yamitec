@@ -131,9 +131,12 @@ const SelectInput = (props) => {
         </FormControl>)
 }
 const StyledDataGrid = withStyles({
-    window:  {
-          overflowX: 'hidden'
-      }
+    root:{
+        '& div.MuiDataGrid-root .MuiDataGrid-viewport': {
+            width: "600px",
+            background: "blue"
+      },
+    }
   })(DataGrid);
   const useStyles = makeStyles(theme => ({
     root: {
@@ -147,22 +150,24 @@ class LDataGrid extends Component {
     state = {
         data: [],
         filters: {},
+        page: 1,
         filter: 'flex',
-        loading: true
+        loading: true,
+        firstLoad: true
     }
     async setPage(params = { page: 1 }) {
         this.setState({ ...this.state, loading: true })
-        let cleanfilters = {};
-        Object.entries(params).map((item) => { 
+        let cleanfilters = this.state.filters;
+        Object.entries(this.state.filters).map((item) => {
             if(item[1].length >= 1 ){
                 if(item[1] !== "Todos"){
                     cleanfilters[item[0]] = item[1];
                     console.log(item);
                 }
             }
-            
         });
-        let query = Object.assign({queryType : 'like', withId: "name"}, cleanfilters);
+
+        let query = Object.assign({queryType : 'like', withId: "name", page: params.page}, cleanfilters);
         console.log(query);
         const data = await this.props.pageRequest(query);
         if (data !== undefined) {
@@ -251,7 +256,7 @@ class LDataGrid extends Component {
                                 this.props.filterInputs.map(input => {
                                     if (input.type == "text") {
                                         if (input.mask === undefined)
-                                            return <TextField style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         else
                                             return (
                                                 <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
@@ -283,7 +288,7 @@ class LDataGrid extends Component {
                                 })
                             }
                             <div>
-                                <Button size="small" style={{ margin: 5 }} startIcon={<SearchIcon />} variant="contained" color="primary" onClick={() => { this.setPage(this.state.filters) }}> Pesquisar</Button>
+                                <Button size="small" style={{ margin: 5 }} startIcon={<SearchIcon />} variant="contained" color="primary" onClick={() => { this.setPage(this.state.filters); this.setState({...this.state, firstLoad : false}) }}> Pesquisar</Button>
                                 <Button size="small" style={{ margin: 5 }} startIcon={<ReorderIcon />} variant="contained" color="primary" onClick={() => {onClearFilter()}} > Limpar</Button>
                             </div>
                         </div>
@@ -292,10 +297,20 @@ class LDataGrid extends Component {
 
                 <Card>
                     <CardContent>
-                        {rows.length > 0 &&
-                        <div style={{ height: 450, width: '100%' }}>
-                            <StyledDataGrid rows={rows} columns={columns}
-                                columnBuffer={4}
+                        {!this.state.firstLoad &&
+                        <div style={{ height: 700, width: '100%' }}>
+                            <DataGrid
+                            sx={{
+                                '& .MuiDataGrid-root':{
+                                    '& .MuiDataGrid-viewport': {
+                                  maxWidth: '600px',
+                                },
+                            }
+                              }}
+                             rows={rows} columns={columns}
+                                spacing={0}
+                                stickyHeader
+                                sortModel={this.props.sortModel}
                                 disableClickEventBubbling
                                 disableColumnMenu={true}
                                 loading={this.state.loading}
@@ -307,8 +322,9 @@ class LDataGrid extends Component {
                                     this.setPage({ page: params.page, pageSize: params.pageSize });
                                 }}*/
                                 onPageChange={(params) => {
-                                    console.log("CARREGOU");
-                                    this.setPage({ page: params.page, pageSize: params.pageSize });
+                                    let filters = Object.assign({}, this.state.filters,{ page: params.page, pageSize: params.pageSize });
+                                    this.setState({...this.state, filters});
+                                    this.setPage(filters);
                                 }}
                             />
                         </div> }

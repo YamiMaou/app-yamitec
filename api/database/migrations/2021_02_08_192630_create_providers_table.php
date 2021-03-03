@@ -25,9 +25,6 @@ class CreateProvidersTable extends Migration
             $table->string('cnpj', 14)->unique();
             $table->string('company_name', 100);
             $table->string('fantasy_name', 100);
-            $table->longText('address');
-            $table->longText('contact');
-            $table->longText('social_media');
 
             $table->unsignedBigInteger('manager_id')->nullable(); // ID do responsável pela farmácia
             $table->unsignedBigInteger('filial_id')->nullable(); // referencia do self-relation/filial

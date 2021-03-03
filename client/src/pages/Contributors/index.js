@@ -19,56 +19,70 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 //
 import Typography from '@material-ui/core/Typography';
 import LDataGrid from '../../components/List/datagrid';
+import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
 import { getApiContributors, putApiContributors } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
-import { IconButton, Toolbar } from '@material-ui/core';
+import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-import { DataGrid, RowsProp, ColDef } from '@material-ui/data-grid';
+import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
-    const [justfy, setjustfy] = React.useState("");
-  
+    const [loading, setLoading] = React.useState(false);
+    const [justfy, setjustfy] = React.useState('');
+    
     const handleClose = () => {
       setOpen(false);
+      setLoading(false);
     };
     
     const send = async () => {
-        await putApiContributors( props.id, {active: 0 ?? undefined, justification: justfy});
+        setLoading(true);
+        await putApiContributors( props.id, {active: props.active ?? undefined, justification: justfy});
+        props.handle(props.active);
         props.handleClose();
+        setjustfy('');
+        setLoading(false);
     }
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Bloqueio de Colaborador</DialogTitle>
+          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "Desb" }loqueio de colaborador</DialogTitle>
           <DialogContent>
             <DialogContentText>
-                Confirma o bloqueio do registro selecionado?
+            
+                Confirma o { props.active == 0 ? "" : "Des" }bloqueio do registro selecionado?
             </DialogContentText>
-            <TextField
+            { props.active == 0 &&<TextField
               autoFocus
               margin="dense"
-              id="jistification"
-              label="Jistificativa"
+              id="justification"
+              label="Justificativa"
               type="text"
               fullWidth
               value={justfy}
               onChange={(e) => {
                 setjustfy(e.target.value)
               }}
-            />
+            /> }
           </DialogContent>
           <DialogActions>
             <Button onClick={props.handleClose} color="primary">
               NÃO
             </Button>
+            { !loading ? (
             <Button onClick={send} color="primary">
               SIM
-            </Button>
+            </Button>):(
+                <Button color="primary">
+                     <CircularProgress style={{display: 'flex'}} />
+                </Button>
+               
+            )}
           </DialogActions>
         </Dialog>
       </div>
@@ -78,10 +92,16 @@ function BlockDialog(props) {
 class Contributors extends Component {
     state = {
         contributors: [],
-        blockDialog: {open: false, id: undefined}
+        pageRequest: {},
+        blockDialog: {open: false, id: undefined,active: 0, handle: undefined},
+       
     }
     
-    async componentDidMount() {
+    componentDidMount() {
+        if(JSON.parse(localStorage.getItem("user")) == null){
+            window.location.href = '/login';
+            return;
+        }
     }
 
     render() {
@@ -97,7 +117,7 @@ class Contributors extends Component {
         }
         const rows : RowsProp = this.state.contributors.data ?? [];
         const columns: ColDef[] = [
-            { field: 'cpf', headerName: 'Cpf', flex: 0.7,
+            { field: 'cpf', headerName: 'CPF', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return stringCpf(params.value);
                 }
@@ -115,7 +135,8 @@ class Contributors extends Component {
                 field: 'id',
                 headerName: 'Ações',
                 flex: 1,
-                renderCell: (params: ValueFormatterParams) => (
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => (
+                        
                     <div>
                     <Link to={`/colaboradores/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
@@ -130,12 +151,15 @@ class Contributors extends Component {
                         variant="contained"
                         color="primary"
                         size="small"
-                        onClick={async ()=> {
-                            this.setState({...this.state, blockDialog: {open: true, id: params.value}})
+                        onClick={async (e)=> {
+                            const handle = (status) => {
+                                params.row.active = status;
+                            }
+                            this.setState({...this.state, blockDialog: {open: true, id: params.value, active: params.row.active === 1 ? 0 : 1,handle }})
                         }}
                         style={{ marginLeft: 16 }}
                       >
-                        <BlockIcon fontSize="small"/>
+                        {params.row.active === 1 ? <BlockIcon fontSize="small"/> : <CheckCircleIcon fontSize="small" /> }
                       </Button>
                     </div>
                   ),
@@ -184,17 +208,37 @@ class Contributors extends Component {
                     </Toolbar>
                     
                 </AppBar>
+                {window.innerWidth > 720 ? (
                     <LDataGrid rows={rows} columns={columns} filterInputs={filter} 
+                    sortModel={[
+                        {
+                          field: 'name',
+                          sort: 'asc',
+                        },
+                    ]}
                     pageRequest={
                         (params) => {
                             if(params.active !== undefined){
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
+                            this.setState({...this.state, pageRequest: params})
                             return getApiContributors(params)
-                    }} />
+                    }} />) : (
+                        <LCardGrid rows={rows} columns={columns} filterInputs={filter}
+                        pageRequest={
+                            (params) => {
+                                if(params.active !== undefined){
+                                    params.active = params.active == "Ativo" ? 1: 0;
+                                }
+                                this.setState({...this.state, pageRequest: params})
+                                return getApiContributors(params)
+                        }}  />
+                    )}
                         <BlockDialog 
                             open={this.state.blockDialog.open} 
                             id={this.state.blockDialog.id}
+                            handle={this.state.blockDialog.handle}
+                            active={this.state.blockDialog.active}
                             handleClose={() => {
                                 this.setState({...this.state, blockDialog: { open : false, id: undefined }})
                             }}

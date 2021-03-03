@@ -34,13 +34,15 @@ Route::get('/profile', 'Api\UsersController@details')
     ->middleware(['auth:api', 'scope:view-posts']);
 Route::put('/posts/{id}', 'Api\PostsController@update')
     ->middleware(['auth:api', 'scope:update-posts']);*/
+Route::post('/contributors/downloads', 'Api\ContributorsController@download');
 Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // POSTS
     Route::resource('/posts', 'Api\PostsController');
     // COLABORATORS
     Route::resource('/contributors', 'Api\ContributorsController');
+    
     // PROVIDERS
-    Route::resource('/providers', 'Api\ProvidersController@')->middleware(['auth:api', 'scope:view-posts']);
+    Route::resource('/providers', 'Api\ProvidersController')->middleware(['auth:api', 'scope:view-posts']);
     // CONTRACT
     Route::resource('/contracts', 'Api\ContractController')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_FILES
@@ -49,6 +51,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/clients', 'Api\ClientsController')->middleware(['auth:api', 'scope:view-posts']);
     // MANAGERS
     Route::resource('/managers', 'Api\ManagersController')->middleware(['auth:api', 'scope:view-posts']);
+    // AUDIT
+    Route::resource('/audits', 'Api\AuditsController');
 });
 /** teste */
 Route::post('/providers/active', 'Api\ProvidersController@activate')

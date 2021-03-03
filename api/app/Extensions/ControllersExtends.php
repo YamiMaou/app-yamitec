@@ -62,7 +62,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate($request->pageSize);
+            })->paginate(10);
             //echo $data->toSql();
         }
 
@@ -92,26 +92,23 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function store(Request $request)
     {
-        /*echo "<pre>";
-        var_dump($request->all());
-        exit;*/
-
+        
         if (count($this->validate) > 0) {
             $request->validate($this->validate);
         }
-
+        //var_dump( $request->all());
+           // exit;
         try {
-            $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
-            $files = new FilesController();
-            $files = $files->multUpload($request, $modelName);
-            $data = $files->request;
-            $data['user_id'] = $request->user()->id;
-            $data['username'] = $request->user()->email;
-            $data['anexo'] = 1;
-            unset($data["file"]);
-            unset($data["_token"]);
-            unset($data["_method"]);
             if (count($this->with) > 0) {
+                $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
+                $files = new FilesController();
+                $files = $files->multUpload($request, $modelName);
+                $data = $files->request;
+                $data['user_id'] = $request->user()->id;
+                $data['username'] = $request->user()->email;
+                unset($data["file"]);
+                unset($data["_token"]);
+                unset($data["_method"]);
                 $i = 0;
                 $primary = null;
                 foreach ($this->with["data"] as $model => $fields) {
@@ -122,10 +119,17 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                     }
                     $i++;
                     $fields[$this->with["changes"]->key] = $primary->id;
-                    $model->create($fields);
+                    //var_dump($fields);
+                    $model::create($fields);
                 }
             } else {
-                $obj = $this->model->create($data);
+                $data = $request->all();
+                $data['user_id'] = $request->user()->id;
+                $data['username'] = $request->user()->email;
+                unset($data["file"]);
+                unset($data["_token"]);
+                unset($data["_method"]);
+                $this->model->create($data);
                 //FilesController::upload($request, $this->model, $obj->id);
             }
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
@@ -156,7 +160,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
-            $this->saveLog($id, $request);
+            $this->saveLog($id, $request, $modelName);
             
             unset($data["_token"]);
             unset($data["_method"]);
@@ -165,7 +169,12 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             if (count($this->with) > 0) {
                 $i = 0;
                 foreach ($this->with["data"] as $model => $fields) {
-                    $model->where($i == 0 ? 'id' : $this->with["changes"]->key, $id)->update($fields);
+                    foreach($fields as $k => $field){
+                        if($field == null)
+                            unset($fields[$k]);
+                    }
+                // echo ($i == 0 ? 'id' : $this->with["changes"]->key) . $id;
+                   $model::where(($i == 0 ? 'id' : $this->with["changes"]->key), $id)->update($fields);
                     $i++;
                 }
             } else {
@@ -202,14 +211,15 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         return $this;
     }
 
-    public function saveLog($id, $request){
+    public function saveLog($id, $request, $modelName = ""){
         $data =  $request->all();
         $olderData = $this->model->where('id', $id )->first();
-        $to = json_encode($olderData);
+        $to = json_encode($data);
         $from = json_encode($olderData);
         $audit = new Audit();
         $audit->create([
             'user_id' => $request->user()->id,
+            'contributors_id' => $id,
             'justification'=> $data['justification'],
             'from' => $from,
             'to' => $to

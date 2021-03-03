@@ -16,8 +16,8 @@ class CreateContactsTable extends Migration
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
 
-            $table->string('phone1', 11);
-            $table->string('phone2', 11)->nullable();
+            $table->string('phone1', 15);
+            $table->string('phone2', 15)->nullable();
             $table->string('email', 100);
             $table->string('linkedin', 100);
             $table->string('facebook', 100);
@@ -30,6 +30,9 @@ class CreateContactsTable extends Migration
             $table->foreign('contributors_id')->references('id')->on('contributors')->onDelete('cascade');
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
+
+            $table->unsignedBigInteger('providers_id');
+            $table->foreign('providers_id')->references('id')->on('providers')->onDelete('cascade');
 
             $table->timestamps();
         });

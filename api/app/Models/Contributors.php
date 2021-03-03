@@ -17,17 +17,18 @@ class Contributors extends Model
         'address',
         'contact',
         'anexo',
-        'birthdate'
+        'birthdate',
+        'justify'
     ];
 
-    public function address()
+    public function addresses()
     {
-        return $this->hasMany(Address::class);
+        return $this->hasOne(Address::class,'contributors_id');
     }
 
     public function contacts()
     {
-        return $this->hasMany(Contact::class);
+        return $this->hasOne(Contact::class,'contributors_id');
     }
     public function user()
     {
@@ -36,7 +37,12 @@ class Contributors extends Model
 
     public function file()
     {
-        return $this->hasOne(\App\Models\File::class, 'id','anexo');
+        return $this->hasOne(\App\Models\File::class, 'id','anexo')->latest();
+    }  
+
+    public function audits()
+    {
+        return $this->hasOne(\App\Models\Audit::class, 'contributors_id','id')->latest();
     }  
 
 }

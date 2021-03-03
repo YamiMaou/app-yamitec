@@ -19,6 +19,9 @@
        */
       html,
       body,
+      .MuiDataGrid-viewport {
+        min-width: 600px !important;
+      }
       #root {
         width: 100%;
         /* To smooth any scrolling behavior */

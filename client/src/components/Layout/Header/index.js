@@ -26,6 +26,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Avatar from '@material-ui/core/Avatar';
 import { styles, StyledAppBar } from './style.js'
 import { red } from '@material-ui/core/colors';
+import { PersonOutlined, Timer10Outlined, TimerOutlined } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -88,6 +89,40 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Header(props) {
+  // TIMER
+  const [timer, setTimer] = React.useState("");
+  const [second, setSecond] = useState('00');
+  const [minute, setMinute] = useState('00');
+  const [isActive, setIsActive] = useState(true);
+  const [counter, setCounter] = useState(parseInt(localStorage.getItem("sessionTime"))); // sec to minute #900 to 15 minutes
+  
+    useEffect(() => {
+      let intervalId;
+      //localStorage.setItem("sessionTime", 900);
+      if (isActive) {
+        intervalId = setInterval(() => {
+          let count = parseInt(localStorage.getItem("sessionTime"));
+          if(count <= 0){
+            logoutClick();
+          }
+          const secondCounter = counter % 60;
+          const minuteCounter = Math.floor(counter / 60);
+  
+          const computedSecond = String(secondCounter).length === 1 ? `0${secondCounter}`: secondCounter;
+          const computedMinute = String(minuteCounter).length === 1 ? `0${minuteCounter}`: minuteCounter;
+  
+          setSecond(computedSecond);
+          setMinute(computedMinute);
+          setCounter(counter => parseInt(localStorage.getItem("sessionTime")));
+          localStorage.setItem("sessionTime", count -1)
+        }, 1000)
+      }
+  
+      return () => clearInterval(intervalId);
+    }, [isActive, counter])
+  
+
+  //END TIMER
   const authData = JSON.parse(localStorage.getItem("user"));
   
   const cliente = JSON.parse(localStorage.getItem("cliente")) === null ? { logo: undefined } :JSON.parse(localStorage.getItem("cliente"));
@@ -107,7 +142,6 @@ function Header(props) {
     setAnchorEl(event.currentTarget);
   };
 
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -123,6 +157,7 @@ function Header(props) {
   let hostUrl = "https://services.yamitec.com";
   //console.log(hostUrl+"/"+cliente.logo);
   let isLogo = checkImageUrl(cliente.logo) ? true :  false
+
   return (
     <div className={classes.root}>
       {props.loading === true ? <CircularProgress /> : null}
@@ -165,6 +200,11 @@ function Header(props) {
          
           {authData !== null ? (
             <div>
+              { window.innerWidth >= 720 && 
+              <Typography>
+                Sessão: {minute} : {second} 
+              </Typography>}
+              
               <Button color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={usrClick}>
               <Avatar alt={authData.name}> {authData.name.charAt(0)} </Avatar> &nbsp; { window.innerWidth >= 767 && authData.name }
               </Button>
@@ -175,7 +215,8 @@ function Header(props) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                 { window.innerWidth < 767 && <MenuItem disable={true}>{authData.name}</MenuItem>}
+                { window.innerWidth < 720 && <MenuItem disable={true}><TimerOutlined /> {minute} : {second}</MenuItem>}
+                { window.innerWidth < 720 && <MenuItem disable={true}><PersonOutlined />{authData.name}</MenuItem>}
                 <MenuItem onClick={logoutClick}>
                   <PowerSettingsNewIcon style={{ color: red[500] }}/>
                   Sair 

@@ -20,7 +20,12 @@ class CreateAudits extends Migration
             ->references('id')->on('users')
             ->onDelete('cascade');
 
-            $table->text('justification');
+            $table->unsignedBigInteger('contributors_id')->nullable();
+            $table->foreign('contributors_id')
+            ->references('id')->on('contributors')
+            ->onDelete('cascade');
+
+            $table->text('justification')->nullable();
             $table->text('to')->nullable();
             $table->text('from')->nullable();
             $table->timestamps();
