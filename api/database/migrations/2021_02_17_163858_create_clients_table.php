@@ -21,12 +21,9 @@ class CreateClientsTable extends Migration
             $table->date('birth_date');
             $table->tinyInteger('active')->default(1);
             $table->string('note', 200);
-            $table->longText('address');
-            $table->longText('contact');
-            $table->longText('social_media');
 
-            $table->unsignedBigInteger('provider_id');
-            $table->unsignedBigInteger('user_id'); // ID do usuário que executou ações no client
+            $table->unsignedBigInteger('provider_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable(); // ID do usuário que executou ações no client
 
             $table->foreign('provider_id')->references('id')->on('providers')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

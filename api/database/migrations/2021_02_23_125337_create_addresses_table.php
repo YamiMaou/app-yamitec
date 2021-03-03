@@ -22,8 +22,13 @@ class CreateAddressesTable extends Migration
             $table->string('city', 100);
             $table->string('uf', 50);
 
-            $table->unsignedBigInteger('contributors_id');
+            $table->unsignedBigInteger('contributors_id')->nullable();
+            $table->unsignedBigInteger('client_id')->nullable();
+            $table->unsignedBigInteger('manager_id')->nullable();
+
             $table->foreign('contributors_id')->references('id')->on('contributors')->onDelete('cascade');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
 
             $table->timestamps();
         });

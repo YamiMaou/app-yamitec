@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Extensions\ControllersExtends;
 
-class ClienController extends ControllersExtends
+class ClientsController extends ControllersExtends
 {
     public function __construct()
     {

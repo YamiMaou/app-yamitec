@@ -15,11 +15,23 @@ class Contact extends Model
         'linkedin',
         'facebook',
         'instagram',
-        'contributors_id'
+        'contributors_id',
+        'manager_id',
+        'client_id'
     ];
 
     public function contributors()
     {
         return $this->belongsTo(Contributors::class);
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(Manager::class, 'manager_id', 'id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 }

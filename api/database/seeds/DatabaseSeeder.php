@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             ProviderFilesSeeder::class,
             ContractsSeeder::class,
             ContractsSeeder::class,
-            ManagerProvidersSeeder::class  
+            ManagerProvidersSeeder::class  ,
+            ContactSeeder::class,
+            AddressSeeder::class
         ]);
         //$this->call(PostsTableSeeder::class);
     }

@@ -15,14 +15,18 @@ use Illuminate\Support\Facades\Route;
 */
 //Auth::routes();
 
-Route::get( '/{path?}', function(){
+/*Route::get( '/{path?}', function(){
     return view( 'react.index' );
-} )->where('path', '.*');
+} )->where('path', '.*'); */
 
-Auth::routes();
+//Auth::routes();
 /*
 Route::resource('/', 'HomeController');
 
 Route::resource('posts', 'PostsController');
 
 Route::resource('developers', 'DevelopersController');*/
+
+Route::get('/managers/insert', 'ManagersController@insertManager');
+
+Route::get('/client', 'ClientsController@save');

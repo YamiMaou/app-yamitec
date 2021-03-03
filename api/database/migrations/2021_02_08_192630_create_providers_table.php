@@ -31,7 +31,7 @@ class CreateProvidersTable extends Migration
 
             $table->unsignedBigInteger('manager_id')->nullable(); // ID do responsável pela farmácia
             $table->unsignedBigInteger('filial_id')->nullable(); // referencia do self-relation/filial
-            $table->unsignedBigInteger('user_id'); // ID do usuário que executou ações no fornecedor
+            $table->unsignedBigInteger('user_id')->nullable(); // ID do usuário que executou ações no fornecedor
 
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

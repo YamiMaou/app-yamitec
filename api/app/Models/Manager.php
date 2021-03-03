@@ -13,9 +13,7 @@ class Manager extends Model
         'active',
         'cpf',
         'name',
-        'role',
-        'address',
-        'contact',
+        'function',
         'user_id'
     ];
 
@@ -29,8 +27,13 @@ class Manager extends Model
         );
     }
 
-    public function files()
+    public function address()
     {
-        return $this->hasMany(Files::class);
+        return $this->hasOne(Address::class, 'manager_id', 'id');
+    }
+
+    public function contact()
+    {
+        return $this->hasOne(Contact::class, 'manager_id', 'id');
     }
 }

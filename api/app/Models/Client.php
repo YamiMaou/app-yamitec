@@ -14,11 +14,7 @@ class Client extends Model
         'birth_date',
         'active',
         'note',
-        'address',
-        'contact',
-        'social_media',
         'user_id'
-
     ];
 
     public function providers()
@@ -29,6 +25,16 @@ class Client extends Model
             'client_id',
             'provider_id'
         );
+    }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class);
+    }
+
+    public function contact()
+    {
+        return $this->hasOne(Address::class);
     }
 
 }

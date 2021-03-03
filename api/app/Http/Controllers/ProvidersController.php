@@ -15,7 +15,7 @@ class ProvidersController extends ControllersExtends
 
     public function getAll()
     {
-        $provider = Provider::find(201)->first();
+        $provider = Provider::all();
         return ['manager_list' => $provider];
-    }
+    }   
 }

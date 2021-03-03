@@ -14,12 +14,11 @@ class File extends Model
         'path',
         'provider_id',
         'contributors_id',
-        'manager_id'
     ];
 
     public function provider()
     {
-        return $this->belongsTo(Provider::class);
+        return $this->belongsTo(Provider::class, 'provider_id', 'id');
     }
 
     public function contributors()
@@ -27,8 +26,4 @@ class File extends Model
         return $this->belongsTo(Contributors::class);
     }
 
-    public function manager()
-    {
-        return $this->belongsTo(Manager::class);
-    }
 }
