@@ -9,7 +9,6 @@ use App\Models\Address;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Hash;
 use \App\User;
-use Dotenv\Result\Result;
 
 class ClientsController extends Controller
 {
@@ -25,7 +24,7 @@ class ClientsController extends Controller
         return ['client_list' => $clients];
     }
 
-    public function save(Result $resquest)
+    public function store(Request $resquest)
     {
         try {
             $data_user = [
@@ -59,7 +58,7 @@ class ClientsController extends Controller
     
             $data_address = [
                 'phone1' => $resquest->phone1,
-                'phone1' => $resquest->phone2,
+                'phone' => $resquest->phone2,
                 'email' => $resquest->email,
                 'linkedin' => $resquest->linkedin,
                 'facebook' => $resquest->facebook,
@@ -72,6 +71,65 @@ class ClientsController extends Controller
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
+        }
+
+    }
+
+    public function update(Request $resquest, $id)
+    {
+        try {
+            $client = Client::findOrFail($id);
+
+            $user = User::findOrFail($client->user_id);
+
+            $data_user = [
+                'name' => $resquest->name,
+                'email' => $resquest->email,
+                'password' => Hash::make($resquest->cpf),
+            ];
+    
+            $user = $user->update($data_user);
+
+            $data_client = [
+                'name' => $resquest->name,
+                'cpf' => $resquest->cpf,
+                'birth_date' => $resquest->birth_date,
+                'active' => $resquest->active,
+                'note' => $resquest->note,
+                'user_id' => $user->id,
+            ];
+
+            $client = $client->update($data_client);
+
+            $data_address = [
+                'zipcode' => $resquest->zipcode,
+                'street' => $resquest->street,
+                'city' => $resquest->city,
+                'uf' => $resquest->uf,
+                'client_id' => $client->id,
+            ];
+    
+            $address = Address::findOrFail($client->client_id);
+            
+            $address->update($data_address);
+    
+            $data_contact = [
+                'phone1' => $resquest->phone1,
+                'phone1' => $resquest->phone2,
+                'email' => $resquest->email,
+                'linkedin' => $resquest->linkedin,
+                'facebook' => $resquest->facebook,
+                'instagram' => $resquest->instagram,
+                'client_id' => $client->id,
+            ];
+
+            $contact = Contact::findOrFail($client->client_id);
+    
+            $contact->update($data_contact);
+
+            return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
+        } catch(\Exception  $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
         }
 
     }

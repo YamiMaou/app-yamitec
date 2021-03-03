@@ -34,6 +34,6 @@ class Manager extends Model
 
     public function contact()
     {
-        return $this->hasOne(Contact::class, 'manager_id', 'id');
+        return $this->hasOne(Contact::class, 'contact_id', 'id');
     }
 }

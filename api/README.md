@@ -6,7 +6,7 @@ para iniciar o projeto basta clonar o repositorio e utilizar o branch ```server`
 
 para baixar o repositório rode o comando no terminal :
 
-```git clone git@github.com:yamimaou/app-yamitec.git```
+```git clone git@bitbucket.org:yamimaou/app-yamitec.git```
 
 e para alterar o branch para rode o comando :
 
