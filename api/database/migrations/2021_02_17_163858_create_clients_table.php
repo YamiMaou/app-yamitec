@@ -20,7 +20,7 @@ class CreateClientsTable extends Migration
             $table->string('cpf', 14)->unique();
             $table->date('birth_date');
             $table->tinyInteger('active')->default(1);
-            $table->string('note', 200);
+            $table->string('note', 200)->nullable();
 
             $table->unsignedBigInteger('provider_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable(); // ID do usuário que executou ações no client
