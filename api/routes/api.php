@@ -28,12 +28,22 @@ Route::middleware(['auth:api', 'scope:view-user'])->get('/users', function (Requ
 });
 Route::get('/profile', 'Api\UsersController@details')
     ->middleware(['auth:api', 'scope:view-profile']);
+Route::post('reset', 'Api\UsersController@resetPassword');
+Route::put('resetpwd', 'Api\AccountController@resetPassword');
 
 // POSTS
 /*Route::get('/posts', 'Api\PostsController@index')
     ->middleware(['auth:api', 'scope:view-posts']);
 Route::put('/posts/{id}', 'Api\PostsController@update')
     ->middleware(['auth:api', 'scope:update-posts']);*/
+    Route::get('report', function (){
+        //echo "ok";
+        $model = \App\Models\Contributors::get(['id', 'name', 'cpf'])->map(function($item) {
+            return array_values($item->toArray());
+        });
+        //var_dump($model);
+        return \App\Library\ExportClass::getCsv(['id','name', 'cpf'], $model);
+    });
 Route::post('/contributors/downloads', 'Api\ContributorsController@download');
 Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // POSTS

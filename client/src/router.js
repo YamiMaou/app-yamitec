@@ -11,6 +11,8 @@ import MiniDrawer from './components/Layout/Sidebar/minidrawer'
 
 import Home from './pages/Home';
 import Login from './pages/Login';
+import ResetPassword from './pages/Login/recovery';
+
 //import Audits from './pages/Audits';Providers
 import Contributors from './pages/Contributors';
 import CreateContributors from './pages/Contributors/create';
@@ -82,6 +84,7 @@ function Alert(props) {
         <Router>
           <Switch>
             <Route path="/login" exact={true} component={Login} />
+            <Route path="/reset/:token" exact={true} component={ResetPassword} />
             <Route path="/" exact={true} render={() => (isAuth ?  <Home /> : <Redirect push to="/login" />)} />
             <Route path="/colaboradores" exact={true} render={() => (isAuth ?  <Contributors /> : <Redirect push to="/login" />)} />
             <Route path="/colaboradores/novo" exact={true} render={() => (isAuth ?  <CreateContributors /> : <Redirect push to="/login" />)} />

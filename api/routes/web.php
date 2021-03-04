@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 //Auth::routes();
 
-/*Route::get( '/{path?}', function(){
+Route::get( '/{path?}', function(){
     return view( 'react.index' );
-} )->where('path', '.*'); */
+} )->where('path', '.*');
 
 //Auth::routes();
 /*

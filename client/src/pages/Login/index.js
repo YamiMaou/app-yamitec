@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { postAuth, JWT_Decode } from '../../providers/api'
+import { postResetPassword,postAuth, JWT_Decode } from '../../providers/api'
 import {setDialog as authDialog, setAuth} from '../../actions/authAction'
 import {setLoading } from '../../actions/appActions'
 
@@ -43,22 +43,36 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 function FullScreenInvoiceDialog(props) {
   const [loginError, setLoginerror] = React.useState(false);
+  const [resetError, setReseterror] = React.useState({success: false, message: ''});
   const [loading, setloading] = React.useState(false);
+  const [resetpwd, setResetpwd] = React.useState(false);
   const [dados, setDados] = React.useState({});
 
   const classes = useStyles();
-
-  const handleClose = () => {
-    props.authDialog(false);
-  };
-
-  const { aDialog } = props;
 
   function onChange(e) {
     let dt = dados;
     dt[e.target.id] = e.target.value
     setDados(dt);
   }
+  
+  async function onSubmitReset(e) {
+    e.preventDefault();
+    setloading(true);
+    let data = await postResetPassword(dados);
+    if(data !== undefined) {
+      if(data.data.success){
+        setLoginerror(false);
+        setloading(false);
+        window.location.href="/";
+      }else{
+        setLoginerror(true)
+        setloading(false);
+      }
+      setReseterror({success: true, message: data.data.message})
+    }
+  }
+
   async function onSubmit(e) {
     e.preventDefault();
     setloading(true);
@@ -81,8 +95,8 @@ function FullScreenInvoiceDialog(props) {
   return (
     <div>
       <img src={logo} style={{display: 'flex', margin: 'auto'}} height="150" width="150" />
-      <form id="loginform" onSubmit={onSubmit}>
-        
+      {!resetpwd ?(
+        <form id="loginform" onSubmit={onSubmit}>
         <Card className={classes.root}>
             <CardContent>
               <div>
@@ -114,7 +128,13 @@ function FullScreenInvoiceDialog(props) {
             </CardContent>
             
          
-          <CardActions>
+            <CardActions style={{flexDirection: 'column'}}>
+            <div style={{marginTop: 5, marginBottom: 5, alignSelf: 'start'}}>
+              <a onClick={() => {
+                setResetpwd(true);
+              }
+              }>Esqueceu a senha?</a>
+            </div><br />
             {!loading ? (
             <Button variant="contained" size="large" fullWidth color="primary" disableElevation type="submit" form="loginform"
             style={{
@@ -130,6 +150,51 @@ function FullScreenInvoiceDialog(props) {
           
         </Card>
       </form>
+      ) :(<form id="loginform" onSubmit={onSubmitReset}>
+        <Card className={classes.root}>
+            <CardContent>
+              <div>
+              {/*<InputMask id="username" label="Usuário" mask="999.999.999-99" maskChar=" " onChange={onChange}>
+                {(inputProps) =>
+                  <TextField
+                  error={loginError === true ? true : false}
+                  helperText={ loginError ? "Usuário ou senha invalidos." : ""}
+                  fullWidth id="username" label="Usuário" variant="outlined" onChange={onChange} />
+                }
+              </InputMask> */}
+              <TextField
+                error={resetError.success}
+                helperText={ resetError.success ? resetError.message : "" }
+                type="text"
+                fullWidth id="email" type="text" label="E-mail" variant="outlined" 
+                onChange={onChange}
+                onBlur={onChange} />
+              </div>
+            </CardContent>
+            
+         
+          <CardActions style={{flexDirection: 'column'}}>
+            <div style={{marginTop: 5, marginBottom: 5, alignSelf: 'start'}}>
+              <a onClick={() => {
+                setResetpwd(false);
+              }
+              }>Login</a>
+            </div><br />
+            {!loading ? (
+            <Button variant="contained" size="large" fullWidth color="primary" disableElevation type="submit" form="loginform"
+            style={{
+              background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
+            }}>
+              SOLICITAR 
+            </Button>
+            ) : (
+            <CircularProgress style={{margin: 'auto'}} />
+            )}
+            
+          </CardActions>
+          
+        </Card>
+      </form>)}
     </div>
   );
 }
