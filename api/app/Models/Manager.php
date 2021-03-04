@@ -39,11 +39,11 @@ class Manager extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class,'id', 'user_id');
+        return $this->hasOne(\App\User::class,'id', 'user_id');
     }
 
     public function audits()
     {
-        return $this->hasOne(\App\Models\Audit::class)->latest();
+        return $this->hasOne(\App\Models\Audit::class,'managers_id')->latest();
     } 
 }

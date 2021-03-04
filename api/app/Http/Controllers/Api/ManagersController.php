@@ -63,6 +63,9 @@ class ManagersController extends ControllersExtends
 
     public function update(Request $resquest, $id)
     {
+        if(!isset($resquest->cpf)){
+            return parent::update($resquest, $id);
+        }
         try {
             $manager = Manager::findOrFail($id);
 

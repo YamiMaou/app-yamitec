@@ -42,16 +42,8 @@ class CreateManagers extends Component {
         const request = async (data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             this.setState({ ...this.state, loading: true });
-            //data = Object.assign({},state.addresses,data);
-            //data = Object.assign({},state.contacts,data);
-            //data = Object.assign({},state,data);
-            //delete data.addresses;
-           // delete data.contacts;
-
             let response = await postApiClients(data);
-            //console.log(response);
             if (response.data.success) {
-                //this.props.enqueueSnackbar( response.data.message, { variant: 'success' });
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
@@ -59,7 +51,6 @@ class CreateManagers extends Component {
                 console.log(response)
                 let errors = response.data ?? undefined;
 
-                //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
                 if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
                     Object.keys(errors.error.response.data.errors).map(err => {
@@ -70,15 +61,12 @@ class CreateManagers extends Component {
                 } else{
                     messages = 'Houve um problema em sua requisição!'
                 }
-                //response.data.error.response.data.errors
-                //this.props.enqueueSnackbar( message, { variant: 'error' });
                 this.setState({ ...this.state, loading: false });
                 this.props.setSnackbar({ open: true, message: messages});
             }
 
         }
         const validateFields = (fields, values) => {
-            //console.log(fields);
             let campo = undefined;
             fields.reverse().map((v,k) => {
                 v.fields.reverse().map((v1,k1)=>{
@@ -113,7 +101,6 @@ class CreateManagers extends Component {
                         }
                     })
                 })
-                //console.log(campo)
                 campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message}) : '';
 
                 return campo === undefined ? true : false
@@ -126,18 +113,27 @@ class CreateManagers extends Component {
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'birth_date', label: 'Data de nascimento', type: 'date', validate: {required: true}, validateHandler: isFutureData, flexBasis, style:{maxWidth: '210px'} },
+                    {
+                        column: 'function', label: 'Função', type: 'select',
+                        values: [
+                            "Administração",
+                            "Coordenador de usuários", 
+                            "Coordenador de parceiros", 
+                            "Gerente", 
+                            "Operador de marketing", 
+                            "Vendedor"
+                        ],
+                        validate: {required: true },
+                        flexBasis, style:{width: '220px'}
+                    },
                 ]
             },
             {
                 id: 'addr',
                 title: 'Endereço',
-                //flexFlow: 'row no-wrap',
-                //json: "address",
                 fields: [
                     {
                         column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
-                        //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
                     { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
@@ -152,7 +148,6 @@ class CreateManagers extends Component {
             },
             {
                 title: 'Contato',
-                //json: 'contact',
                 fields: [
                     { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
                     { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
@@ -161,7 +156,6 @@ class CreateManagers extends Component {
             },
             {
                 title: 'Redes Sociais',
-                //json: 'contact',
                 fields: [
                     { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
                     { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
@@ -174,7 +168,7 @@ class CreateManagers extends Component {
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Typography variant="h6">
-                        <HomeIcon />  <span>Cadastro / Clientes</span>
+                        <HomeIcon />  <span>Cadastro / Responsáveis</span>
                     </Typography>
                 </AppBar>
                 <LForms forms={forms}

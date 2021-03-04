@@ -88,8 +88,6 @@ class ContributorsController extends ControllersExtends
             "function"=>$request->function,
             "active" => $request->active,
             "anexo" =>  $data['file'],
-            "address" => "[]",
-            "contact" => "[]",
             'user_id' => $request->user()->id,
             'username' => $request->user()->email,
         ];

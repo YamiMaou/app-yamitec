@@ -42,16 +42,8 @@ class CreateContributors extends Component {
         const request = async (data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             this.setState({ ...this.state, loading: true });
-            //data = Object.assign({},state.addresses,data);
-            //data = Object.assign({},state.contacts,data);
-            //data = Object.assign({},state,data);
-            //delete data.addresses;
-           // delete data.contacts;
-
             let response = await postApiContributors(data);
-            //console.log(response);
             if (response.data.success) {
-                //this.props.enqueueSnackbar( response.data.message, { variant: 'success' });
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
@@ -59,7 +51,6 @@ class CreateContributors extends Component {
                 console.log(response)
                 let errors = response.data ?? undefined;
 
-                //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
                 if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
                     Object.keys(errors.error.response.data.errors).map(err => {
@@ -70,15 +61,12 @@ class CreateContributors extends Component {
                 } else{
                     messages = 'Houve um problema em sua requisição!'
                 }
-                //response.data.error.response.data.errors
-                //this.props.enqueueSnackbar( message, { variant: 'error' });
                 this.setState({ ...this.state, loading: false });
                 this.props.setSnackbar({ open: true, message: messages});
             }
 
         }
         const validateFields = (fields, values) => {
-            //console.log(fields);
             let campo = undefined;
             fields.reverse().map((v,k) => {
                 v.fields.reverse().map((v1,k1)=>{
@@ -113,7 +101,6 @@ class CreateContributors extends Component {
                         }
                     })
                 })
-                //console.log(campo)
                 campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message}) : '';
 
                 return campo === undefined ? true : false
@@ -138,7 +125,6 @@ class CreateContributors extends Component {
                             "Vendedor"
                         ],
                         validate: {required: true },
-                        //value: "Coordenador de usuários",
                         flexBasis, style:{width: '220px'}
                     },
                     { column: 'file', label: 'Anexar Documento', type: 'file', validate: {required: true}, flexBasis },
@@ -149,12 +135,9 @@ class CreateContributors extends Component {
             {
                 id: 'addr',
                 title: 'Endereço',
-                //flexFlow: 'row no-wrap',
-                //json: "address",
                 fields: [
                     {
                         column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
-                        //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
                     { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
@@ -169,7 +152,6 @@ class CreateContributors extends Component {
             },
             {
                 title: 'Contato',
-                //json: 'contact',
                 fields: [
                     { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
                     { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
@@ -178,7 +160,6 @@ class CreateContributors extends Component {
             },
             {
                 title: 'Redes Sociais',
-                //json: 'contact',
                 fields: [
                     { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
                     { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },

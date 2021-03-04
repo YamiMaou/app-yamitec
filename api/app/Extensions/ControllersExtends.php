@@ -140,7 +140,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function update(Request $request, $id)
     {
-        $modelName = strtolower(str_replace('Model','',(new \ReflectionClass($this->model))->getShortName())).'s';
+        $modelName = strtolower(str_replace('Controller','',(new \ReflectionClass($this->model))->getShortName()));
         if (count($this->validate) > 0) {
             foreach ($this->validate as $k => $val) {
                 $regras = "";
@@ -160,7 +160,6 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
             $data['user_id'] = $request->user()->id;
-            echo $modelName;
             $this->saveLog($id, $request, $modelName);
             
             unset($data["_token"]);
