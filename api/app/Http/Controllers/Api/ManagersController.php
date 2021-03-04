@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Extensions\ControllersExtends;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use Illuminate\Http\Request;
@@ -52,6 +53,52 @@ class ManagersController extends Controller
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
+        }
+
+    }
+
+    public function update(Request $resquest, $id)
+    {
+        try {
+            $manager = Manager::findOrFail($id);
+
+            $user = User::findOrFail($manager->user_id);
+
+            $data_user = [
+                'name' => $resquest->name,
+                'email' => $resquest->email,
+                'password' => Hash::make($resquest->cpf),
+            ];
+    
+            $user->update($data_user);
+
+            $data_manager = [
+                'name' => $resquest->name,
+                'cpf' => $resquest->cpf,
+                'function' => $resquest->function,
+                'active' => $resquest->active,
+                'user_id' => $user->id,
+            ];
+    
+            $manager->update($data_manager);
+    
+            $data_contact = [
+                'phone1' => $resquest->phone1,
+                'phone2' => $resquest->phone2,
+                'email' => $resquest->email,
+                'linkedin' => $resquest->linkedin,
+                'facebook' => $resquest->facebook,
+                'instagram' => $resquest->instagram,
+                'manager_id' => $manager->id,
+            ];
+
+            $contact = Contact::where('client_id', $manager->id);
+    
+            $contact->update($data_contact);
+
+            return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
+        } catch(\Exception  $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
         }
 
     }
