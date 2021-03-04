@@ -11,11 +11,11 @@ use App\Models\Contact;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 
-class ClientsController extends Controller
+class ClientsController extends ControllersExtends
 {
     public function __construct()
     {
-       // parent::__construct(Client::class, 'home');
+         parent::__construct(Client::class, 'home');
     }
 
     // TESTE
@@ -23,6 +23,11 @@ class ClientsController extends Controller
     {
         $clients = Client::all();
         return ['client_list' => $clients];
+    }
+
+    public function show(Request $request, $id, $with=[])
+    {
+       return  parent::show($request, $id, ['user', 'addresses', 'contacts', 'audits']);
     }
 
     public function store(Request $resquest)
@@ -51,6 +56,7 @@ class ClientsController extends Controller
                 'zipcode' => $resquest->zipcode,
                 'street' => $resquest->street,
                 'city' => $resquest->city,
+                'additional' => $resquest->additional,
                 'uf' => $resquest->uf,
                 'client_id' => $client->id,
             ];
@@ -78,6 +84,9 @@ class ClientsController extends Controller
 
     public function update(Request $resquest, $id)
     {
+        if(!isset($resquest->cpf)){
+            return parent::update($resquest, $id);
+        }
         try {
             $client = Client::findOrFail($id);
 
@@ -105,6 +114,7 @@ class ClientsController extends Controller
             $data_address = [
                 'zipcode' => $resquest->zipcode,
                 'street' => $resquest->street,
+                'additional' => $resquest->additional,
                 'city' => $resquest->city,
                 'uf' => $resquest->uf,
                 'client_id' => $client->id,
@@ -127,7 +137,7 @@ class ClientsController extends Controller
             $contact = Contact::where('client_id', $client->id);
     
             $contact->update($data_contact);
-
+            //parent::saveLog($id, $data_client, 'clients');
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);

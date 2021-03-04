@@ -20,6 +20,10 @@ import Providers from './pages/Providers';
 import CreateProviders from './pages/Providers/create';
 import EditProviders from './pages/Providers/edit';
 
+import Clients from './pages/Clientes';
+import CreateClients from './pages/Clientes/create';
+import EditClients from './pages/Clientes/edit';
+
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
 import {themeStyle} from './components/Layout/Header/style'
@@ -81,6 +85,9 @@ function Alert(props) {
             <Route path="/fornecedores" exact={true} render={() => (isAuth ?  <Providers /> : <Redirect push to="/login" />)} />
             <Route path="/fornecedores/novo" exact={true} render={() => (isAuth ?  <CreateProviders /> : <Redirect push to="/login" />)} />
             <Route path="/fornecedores/:id" exact={true} render={() => (isAuth ?  <EditProviders /> : <Redirect push to="/login" />)} />
+            <Route path="/clientes" exact={true} render={() => (isAuth ?  <Clients /> : <Redirect push to="/login" />)} />
+            <Route path="/clientes/novo" exact={true} render={() => (isAuth ?  <CreateClients /> : <Redirect push to="/login" />)} />
+            <Route path="/clientes/:id" exact={true} render={() => (isAuth ?  <EditClients /> : <Redirect push to="/login" />)} />
 
             <Route path="*">
               <Box>
