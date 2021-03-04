@@ -16,7 +16,7 @@ class Address extends Model
         'uf',
         'contributors_id',
         'client_id',
-        'manager_id'
+        'provider_id',
     ];
 
     public function contributors()
@@ -32,5 +32,10 @@ class Address extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
     }
 }

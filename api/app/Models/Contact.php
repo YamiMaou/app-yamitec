@@ -17,7 +17,8 @@ class Contact extends Model
         'instagram',
         'contributors_id',
         'manager_id',
-        'client_id'
+        'client_id',
+        'provider_id',
     ];
 
     public function contributors()
@@ -33,5 +34,10 @@ class Contact extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
     }
 }

@@ -3,108 +3,127 @@
 namespace App\Http\Controllers\Api;
 
 use App\Extensions\ControllersExtends;
+use App\Http\Controllers\Controller;
+use App\Models\Address;
+use App\Models\Contact;
+use App\Models\Manager;
 use App\Models\Provider;
 use Illuminate\Http\Request;
 
-class ProvidersController extends ControllersExtends
+class ProvidersController extends Controller
 {
     public function __construct()
     {
-        parent::__construct(Provider::class, 'home');
+        //parent::__construct(Provider::class, 'home');
     }
 
-    public function store(Request $request){
-        $validate = $request;
-        
-        $files = new \App\Http\Controllers\FilesController();
-        $files = $files->multUpload($request, 'providers');
-        $data = $files->request;
-        //var_dump($data);
-        //return response()->json(['success' => true],200);
-        $providers = [
-            "cnpj" => $request->cnpj,
-            "company_name" => $request->company_name,
-            "fantasy_name" => $request->fantasy_name,
-            "function"=>$request->function,
-            "active" => $request->active,
-            "matriz" => $request->matriz,
-            "type" => $request->type,
-            "anexo" =>  $data['anexo'],
-            "logo" =>  $data['logo'],
-            'provider_id' => $request->provider_id,
-            'user_id' => $request->user()->id,
-            'username' => $request->user()->email,
-        ];
-        //$request['name'] = $data['name'] ?? null;
-        $request['anexo'] = $data['file'] ?? null;
-
-        $address = [
-            "uf" => $request->uf,
-            "city" => $request->city,
-            "additional" => $request->additional,
-            "street" => $request->street,
-            "zipcode" => $request->zipcode,
-        ];
-
-        $contact = [
-            "phone1" => $request->phone1,
-            "phone2" => $request->phone2,
-            "email" => $request->email,
-            "linkedin" => $request->linkedin,
-            "facebook" => $request->facebook,
-            "instagram" => $request->instagram,
-        ];
-
-        $contract = [
-            "accession_date" => $request->accession_date,
-            "end_date" => $request->end_date,
-            "rate" => $request->rate,
-            "contributors_id" =>  5,
-            "file_id" => 1
-        ];
-        parent::withAndChange([
-            \App\Models\Provider::class => $providers ,
-            \App\Models\Address::class => $address,
-            \App\Models\Contact::class => $contact,
-            \App\Models\Contract::class => $contract,
-        ],
-        ["permiss" => true, "key" => "providers_id"]);
-        return parent::store($validate);
-    }
-
-    public function activate(Request $request)
+    public function store(Request $request)
     {
         try {
-            $model = new Provider();
+            $provider_data = [
+                "type" => $request->type,
+                "active" => $request->active,
+                "cnpj" => $request->cnpj,
+                "company_name" => $request->company_name,
+                "fantasy_name" => $request->fantasy_name
+            ];
 
-            $active = $request['active'];
-            $id = $request['id'];
+            $provider = Provider::create($provider_data);
 
-            $this->validate($request,[
-                'active'=>'required|digits_between:0,1',
-               ]);
+            $address_data = [
+                "uf" => $request->uf,
+                "city" => $request->city,
+                "additional" => $request->additional,
+                "street" => $request->street,
+                "zipcode" => $request->zipcode,
+                "provider_id" => $provider->id,
+            ];
 
-            $provider = $model::find($id)->first();
+            Address::create($address_data);
 
-            if ($provider):
-                $model::where("id", $id)->update(['active' => $active]);
-            endif;
+            $contact_data = [
+                "phone1" => $request->phone1,
+                "phone2" => $request->phone2,
+                "email" => $request->email,
+                "linkedin" => $request->linkedin,
+                "facebook" => $request->facebook,
+                "instagram" => $request->instagram,
+                "provider_id" => $provider->id,
+            ];
 
-            if ($active == '0'):
-                return response()->json(["message" => "Desativado com sucesso!"]);
-            else:
-                return response()->json(["message" => "reativado com sucesso!"]);
-            endif;
+            Contact::create($contact_data);
+
+            return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
-            return response()->json(["message" => "Erro: Não foi possível efeturar a operação", "error" => $error->getMessage(), 500]);
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
+        }
+
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $provider = Provider::findOrFail($id);
+
+            $provider_data = [
+                "type" => $request->type,
+                "active" => $request->active,
+                "cnpj" => $request->cnpj,
+                "company_name" => $request->company_name,
+                "fantasy_name" => $request->fantasy_name
+            ];
+
+            $provider->update($provider_data);
+
+            $address = Address::where('provider_id', $provider->id);
+
+            $address_data = [
+                "uf" => $request->uf,
+                "city" => $request->city,
+                "additional" => $request->additional,
+                "street" => $request->street,
+                "zipcode" => $request->zipcode,
+                "provider_id" => $provider->id,
+            ];
+
+            $address->update($address_data);
+
+            $contact = Contact::where('provider_id', $provider->id);
+
+            $contact_data = [
+                "phone1" => $request->phone1,
+                "phone2" => $request->phone2,
+                "email" => $request->email,
+                "linkedin" => $request->linkedin,
+                "facebook" => $request->facebook,
+                "instagram" => $request->instagram,
+                "provider_id" => $provider->id,
+            ];
+
+            $contact->update($contact_data);
+
+            return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
         }
     }
 
-    // TESTE
-    public function getManagerNameOfProvider()
+    public function addManageToProvider($provider_id, $manager_id)
     {
-        $manager = Provider::find(201)->managers;
+        try {
+            $provider = Provider::findOrFail($provider_id);
+            $manager = Manager::findOrFail($manager_id);
+    
+            if ($provider->managers->find($manager_id)):
+              return response()->json(["success"=> false, "type" => "vinculate", "message" => "Responsável já é vinculado!"]);
+            endif;
 
-        return ['manager_name' => $manager[0]->name];
+            $provider->managers()->attach($manager);
+
+            return response()->json(["success"=> true, "type" => "vinculate", "message" => "Responsável vinculado com sucesso!"]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao vincular responsável. ", "error" => $error->getMessage()], 201);
+        }
     }
+
 }

@@ -47,6 +47,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/contracts', 'Api\ContractController')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_FILES
     Route::resource('/provider/files', 'Api\ProviderFilesController')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_MANAGER
+    Route::put('/providers/manager/{provider}/{manager}', 'Api\ProvidersController@addManageToProvider')->middleware(['auth:api', 'scope:view-posts']);
     // CLIENTS
     Route::resource('/clients', 'Api\ClientsController')->middleware(['auth:api', 'scope:view-posts']);
     // MANAGERS
@@ -54,12 +56,3 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // AUDIT
     Route::resource('/audits', 'Api\AuditsController');
 });
-/** teste */
-Route::post('/providers/active', 'Api\ProvidersController@activate')
-    ->middleware(['auth:api', 'scope:view-posts']);
-/** teste */
-Route::get('/providers/getname', 'Api\ProvidersController@getManagerNameOfProvider')
-    ->middleware(['auth:api', 'scope:view-posts']);
-/** teste */
-Route::get('/managers/get', 'Api\ManagersController@getAll')
-    ->middleware(['auth:api', 'scope:view-posts']);
