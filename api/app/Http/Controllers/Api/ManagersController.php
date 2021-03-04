@@ -10,13 +10,17 @@ use App\Models\Manager;
 use Illuminate\Support\Facades\Hash;
 use \App\User;
 
-class ManagersController extends Controller
+class ManagersController extends ControllersExtends
 {
     public function __construct()
     {
-       // parent::__construct(Manager::class, 'home');
+       parent::__construct(Manager::class, 'home');
     }
-
+    
+    public function show(Request $request, $id, $with=[])
+    {
+       return  parent::show($request, $id, ['user', 'addresses', 'contacts', 'audits']);
+    }
     public function store(Request $resquest)
     {
         try {
