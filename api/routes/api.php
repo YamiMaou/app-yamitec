@@ -38,11 +38,11 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
     ->middleware(['auth:api', 'scope:update-posts']);*/
     Route::get('report', function (){
         //echo "ok";
-        $model = \App\Models\Contributors::get(['id', 'name', 'cpf'])->map(function($item) {
+        $model = \App\Models\Audit::get(['id', 'user_id', 'justification', 'from', 'to'])->map(function($item) {
             return array_values($item->toArray());
         });
-        //var_dump($model);
-        return \App\Library\ExportClass::getCsv(['id','name', 'cpf'], $model);
+        echo " ";
+        return \App\Library\ExportClass::getCsv(['ID','Usuario', 'Justificativa', 'DE', 'PARA'], $model);
     });
 Route::post('/contributors/downloads', 'Api\ContributorsController@download');
 Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
