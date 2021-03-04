@@ -21,6 +21,7 @@ class ContributorsController extends ControllersExtends
             'file' => 'required|mimes:jpg,png,pdf,xlx,csv|max:2048',
         ]);
     }
+    
     public function show(Req $request, $id, $with=[])
     {
        return  parent::show($request, $id, ['user', 'file', 'addresses', 'contacts', 'audits']);
@@ -118,7 +119,7 @@ class ContributorsController extends ControllersExtends
         ["permiss" => true, "key" => "contributors_id"]);
         return parent::store($validate);
     }
-
+    
     public function Download(Req $request)
     {
         ob_end_clean();

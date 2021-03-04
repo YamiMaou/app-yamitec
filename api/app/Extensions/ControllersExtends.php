@@ -213,14 +213,24 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function saveLog($id, $request, $modelName = ""){
         $data =  $request->all();
-        $olderData = $this->model->where('id', $id )->first();
+        $just = $data['justification'];
+        unset($data['_method']);
+        unset($data['justification']);
+        $older = $this->model->where('id', $id )->first()->toArray();
+        $od = [];
+        foreach($older as $key=>$value){
+            if(isset($data[$key])){
+                $od[$key] = $value;
+            }
+        }
+
         $to = json_encode($data);
-        $from = json_encode($olderData);
+        $from = json_encode($od);
         $audit = new Audit();
         $audit->create([
             'user_id' => $request->user()->id,
             $modelName.'_id' => $id,
-            'justification'=> $data['justification'],
+            'justification'=> $just,
             'from' => $from,
             'to' => $to
         ]); 

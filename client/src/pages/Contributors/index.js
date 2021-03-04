@@ -22,7 +22,7 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiContributors, putApiContributors } from '../../providers/api'
+import { getApiContributorsReport,getApiContributors, putApiContributors } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
@@ -97,11 +97,12 @@ class Contributors extends Component {
        
     }
     
-    componentDidMount() {
+    async componentDidMount() {
         if(JSON.parse(localStorage.getItem("user")) == null){
             window.location.href = '/login';
             return;
         }
+        let report = await getApiContributorsReport();
     }
 
     render() {
