@@ -59,6 +59,12 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/provider/files', 'Api\ProviderFilesController')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_MANAGER
     Route::put('/providers/manager/{provider}/{manager}', 'Api\ProvidersController@addManageToProvider')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_ALL-AFFILIATES
+    Route::get('/providers/affiliates/{provider_id}', 'Api\ProvidersController@allAffiliates')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_GET-MATRIZ
+    Route::get('/providers/matrix/{provider_id}', 'Api\ProvidersController@getMatriz')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_GET-MATRIZ-BY-AFFILIATE-ID
+    Route::get('/providers/affiliate/matrix/{affiliate_id}', 'Api\ProvidersController@getMatrizByAffiliateId')->middleware(['auth:api', 'scope:view-posts']);
     // CLIENTS
     Route::resource('/clients', 'Api\ClientsController')->middleware(['auth:api', 'scope:view-posts']);
     // MANAGERS

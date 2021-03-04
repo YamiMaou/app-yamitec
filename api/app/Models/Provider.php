@@ -14,7 +14,7 @@ class Provider extends Model
         'cnpj',
         'company_name',
         'fantasy_name',
-        'filial_id',
+        'matriz_id',
     ];
 
     public function providerFiles()
@@ -49,12 +49,22 @@ class Provider extends Model
 
     public function matriz()
     {
-        return $this->hasMany(Provider::class, 'filial_id');
+        return $this->belongsTo(Provider::class);
     }
 
     public function filials()
     {
-        return $this->belongsTo(Provider::class, 'filial_id');
+        return $this->hasMany(Provider::class, 'matriz_id', 'id');
+    }
+
+    public function allfilials()
+    {
+        return $this->filials()->with('Allfilials');
+    }
+
+    public function root()
+    {
+        return $this->matriz ? $this->matriz->root() : $this;
     }
 
     public function files()

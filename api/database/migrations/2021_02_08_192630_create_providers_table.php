@@ -26,7 +26,8 @@ class CreateProvidersTable extends Migration
             $table->string('company_name', 100);
             $table->string('fantasy_name', 100);
 
-            $table->unsignedBigInteger('filial_id')->nullable(); // referencia do self-relation/filial
+            $table->unsignedBigInteger('matriz_id')->nullable(); // referencia do self-relation/filial
+            $table->foreign('matriz_id')->references('id')->on('providers')->onDelete('cascade');
 
             $table->timestamps();
         });

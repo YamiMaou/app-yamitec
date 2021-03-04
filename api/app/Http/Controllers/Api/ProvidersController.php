@@ -25,7 +25,8 @@ class ProvidersController extends Controller
                 "active" => $request->active,
                 "cnpj" => $request->cnpj,
                 "company_name" => $request->company_name,
-                "fantasy_name" => $request->fantasy_name
+                "fantasy_name" => $request->fantasy_name,
+                "matriz_id" => $request->matriz_id
             ];
 
             $provider = Provider::create($provider_data);
@@ -70,7 +71,8 @@ class ProvidersController extends Controller
                 "active" => $request->active,
                 "cnpj" => $request->cnpj,
                 "company_name" => $request->company_name,
-                "fantasy_name" => $request->fantasy_name
+                "fantasy_name" => $request->fantasy_name,
+                "matriz_id" => $request->matriz_id
             ];
 
             $provider->update($provider_data);
@@ -124,6 +126,33 @@ class ProvidersController extends Controller
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao vincular responsável. ", "error" => $error->getMessage()], 201);
         }
+    }
+
+    // busca todos os afiliados
+    public function allAffiliates($provider_id)
+    {
+        $provider = Provider::findOrFail($provider_id);
+        $affiliates = ['affiliates' => $provider->where('matriz_id', $provider_id)->get()];
+
+        return response()->json($affiliates);
+    }
+
+    // busca matriz
+    public function getMatriz($provider_id)
+    {
+        $provider = Provider::findOrFail($provider_id);
+        $matriz = ['matriz' => $provider->where('id', $provider_id)->get()];
+
+        return response()->json($matriz);
+    }
+
+    // busca matriz pelo id do afiliado
+    public function getMatrizByAffiliateId($affiliate_id)
+    {
+        $provider = Provider::findOrFail($affiliate_id);
+        $matriz = ['matriz' => $provider->matriz()->get()];
+
+        return response()->json($matriz);
     }
 
 }
