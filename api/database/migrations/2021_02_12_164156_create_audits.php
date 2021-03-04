@@ -15,7 +15,7 @@ class CreateAudits extends Migration
     {
         Schema::create('audits', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            /*$table->unsignedBigInteger('user_id');
             $table->foreign('user_id')
             ->references('id')->on('users')
             ->onDelete('cascade');
@@ -44,7 +44,7 @@ class CreateAudits extends Migration
             $table->text('to')->nullable();
             $table->text('from')->nullable();
             $table->timestamps();
-            $table->engine = 'InnoDB';
+            $table->engine = 'InnoDB';*/
         });
     }
 

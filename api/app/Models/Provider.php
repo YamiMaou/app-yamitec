@@ -15,6 +15,9 @@ class Provider extends Model
         'company_name',
         'fantasy_name',
         'matriz_id',
+        'addr_clone',
+        'contact_clone',
+        'contract_clone'
     ];
 
     public function providerFiles()

@@ -51,10 +51,14 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::put('/providers/manager/{provider}/{manager}', 'Api\ProvidersController@addManageToProvider')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_ALL-AFFILIATES
     Route::get('/providers/affiliates/{provider_id}', 'Api\ProvidersController@allAffiliates')->middleware(['auth:api', 'scope:view-posts']);
-    // PROVIDER_GET-MATRIZ
-    Route::get('/providers/matrix/{provider_id}', 'Api\ProvidersController@getMatriz')->middleware(['auth:api', 'scope:view-posts']);
-    // PROVIDER_GET-MATRIZ-BY-AFFILIATE-ID
+    // PROVIDER_GET-PROVIDER
+    Route::get('/providers/get/{provider_id}', 'Api\ProvidersController@getProvider')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_GET-MATRIX-BY-AFFILIATE-ID
     Route::get('/providers/affiliate/matrix/{affiliate_id}', 'Api\ProvidersController@getMatrizByAffiliateId')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_IS-MATRIX
+    Route::get('/providers/show/matrix/{provider_id}', 'Api\ProvidersController@showMatrix')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_GET-FULL
+    Route::get('/providers/show/matrix/full/{provider_id}', 'Api\ProvidersController@getFullProvider')->middleware(['auth:api', 'scope:view-posts']);
     // CLIENTS
     Route::resource('/clients', 'Api\ClientsController')->middleware(['auth:api', 'scope:view-posts']);
     // MANAGERS

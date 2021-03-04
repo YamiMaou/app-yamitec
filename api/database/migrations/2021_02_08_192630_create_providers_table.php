@@ -25,6 +25,9 @@ class CreateProvidersTable extends Migration
             $table->string('cnpj', 14)->unique();
             $table->string('company_name', 100);
             $table->string('fantasy_name', 100);
+            $table->boolean('addr_clone')->default(false)->nullable();
+            $table->boolean('contact_clone')->default(false)->nullable();
+            $table->boolean('contract_clone')->default(false)->nullable();
 
             $table->unsignedBigInteger('matriz_id')->nullable(); // referencia do self-relation/filial
             $table->foreign('matriz_id')->references('id')->on('providers')->onDelete('cascade');

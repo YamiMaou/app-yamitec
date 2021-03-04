@@ -26,33 +26,40 @@ class ProvidersController extends Controller
                 "cnpj" => $request->cnpj,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
-                "matriz_id" => $request->matriz_id
+                "matriz_id" => $request->matriz_id,
+                "addr_clone" => $request->addr_clone ? true : false,
+                "contact_clone" => $request->contact_clone ? true : false,
+                "contract_clone" => $request->contract_clone ? true : false
             ];
 
             $provider = Provider::create($provider_data);
 
-            $address_data = [
-                "uf" => $request->uf,
-                "city" => $request->city,
-                "additional" => $request->additional,
-                "street" => $request->street,
-                "zipcode" => $request->zipcode,
-                "provider_id" => $provider->id,
-            ];
+            if ($request->addr_clone == null):
+                $address_data = [
+                    "uf" => $request->uf,
+                    "city" => $request->city,
+                    "additional" => $request->additional,
+                    "street" => $request->street,
+                    "zipcode" => $request->zipcode,
+                    "provider_id" => $provider->id,
+                ];
 
-            Address::create($address_data);
+                Address::create($address_data);
+            endif;
 
-            $contact_data = [
-                "phone1" => $request->phone1,
-                "phone2" => $request->phone2,
-                "email" => $request->email,
-                "linkedin" => $request->linkedin,
-                "facebook" => $request->facebook,
-                "instagram" => $request->instagram,
-                "provider_id" => $provider->id,
-            ];
-
-            Contact::create($contact_data);
+            if ($request->contact_clone == null):
+                $contact_data = [
+                    "phone1" => $request->phone1,
+                    "phone2" => $request->phone2,
+                    "email" => $request->email,
+                    "linkedin" => $request->linkedin,
+                    "facebook" => $request->facebook,
+                    "instagram" => $request->instagram,
+                    "provider_id" => $provider->id,
+                ];
+    
+                Contact::create($contact_data);
+            endif;
 
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
@@ -137,11 +144,11 @@ class ProvidersController extends Controller
         return response()->json($affiliates);
     }
 
-    // busca matriz
-    public function getMatriz($provider_id)
+    // get provider by id
+    public function getProvider($provider_id)
     {
         $provider = Provider::findOrFail($provider_id);
-        $matriz = ['matriz' => $provider->where('id', $provider_id)->get()];
+        $matriz = ['provider' => $provider->where('id', $provider_id)->get()];
 
         return response()->json($matriz);
     }
@@ -153,6 +160,67 @@ class ProvidersController extends Controller
         $matriz = ['matriz' => $provider->matriz()->get()];
 
         return response()->json($matriz);
+    }
+
+    public function showMatrix($provider_id)
+    {
+        try {
+            $provider = Provider::findOrFail($provider_id);
+
+            if ($provider->type == 'matriz'):
+                return response()->json(['matrix' => $provider]);
+            else:
+                return response()->json([]);
+            endif;
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Matriz não encontrada. ", "error" => $error->getMessage()], 201);
+        }
+    }
+
+    public function affiliate(Request $request)
+    {
+        try {
+            $provider = Provider::findOrFail($request->id);
+
+            $provider_data = [
+                "type" => $request->type,
+                "active" => $request->active,
+                "cnpj" => $request->cnpj,
+                "company_name" => $request->company_name,
+                "fantasy_name" => $request->fantasy_name,
+                "matriz_id" => $provider->id
+            ];
+
+            $provider = Provider::create($provider_data);
+
+            return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
+        }
+
+    }
+
+    public function getFullProvider($provider_id)
+    {
+        try {
+            $provider = Provider::findOrFail($provider_id);
+
+            if ($provider->addr_clone == true):
+                $addr = Address::where('provider_id', $provider->matriz_id)->get();
+            else:
+                $addr = Address::where('provider_id', $provider->id)->get();
+            endif;
+
+            if ($provider->contact_clone == true):
+                $contact = Contact::where('provider_id', $provider->matriz_id)->get();
+            else:
+                $contact = Contact::where('provider_id', $provider->id)->get();
+            endif;
+
+            return response()->json(['provider' => $provider, 'addr' => $addr, 'contact' => $contact]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
+        }
     }
 
 }
