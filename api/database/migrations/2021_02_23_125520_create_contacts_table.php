@@ -31,7 +31,7 @@ class CreateContactsTable extends Migration
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
 
-            $table->unsignedBigInteger('providers_id');
+            $table->unsignedBigInteger('providers_id')->nullable();
             $table->foreign('providers_id')->references('id')->on('providers')->onDelete('cascade');
 
             $table->timestamps();

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Client extends Model
@@ -27,14 +28,24 @@ class Client extends Model
         );
     }
 
-    public function address()
+    public function addresses()
     {
         return $this->hasOne(Address::class);
     }
 
-    public function contact()
+    public function contacts()
     {
-        return $this->hasOne(Address::class);
+        return $this->hasOne(Contact::class);
     }
+
+    public function user()
+    {
+        return $this->hasOne(User::class,'id', 'user_id');
+    }
+
+    public function audits()
+    {
+        return $this->hasOne(\App\Models\Audit::class, 'clients_id','id')->latest();
+    } 
 
 }

@@ -78,34 +78,34 @@ function TextMaskCustom(props) {
 
 //
 const DateInput = (props) => {
-    const [value, setValue] = useState(new Date('2021-02-13'));
-    function handleChange(value) {
-        let e = { target: { id: props.id, value: `${value.toJSON().split('T')[0]}` } }
+    const [value, setValue] = useState(props.value);
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        //let e = { target: { id: props.id, value: `${value.toJSON().split('T')[0]}` } }
         try {
             //inputValues[props.id] = `${value.toJSON().split('T')[0]}`
             props.onChange(e)
         } catch (err) {
             console.log(err);
         }
-        setValue(value);
+        setValue(e);
     }
-    return (<MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
-        <Grid justify="space-around" style={{ flexGrow: 0, marginTop: 18 }}>
-            <KeyboardDatePicker
-                margin="normal"
-                id={props.id}
-                value={props.value}
-                label={props.label ?? 'Data'}
-                format="dd/MM/yyyy"
-                value={value}
-                onChange={handleChange}
-                onBlur={handleChange}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                }}
-            />
-        </Grid>
-    </MuiPickersUtilsProvider>)
+    return (<form noValidate style={{ ...props.style, marginTop: 20 }} >
+        <TextField
+            style={{width: '100%'}} 
+            id={props.id}
+            label={props.label ?? 'Data'}
+            type="date"
+            defaultValue={value}
+            onChange={handleChange}
+            onBlur={handleChange}
+            error={error}
+            helperText={error == true ? props.helperText ?? "Data inválida" : ""}
+            InputLabelProps={{
+                shrink: true,
+            }}
+        />
+    </form>)
 }
 //
 
@@ -286,7 +286,7 @@ class LCardGrid extends Component {
                                                 </FormControl>)
 
                                     } else if (input.type == "date") {
-                                        return <DateInput id={input.column} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />
+                                        return <DateInput label={input.label}  id={input.column} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onChange={onChangeInputs}  onBlur={onChangeInputs} />
                                     } else if (input.type == "select") {
                                         return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />)
                                     }

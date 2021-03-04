@@ -73,34 +73,47 @@ function TextMaskCustom(props) {
 
 //
 const DateInput = (props) => {
-    const [value, setValue] = useState(new Date('2021-02-13'));
-    function handleChange(value) {
-        let e = {target: {id:props.id , value: `${value.toJSON().split('T')[0]}`}}
+    let valueDate = new Date(props.value)
+    const [value, setValue] = useState(props.value);
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        setValue(e.target.value);
+        console.log(e.target.value)
         try {
-            //inputValues[props.id] = `${value.toJSON().split('T')[0]}`
+            //let e = { target: { id: props.id, value: `${selectvalue.toJSON().split('T')[0]}` } }
+            if (props.validate !== undefined) {
+                if (props.validate(e.target.value)) {
+                    setError(false);
+                } else {
+                    setError(true)
+                }
+            }
             props.onChange(e)
+
         } catch (err) {
-            console.log(err);
+            //console.log(err);
         }
-        setValue(value);
+        //props.onChange(value);
+
     }
-    return (<MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
-        <Grid justify="space-around" style={{ flexGrow: 0, marginTop: 18 }}>
-            <KeyboardDatePicker
-                margin="normal"
+    return (
+        <form noValidate style={{ ...props.style, marginTop: 20 }} >
+            <TextField
+                style={{width: '100%'}} 
                 id={props.id}
-                value={props.value}
                 label={props.label ?? 'Data'}
-                format="dd/MM/yyyy"
-                value={value}
+                type="date"
+                defaultValue={value}
                 onChange={handleChange}
                 onBlur={handleChange}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
+                error={error}
+                helperText={error == true ? props.helperText ?? "Data inválida" : ""}
+                InputLabelProps={{
+                    shrink: true,
                 }}
             />
-        </Grid>
-    </MuiPickersUtilsProvider>)
+        </form>
+    );
 }
 //
 
@@ -212,7 +225,7 @@ class LDataGrid extends Component {
                 delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {
-                    value = `${value.toJSON().split('T')[0]}`
+                    //value = `${value.toJSON().split('T')[0]}`
                 }
                 if (e.target.id == 'nome') {
                     //filters["withId"] = "name"
@@ -281,7 +294,7 @@ class LDataGrid extends Component {
                                                 </FormControl>)
 
                                     } else if (input.type == "date") {
-                                        return <DateInput id={input.column} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />
+                                        return <DateInput id={input.column} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
                                     } else if (input.type == "select") {
                                         return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />)
                                     }

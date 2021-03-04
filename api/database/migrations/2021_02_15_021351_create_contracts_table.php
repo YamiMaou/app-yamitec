@@ -27,8 +27,8 @@ class CreateContractsTable extends Migration
             $table->unsignedBigInteger('providers_id')->nullable(); // ID fornecedor
             $table->foreign('providers_id')->references('id')->on('providers')->onDelete('cascade');
             
-            $table->unsignedBigInteger('file_id'); // ID fornecedor
-            $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
+            //$table->unsignedBigInteger('file_id'); // ID fornecedor
+            //$table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
 
             $table->timestamps();
         });
