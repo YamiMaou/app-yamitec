@@ -22,7 +22,7 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiClients, putApiClients } from '../../providers/api'
+import { getApiManagers, putApiManagers } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
@@ -42,7 +42,7 @@ function BlockDialog(props) {
     
     const send = async () => {
         setLoading(true);
-        await putApiClients( props.id, {active: props.active ?? undefined, justification: justfy});
+        await putApiManagers( props.id, {active: props.active ?? undefined, justification: justfy});
         props.handle(props.active);
         props.handleClose();
         setjustfy('');
@@ -89,9 +89,9 @@ function BlockDialog(props) {
     );
   }
 
-class Clients extends Component {
+class Managers extends Component {
     state = {
-        clients: [],
+        managers: [],
         pageRequest: {},
         blockDialog: {open: false, id: undefined,active: 0, handle: undefined},
        
@@ -105,7 +105,7 @@ class Clients extends Component {
     }
 
     render() {
-        const rows : RowsProp = this.state.clients.data ?? [];
+        const rows : RowsProp = this.state.managers.data ?? [];
         const columns: ColDef[] = [
             { field: 'cpf', headerName: 'CPF', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
@@ -113,6 +113,7 @@ class Clients extends Component {
                 }
             },
             { field: 'name', headerName: 'Nome',flex: 2 },
+            { field: 'function', headerName: 'Função', flex: 1 },
             {
                 field: 'active',
                 headerName: 'Situação',
@@ -127,7 +128,7 @@ class Clients extends Component {
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => (
                         
                     <div>
-                    <Link to={`/clientes/${params.value}`} style={{textDecoration: 'none'}} >
+                    <Link to={`/responsaveis/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
                             variant="contained"
                             color="primary"
@@ -160,7 +161,20 @@ class Clients extends Component {
             mask: InputCpf, 
             flexBasis },
             { column: 'name', label: 'Nome', type: 'text', flexBasis },
-            { column: 'birth_date', label: 'Data de Nascimento', type: 'date' },
+            {
+                column: 'function', label: 'Função', type: 'select',
+                values: [
+                    "Todos",
+                    "Administração",
+                    "Coordenador de usuários", 
+                    "Coordenador de parceiros", 
+                    "Gerente", 
+                    "Operador de marketing", 
+                    "Vendedor"
+                ],
+                value: "Todos",
+                flexBasis
+            },
             { column: 'active', label: 'Situação', type: 'select', values: ["Todos", "Ativo", "Inativo"], value: "Todos", flexBasis },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
@@ -170,9 +184,9 @@ class Clients extends Component {
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10}}>
                     <Toolbar>
                         <Typography variant="h6" style={{flexGrow: 1}}>
-                            <HomeIcon />  <span>Cadastro / Clientes</span>
+                            <HomeIcon />  <span>Cadastro / Responsáveis</span>
                         </Typography>
-                        <Link to="clientes/novo" style={{textDecoration: 'none'}} >
+                        <Link to="responsaveis/novo" style={{textDecoration: 'none'}} >
                         <Button variant="contained" size="small" fullWidth color="primary"
                             style={{
                             background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
@@ -198,7 +212,7 @@ class Clients extends Component {
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
                             this.setState({...this.state, pageRequest: params})
-                            return getApiClients(params)
+                            return getApiManagers(params)
                     }} />) : (
                         <LCardGrid rows={rows} columns={columns} filterInputs={filter}
                         pageRequest={
@@ -207,7 +221,7 @@ class Clients extends Component {
                                     params.active = params.active == "Ativo" ? 1: 0;
                                 }
                                 this.setState({...this.state, pageRequest: params})
-                                return getApiClients(params)
+                                return getApiManagers(params)
                         }}  />
                     )}
                         <BlockDialog 
@@ -229,4 +243,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ setSnackbar}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Clients)
+export default connect(mapStateToProps, mapDispatchToProps)(Managers)
