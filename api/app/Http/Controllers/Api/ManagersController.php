@@ -10,13 +10,17 @@ use App\Models\Manager;
 use Illuminate\Support\Facades\Hash;
 use \App\User;
 
-class ManagersController extends Controller
+class ManagersController extends ControllersExtends
 {
     public function __construct()
     {
-       // parent::__construct(Manager::class, 'home');
+       parent::__construct(Manager::class, 'home');
     }
 
+    public function show(Request $request, $id, $with=[])
+    {
+       return  parent::show($request, $id, ['user', 'addresses', 'contacts', 'audits']);
+    }
     public function store(Request $resquest)
     {
         try {
@@ -59,6 +63,9 @@ class ManagersController extends Controller
 
     public function update(Request $resquest, $id)
     {
+        if(!isset($resquest->cpf)){
+            return parent::update($resquest, $id);
+        }
         try {
             $manager = Manager::findOrFail($id);
 
@@ -66,8 +73,8 @@ class ManagersController extends Controller
 
             $data_user = [
                 'name' => $resquest->name,
-                'email' => $resquest->email,
-                'password' => Hash::make($resquest->cpf),
+                //'email' => $resquest->email,
+                //'password' => Hash::make($resquest->cpf),
             ];
     
             $user->update($data_user);
@@ -95,7 +102,7 @@ class ManagersController extends Controller
             $contact = Contact::where('client_id', $manager->id);
     
             $contact->update($data_contact);
-
+            parent::saveLog($id, $resquest, 'managers');
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);

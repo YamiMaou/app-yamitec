@@ -24,6 +24,10 @@ import Clients from './pages/Clientes';
 import CreateClients from './pages/Clientes/create';
 import EditClients from './pages/Clientes/edit';
 
+import Managers from './pages/Managers';
+import CreateManagers from './pages/Managers/create';
+import EditManagers from './pages/Managers/edit';
+
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
 import {themeStyle} from './components/Layout/Header/style'
@@ -85,9 +89,14 @@ function Alert(props) {
             <Route path="/fornecedores" exact={true} render={() => (isAuth ?  <Providers /> : <Redirect push to="/login" />)} />
             <Route path="/fornecedores/novo" exact={true} render={() => (isAuth ?  <CreateProviders /> : <Redirect push to="/login" />)} />
             <Route path="/fornecedores/:id" exact={true} render={() => (isAuth ?  <EditProviders /> : <Redirect push to="/login" />)} />
+            
             <Route path="/clientes" exact={true} render={() => (isAuth ?  <Clients /> : <Redirect push to="/login" />)} />
             <Route path="/clientes/novo" exact={true} render={() => (isAuth ?  <CreateClients /> : <Redirect push to="/login" />)} />
             <Route path="/clientes/:id" exact={true} render={() => (isAuth ?  <EditClients /> : <Redirect push to="/login" />)} />
+
+            <Route path="/responsaveis" exact={true} render={() => (isAuth ?  <Managers /> : <Redirect push to="/login" />)} />
+            <Route path="/responsaveis/novo" exact={true} render={() => (isAuth ?  <CreateManagers /> : <Redirect push to="/login" />)} />
+            <Route path="/responsaveis/:id" exact={true} render={() => (isAuth ?  <EditManagers /> : <Redirect push to="/login" />)} />
 
             <Route path="*">
               <Box>

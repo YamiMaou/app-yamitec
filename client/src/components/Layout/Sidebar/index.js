@@ -70,6 +70,26 @@ function Sidebar(props) {
               </Link>
             </MenuItem>
             <MenuItem>
+            <Link style={styles.link} to="/clientes" >
+              <ListItemIcon>
+                <StyledBadge badgeContent={0} color="secondary">
+                  <PeopleIcon fontSize="small"/>
+                </StyledBadge>
+              </ListItemIcon>
+              <Typography variant="inherit">Clientes</Typography>
+            </Link>
+          </MenuItem>
+          <MenuItem>
+            <Link style={styles.link} to="/responsaveis" >
+              <ListItemIcon>
+                <StyledBadge badgeContent={0} color="secondary">
+                  <PeopleIcon fontSize="small"/>
+                </StyledBadge>
+              </ListItemIcon>
+              <Typography variant="inherit">Responsaveis</Typography>
+            </Link>
+          </MenuItem>
+            <MenuItem>
             <Link style={styles.link} to="/fornecedores" >
               <ListItemIcon>
                 <StyledBadge badgeContent={0} color="secondary">

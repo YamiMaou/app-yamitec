@@ -27,13 +27,23 @@ class Manager extends Model
         );
     }
 
-    public function address()
+    public function addresses()
     {
-        return $this->hasOne(Address::class, 'manager_id', 'id');
+        return $this->hasOne(Address::class);
     }
 
-    public function contact()
+    public function contacts()
     {
-        return $this->hasOne(Contact::class, 'contact_id', 'id');
+        return $this->hasOne(Contact::class);
     }
+
+    public function user()
+    {
+        return $this->hasOne(\App\User::class,'id', 'user_id');
+    }
+
+    public function audits()
+    {
+        return $this->hasOne(\App\Models\Audit::class,'managers_id')->latest();
+    } 
 }

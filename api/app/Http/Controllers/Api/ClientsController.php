@@ -94,8 +94,8 @@ class ClientsController extends ControllersExtends
 
             $data_user = [
                 'name' => $resquest->name,
-                'email' => $resquest->email,
-                'password' => Hash::make($resquest->cpf),
+                //'email' => $resquest->email,
+                //'password' => Hash::make($resquest->cpf),
             ];
     
             $user->update($data_user);
@@ -137,7 +137,7 @@ class ClientsController extends ControllersExtends
             $contact = Contact::where('client_id', $client->id);
     
             $contact->update($data_contact);
-            //parent::saveLog($id, $data_client, 'clients');
+            parent::saveLog($id, $resquest, 'clients');
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
