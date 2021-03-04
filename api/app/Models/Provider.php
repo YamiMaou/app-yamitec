@@ -14,13 +14,7 @@ class Provider extends Model
         'cnpj',
         'company_name',
         'fantasy_name',
-        'address',
-        'contact',
-        'social_media',
-        'manager_id',
         'filial_id',
-        'user_id'
-
     ];
 
     public function providerFiles()
@@ -66,6 +60,16 @@ class Provider extends Model
     public function files()
     {
         return $this->hasMany(Files::class);
+    }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class);
+    }
+
+    public function contact()
+    {
+        return $this->hasOne(Address::class);
     }
 
 }

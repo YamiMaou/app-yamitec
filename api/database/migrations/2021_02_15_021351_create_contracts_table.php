@@ -20,7 +20,7 @@ class CreateContractsTable extends Migration
 
             $table->decimal('rate', 8,2);
             
-            $table->unsignedBigInteger('contributors_id')->nullable(); // ID fornecedor
+           /* $table->unsignedBigInteger('contributors_id')->nullable(); // ID fornecedor
             $table->foreign('contributors_id')->references('id')->on('contributors')->onDelete('cascade');
 
 
@@ -28,7 +28,7 @@ class CreateContractsTable extends Migration
             $table->foreign('providers_id')->references('id')->on('providers')->onDelete('cascade');
             
             $table->unsignedBigInteger('file_id'); // ID fornecedor
-            $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
+            $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade'); */
 
             $table->timestamps();
         });
