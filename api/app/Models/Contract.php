@@ -12,18 +12,11 @@ class Contract extends Model
         'rate',
         'accession_date',
         'end_date',
-        'contributor_id',
-        'file_id',
-        'providers_id',
+        'provider_id',
     ];
 
     public function provider()
     {
         return $this->belongsTo(Provider::class);
-    }
-
-    public function file()
-    {
-        return $this->belongsTo(File::class);
     }
 }

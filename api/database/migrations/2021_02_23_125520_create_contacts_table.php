@@ -19,9 +19,10 @@ class CreateContactsTable extends Migration
             $table->string('phone1', 15);
             $table->string('phone2', 15)->nullable();
             $table->string('email', 100);
-            $table->string('linkedin', 100);
-            $table->string('facebook', 100);
-            $table->string('instagram', 100);
+            $table->string('linkedin', 100)->nullable();
+            $table->string('facebook', 100)->nullable();
+            $table->string('instagram', 100)->nullable();
+            $table->string('site', 100)->nullable();
 
             $table->unsignedBigInteger('contributors_id')->nullable();
             $table->unsignedBigInteger('client_id')->nullable();

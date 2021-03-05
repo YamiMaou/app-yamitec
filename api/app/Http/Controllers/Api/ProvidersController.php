@@ -6,9 +6,11 @@ use App\Extensions\ControllersExtends;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Contact;
+use App\Models\Contract;
 use App\Models\Manager;
 use App\Models\Provider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProvidersController extends Controller
 {
@@ -20,6 +22,13 @@ class ProvidersController extends Controller
     public function store(Request $request)
     {
         try {
+
+            $provider = DB::table('providers')->where('cnpj', $request->cnpj)->first();
+            if ($provider):
+                if ($provider->cnpj == $request->cnpj)
+                    return response()->json(["CPF já cadastrado!"]);
+            endif;
+
             $provider_data = [
                 "type" => $request->type,
                 "active" => $request->active,
@@ -29,7 +38,8 @@ class ProvidersController extends Controller
                 "matriz_id" => $request->matriz_id,
                 "addr_clone" => $request->addr_clone ? true : false,
                 "contact_clone" => $request->contact_clone ? true : false,
-                "contract_clone" => $request->contract_clone ? true : false
+                "contract_clone" => $request->contract_clone ? true : false,
+                "providertype_id" => $request->providertype_id
             ];
 
             $provider = Provider::create($provider_data);
@@ -61,6 +71,17 @@ class ProvidersController extends Controller
                 Contact::create($contact_data);
             endif;
 
+            if ($request->contract_clone == null):
+                $contract_data = [
+                    "rate" => $request->rate,
+                    "accession_date" => $request->accession_date,
+                    "end_date" => $request->end_date,
+                    "provider_id" => $provider->id,
+                ];
+    
+                Contract::create($contract_data);
+            endif;
+
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
@@ -84,7 +105,9 @@ class ProvidersController extends Controller
 
             $provider->update($provider_data);
 
-            $address = Address::where('provider_id', $provider->id);
+            if ($provider->addr_clone == false):
+                $address = Address::where('provider_id', $provider->id);
+            endif;
 
             $address_data = [
                 "uf" => $request->uf,
@@ -95,9 +118,13 @@ class ProvidersController extends Controller
                 "provider_id" => $provider->id,
             ];
 
-            $address->update($address_data);
+            if ($provider->addr_clone == false):
+                $address->update($address_data);
+            endif;
 
-            $contact = Contact::where('provider_id', $provider->id);
+            if ($provider->contact_clone == false):
+                $contact = Contact::where('provider_id', $provider->id);
+            endif;
 
             $contact_data = [
                 "phone1" => $request->phone1,
@@ -109,7 +136,24 @@ class ProvidersController extends Controller
                 "provider_id" => $provider->id,
             ];
 
-            $contact->update($contact_data);
+            if ($provider->contact_clone == false):
+                $contact->update($contact_data);
+            endif;
+
+            if ($provider->contarct_clone == false):
+                $contract = Contract::where('provider_id', $provider->id);
+            endif;
+            
+            $contract_data = [
+                "rate" => $request->rate,
+                "accession_date" => $request->accession_date,
+                "end_date" => $request->end_date,
+                "provider_id" => $provider->id,
+            ];
+            
+            if ($provider->contarct_clone == false):
+                $contract->update($contract_data);
+            endif;
 
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception $error) {
@@ -117,6 +161,7 @@ class ProvidersController extends Controller
         }
     }
 
+    // vincula um responsável à um provider
     public function addManageToProvider($provider_id, $manager_id)
     {
         try {
@@ -162,12 +207,13 @@ class ProvidersController extends Controller
         return response()->json($matriz);
     }
 
+    // mostra a provider caso seja matriz ou retorna vazio Matriz = 1
     public function showMatrix($provider_id)
     {
         try {
             $provider = Provider::findOrFail($provider_id);
 
-            if ($provider->type == 'matriz'):
+            if ($provider->type == 1):
                 return response()->json(['matrix' => $provider]);
             else:
                 return response()->json([]);
@@ -177,6 +223,7 @@ class ProvidersController extends Controller
         }
     }
 
+    // não sei o que faz esse método, acho que era pra afiliar mas ficou obsoleto uai
     public function affiliate(Request $request)
     {
         try {
@@ -200,6 +247,7 @@ class ProvidersController extends Controller
 
     }
 
+    // mostra a provider com todos os dados e caso tenha clonado os dados da matriz, sera mostrado os dado clonados, não permitido alterar
     public function getFullProvider($provider_id)
     {
         try {
@@ -217,10 +265,15 @@ class ProvidersController extends Controller
                 $contact = Contact::where('provider_id', $provider->id)->get();
             endif;
 
-            return response()->json(['provider' => $provider, 'addr' => $addr, 'contact' => $contact]);
+            if ($provider->contract_clone == true):
+                $contract = Contract::where('provider_id', $provider->matriz_id)->get();
+            else:
+                $contract = Contract::where('provider_id', $provider->id)->get();
+            endif;
+
+            return response()->json(['provider' => $provider, 'addr' => $addr, 'contact' => $contact, 'contract' => $contract]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
         }
     }
-
 }

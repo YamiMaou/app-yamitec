@@ -20,7 +20,7 @@ class CreateProvidersTable extends Migration
         Schema::create('providers', function (Blueprint $table) {
             $table->id();
             
-            $table->text('type'); // qual tipo/estrutura de type?
+            $table->tinyInteger('type');  // 1-Matriz 0-Filial 
             $table->tinyInteger('active')->default(1);
             $table->string('cnpj', 14)->unique();
             $table->string('company_name', 100);
@@ -30,7 +30,10 @@ class CreateProvidersTable extends Migration
             $table->boolean('contract_clone')->default(false)->nullable();
 
             $table->unsignedBigInteger('matriz_id')->nullable(); // referencia do self-relation/filial
+            $table->unsignedBigInteger('providertype_id')->nullable(); // referencia do self-relation/filial
+
             $table->foreign('matriz_id')->references('id')->on('providers')->onDelete('cascade');
+            $table->foreign('providertype_id')->references('id')->on('providertypes')->onDelete('cascade');
 
             $table->timestamps();
         });

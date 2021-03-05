@@ -17,7 +17,8 @@ class Provider extends Model
         'matriz_id',
         'addr_clone',
         'contact_clone',
-        'contract_clone'
+        'contract_clone',
+        'providertype_id'
     ];
 
     public function providerFiles()
@@ -25,9 +26,9 @@ class Provider extends Model
         return $this->hasMany(ProviderFiles::class);
     }
 
-    public function contract()
+    public function contracts()
     {
-        return $this->hasOne(Contract::class);
+        return $this->hasMany(Contract::class);
     }
 
     public function managers()
@@ -82,7 +83,12 @@ class Provider extends Model
 
     public function contact()
     {
-        return $this->hasOne(Address::class);
+        return $this->hasOne(Contact::class);
+    }
+
+    public function providertype()
+    {
+        return $this->belongsTo(Providertype::class);
     }
 
 }
