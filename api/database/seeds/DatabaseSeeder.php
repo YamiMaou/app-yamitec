@@ -12,16 +12,17 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            PostsTableSeeder::class,
-            ProvidersSeeder::class,
-            ManagersSeeder::class,
-            ContributorsTableSeeder::class,
-            ProviderFilesSeeder::class,
-            ContractsSeeder::class,
-            ContractsSeeder::class,
-            ManagerProvidersSeeder::class  ,
-            ContactSeeder::class,
-            AddressSeeder::class
+            UserSeeders::class
+           // PostsTableSeeder::class,
+           // ProvidersSeeder::class,
+           // ManagersSeeder::class,
+           // ContributorsTableSeeder::class,
+           // ProviderFilesSeeder::class,
+           // ContractsSeeder::class,
+           // ContractsSeeder::class,
+           // ManagerProvidersSeeder::class  ,
+            //ContactSeeder::class,
+            //AddressSeeder::class
         ]);
         //$this->call(PostsTableSeeder::class);
     }
