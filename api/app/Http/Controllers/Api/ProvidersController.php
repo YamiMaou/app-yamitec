@@ -29,6 +29,7 @@ class ProvidersController extends Controller
                     return response()->json(["CPF já cadastrado!"]);
             endif;
 
+            // type = 1 para matriz e 0 para filial
             $provider_data = [
                 "type" => $request->type,
                 "active" => $request->active,
@@ -57,6 +58,18 @@ class ProvidersController extends Controller
                 Address::create($address_data);
             endif;
 
+            // caso addr_clone == true, cadastra dados vazios ou default onde necessário
+            if ($request->addr_clone == true):
+                $address_data = [
+                    "uf" => 'foo',
+                    "city" => 'foo',
+                    "street" => 'foo',
+                    "zipcode" => 'foo',
+                ];
+
+                Address::create($address_data);
+            endif;
+
             if ($request->contact_clone == null):
                 $contact_data = [
                     "phone1" => $request->phone1,
@@ -71,12 +84,32 @@ class ProvidersController extends Controller
                 Contact::create($contact_data);
             endif;
 
+            // caso contact_clone == true, cadastra dados vazios ou default onde necessário
+            if ($request->contact_clone == true):
+                $contact_data = [
+                    "phone1" => 'foo',
+                    "email" => 'foo',
+                ];
+    
+                Contact::create($contact_data);
+            endif;
+
             if ($request->contract_clone == null):
                 $contract_data = [
                     "rate" => $request->rate,
                     "accession_date" => $request->accession_date,
                     "end_date" => $request->end_date,
                     "provider_id" => $provider->id,
+                ];
+    
+                Contract::create($contract_data);
+            endif;
+
+            // caso contract_clone == true, cadastra dados vazios ou default onde necessário
+            if ($request->contract_clone == true):
+                $contract_data = [
+                    "rate" => 10,
+                    "accession_date" => date('NOW')
                 ];
     
                 Contract::create($contract_data);
