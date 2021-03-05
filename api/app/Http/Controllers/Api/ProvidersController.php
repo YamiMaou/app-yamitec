@@ -312,4 +312,36 @@ class ProvidersController extends Controller
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
         }
     }
+
+    public function show($provider_id)
+    {
+        try {
+            $provider = Provider::findOrFail($provider_id);
+           // return response()->json(['provider' => $provider]);
+
+            if ($provider->get('addr_clone') == true):
+                $address = Provider::find($provider->matriz_id)->address()->get();
+            else:
+                $address = $provider->address()->get();
+            endif;
+
+            if ($provider->get('contact_clone') == true):
+                $contact = Provider::find($provider->matriz_id)->contact()->get();
+            else:
+                $contact = $provider->contact()->get();
+            endif;
+
+            if ($provider->get('contract_clone') == true):
+                $contract = Provider::find($provider->matriz_id)->contracts()->get();
+            else:
+                $contract = $provider->contract()->get();
+            endif;
+
+            //$provider = 
+
+            return response()->json(['provider' => $provider]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
+        }
+    }
 }
