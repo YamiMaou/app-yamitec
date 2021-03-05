@@ -24,13 +24,12 @@ class UsersController extends Controller
     public function login()
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            $user = \App\User::find(Auth::id());
+            $user = \App\User::with(['permissions', 'contributor', 'client'])->find(Auth::id());
             $success = [ 
                 'success' => true,
                 'token' => $user->createToken('Yamitec',['view-posts', 'view-profile'])->accessToken,
                 'data' => [
                     'user' => $user,
-                    'contributor' => $user->contributor
                 ]
             ];
             return response()->json($success, $this->successStatus);
