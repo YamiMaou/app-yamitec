@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'profile_id',
     ];
 
     /**
@@ -40,7 +40,7 @@ class User extends Authenticatable
     ];
 
     public function permissions(){
-        return $this->hasMany(\App\Models\Permission::class,'profile', 'function');
+        return $this->hasMany(\App\Models\Permission::class,'profile_id', 'id');
     }
 
     public function contributor(){

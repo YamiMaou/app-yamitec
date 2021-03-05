@@ -16,7 +16,12 @@ class CreatePermissionsTable extends Migration
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             $table->integer("module");  // 
-            $table->string("profile",100); // function
+            $table->unsignedBigInteger("profile_id"); // function
+            $table->foreign('profile_id')
+                ->references('id')
+                ->on('profiles')
+                ->onDelete('cascade');
+                
             $table->integer("create")->default(0); // store methods/buttons
             $table->integer("read")->default(0);    // show data / list view
             $table->integer("update")->default(0); // update methods /buttons
