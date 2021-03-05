@@ -22,18 +22,18 @@ import { withSnackbar  } from 'notistack';
 class CreateProviders extends Component {
     
     state = {
-        providers: [],
+        data: [],
         states: []
     }
     async componentDidMount() {
-        const providers = await getApiProviders({type: "Matriz", active: 1});
-        this.setState({...this.state, providers: providers.data});
+        const data = await getApiProviders({type: "Matriz", active: 1});
+        this.setState({...this.state, data: data.data});
         localStorage.setItem("sessionTime", 900);
 
     }
 
     render() {
-        console.log(this.state.providers)
+        console.log(this.state.data)
          // to use snackbar Provider
         const closeSnack = (event, reason) => {
             if (reason === 'clickaway') {
@@ -135,7 +135,7 @@ class CreateProviders extends Component {
                     {
                         column: 'provider_id', label: 'Empresa', type: 'select',
                         json: true,
-                        values: this.state.providers,
+                        values: this.state.data,
                         //validate: {required: true },
                         //value: "Coordenador de usuários",
                         flexBasis, style:{width: '220px'}
