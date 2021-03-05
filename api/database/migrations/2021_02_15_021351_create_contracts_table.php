@@ -24,6 +24,7 @@ class CreateContractsTable extends Migration
            $table->unsignedBigInteger('contributors_id')->nullable(); 
            $table->unsignedBigInteger('provider_id')->nullable();
 
+            $table->foreign('contributors_id')->references('id')->on('contributors')->onDelete('cascade');
             $table->foreign('provider_id')->references('id')->on('providers')->onDelete('cascade');
 
             $table->timestamps();
