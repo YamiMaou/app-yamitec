@@ -19,6 +19,7 @@ Route::get('/', function(){
 // AUTH
 Route::post('login', 'Api\UsersController@login');
 Route::post('register', 'Api\UsersController@register');
+
 /*Route::group(['middleware' => ['auth:api', 'scope:update-posts']], function(){
     
 });*/

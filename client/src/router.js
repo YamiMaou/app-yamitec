@@ -32,7 +32,7 @@ import EditManagers from './pages/Managers/edit';
 
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
-import {themeStyle} from './components/Layout/Header/style'
+import { themeStyle } from './components/Layout/Header/style'
 import Footer from './components/Layout/Footer'
 import BottonNav from './components/Layout/BottonNav'
 
@@ -47,77 +47,100 @@ import { setAuth } from './actions/authAction';
 import { setSnackbar, setTimer } from './actions/appActions';
 // Theme
 import * as locales from '@material-ui/core/locale';
-const YamiTheme = createMuiTheme(themeStyle,locales['ptbr'])
-  //background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
+const YamiTheme = createMuiTheme(themeStyle, locales['ptbr'])
+//background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
 
 const AppRouter = (props) => {
   const closeSnack = (event, reason) => {
     if (reason === 'clickaway') {
-        return;
+      return;
     }
     props.setSnackbar({ open: false, message: "" });
-};
-function TransitionDown(props) {
-  return <Slide {...props} direction="down" />;
-}
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+  };
+  function TransitionDown(props) {
+    return <Slide {...props} direction="down" />;
+  }
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
 
   const authData = JSON.parse(localStorage.getItem("user"));
   const isAuth = authData !== null ? true : false;
+  const routes = [
+    { path: 'colaboradores', component: [<Contributors />, <EditContributors />, <CreateContributors />] },
+    { path: 'clientes', component: [<Clients />, <EditClients />, <CreateClients />] },
+    { path: 'responsaveis', component: [<Managers />, <EditManagers />, <CreateManagers />] },
+  ]
+  function permRoutes() {
+    return <Route path="colaboradores" exact={true} render={() => (isAuth ? <Contributors /> : <Redirect push to="/login" />)} />
+    return authData.permissions.map((v, k) => {
+      if (k > 2) return ('');
+
+      if (v.read === 0) return ('');
+      console.log(routes[v.module]);
+      return (
+        <div>
+          <Route path={`${routes[v.module].path}`} exact={true} render={() => (isAuth ? routes[v.module].component[0] : <Redirect push to="/login" />)} />
+          <Route path={`${routes[v.module].path}/novo`} exact={true} render={() => (isAuth ? routes[v.module].component[1] : <Redirect push to="/login" />)} />
+          <Route path={`${routes[v.module].path}/:id`} exact={true} render={() => (isAuth ? routes[v.module].component[2] : <Redirect push to="/login" />)} />
+        </div>);
+      /*if(session.permissions.find(x => x.module === 0).read === 0){
+                    
+      }*/
+    });
+  }
   return props.products !== undefined ? (<LauncherDialog />) : (
-  <ThemeProvider theme={YamiTheme}>
-    { authData !== null ? <Header /> : '' }
-    <Container maxWidth="xl" style={{ overflow: 'hidden', paddingTop: 80, background: '#f1f1f1', height: window.innerHeight, overflow:'auto' }}>
-      <Box>
-      <Snackbar
-        anchorOrigin={{ vertical:'top', horizontal: 'center' }}
-        open={props.snackbar.open}
-        autoHideDuration={3000}
-        onClose={closeSnack}
-        TransitionComponent={TransitionDown}
-        message={props.snackbar.message}
-        key="snb"
-      />
-     
-        <Router>
-          <Switch>
-            <Route path="/login" exact={true} component={Login} />
-            <Route path="/reset/:token" exact={true} component={ResetPassword} />
-            <Route path="/" exact={true} render={() => (isAuth ?  <Home /> : <Redirect push to="/login" />)} />
-            <Route path="/colaboradores" exact={true} render={() => (isAuth ?  <Contributors /> : <Redirect push to="/login" />)} />
-            <Route path="/colaboradores/novo" exact={true} render={() => (isAuth ?  <CreateContributors /> : <Redirect push to="/login" />)} />
-            <Route path="/colaboradores/:id" exact={true} render={() => (isAuth ?  <EditContributors /> : <Redirect push to="/login" />)} />
-            <Route path="/fornecedores" exact={true} render={() => (isAuth ?  <Providers /> : <Redirect push to="/login" />)} />
-            <Route path="/fornecedores/novo" exact={true} render={() => (isAuth ?  <CreateProviders /> : <Redirect push to="/login" />)} />
-            <Route path="/fornecedores/:id" exact={true} render={() => (isAuth ?  <EditProviders /> : <Redirect push to="/login" />)} />
-            
-            <Route path="/clientes" exact={true} render={() => (isAuth ?  <Clients /> : <Redirect push to="/login" />)} />
-            <Route path="/clientes/novo" exact={true} render={() => (isAuth ?  <CreateClients /> : <Redirect push to="/login" />)} />
-            <Route path="/clientes/:id" exact={true} render={() => (isAuth ?  <EditClients /> : <Redirect push to="/login" />)} />
+    <ThemeProvider theme={YamiTheme}>
+      { authData !== null ? <Header /> : ''}
+      <Container maxWidth="xl" style={{ overflow: 'hidden', paddingTop: 80, background: '#f1f1f1', height: window.innerHeight, overflow: 'auto' }}>
+        <Box>
+          <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            open={props.snackbar.open}
+            autoHideDuration={3000}
+            onClose={closeSnack}
+            TransitionComponent={TransitionDown}
+            message={props.snackbar.message}
+            key="snb"
+          />
 
-            <Route path="/responsaveis" exact={true} render={() => (isAuth ?  <Managers /> : <Redirect push to="/login" />)} />
-            <Route path="/responsaveis/novo" exact={true} render={() => (isAuth ?  <CreateManagers /> : <Redirect push to="/login" />)} />
-            <Route path="/responsaveis/:id" exact={true} render={() => (isAuth ?  <EditManagers /> : <Redirect push to="/login" />)} />
+          <Router>
+            <Switch>
+              <Route path="/login" exact={true} component={Login} />
+              <Route path="/reset/:token" exact={true} component={ResetPassword} />
+              <Route path="/" exact={true} render={() => (isAuth ? <Home /> : <Redirect push to="/login" />)} />
+              <Route path="/colaboradores" exact={true} render={() => (isAuth ? <Contributors /> : <Redirect push to="/login" />)} />
+              <Route path="/colaboradores/novo" exact={true} render={() => (isAuth ? <CreateContributors /> : <Redirect push to="/login" />)} />
+              <Route path="/colaboradores/:id" exact={true} render={() => (isAuth ? <EditContributors /> : <Redirect push to="/login" />)} />
+              <Route path="/fornecedores" exact={true} render={() => (isAuth ? <Providers /> : <Redirect push to="/login" />)} />
+              <Route path="/fornecedores/novo" exact={true} render={() => (isAuth ? <CreateProviders /> : <Redirect push to="/login" />)} />
+              <Route path="/fornecedores/:id" exact={true} render={() => (isAuth ? <EditProviders /> : <Redirect push to="/login" />)} />
 
-            <Route path="*">
-              <Box>
-                <View> Pagina não encontrada.</View>
-              </Box>
-            </Route>
-          </Switch>
-          <Sidebar />
-          { /*window.innerWidth < 767 &&
+              <Route path="/clientes" exact={true} render={() => (isAuth ? <Clients /> : <Redirect push to="/login" />)} />
+              <Route path="/clientes/novo" exact={true} render={() => (isAuth ? <CreateClients /> : <Redirect push to="/login" />)} />
+              <Route path="/clientes/:id" exact={true} render={() => (isAuth ? <EditClients /> : <Redirect push to="/login" />)} />
+
+              <Route path="/responsaveis" exact={true} render={() => (isAuth ? <Managers /> : <Redirect push to="/login" />)} />
+              <Route path="/responsaveis/novo" exact={true} render={() => (isAuth ? <CreateManagers /> : <Redirect push to="/login" />)} />
+              <Route path="/responsaveis/:id" exact={true} render={() => (isAuth ? <EditManagers /> : <Redirect push to="/login" />)} />
+
+              <Route path="*">
+                <Box>
+                  <View> Pagina não encontrada.</View>
+                </Box>
+              </Route>
+            </Switch>
+            <Sidebar />
+            { /*window.innerWidth < 767 &&
             <BottonNav />}
           {window.innerWidth >= 767 &&
           <Sidebar /> */}
-        </ Router>
-        <Footer />
-      </Box>
-    </Container>
-  </ThemeProvider>)
-//)};
+          </ Router>
+          <Footer />
+        </Box>
+      </Container>
+    </ThemeProvider>)
+  //)};
 }
 
 const styles = StyleSheet.create({

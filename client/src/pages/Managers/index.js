@@ -30,6 +30,8 @@ import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
+// MODULE ID
+const module_id = 2
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
@@ -91,6 +93,7 @@ function BlockDialog(props) {
 
 class Managers extends Component {
     state = {
+        session: JSON.parse(localStorage.getItem("user")),
         managers: [],
         pageRequest: {},
         blockDialog: {open: false, id: undefined,active: 0, handle: undefined},
@@ -98,7 +101,8 @@ class Managers extends Component {
     }
     
     componentDidMount() {
-        if(JSON.parse(localStorage.getItem("user")) == null){
+        const session = JSON.parse(localStorage.getItem("user"));
+        if(session == null){
             window.location.href = '/login';
             return;
         }
@@ -125,11 +129,13 @@ class Managers extends Component {
                 field: 'id',
                 headerName: 'Ações',
                 flex: 1,
-                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => (
-                        
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
+                    let view = this.state.session.permissions.find(x => x.module === module_id)
+                    return (
                     <div>
-                    <Link to={`/responsaveis/${params.value}`} style={{textDecoration: 'none'}} >
+                    <Link to={ view.update === 0 ? '#' :  `/responsaveis/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
+                        disabled={view.update === 0}
                             variant="contained"
                             color="primary"
                             size="small"
@@ -138,6 +144,7 @@ class Managers extends Component {
                         </Button>
                     </Link>
                       <Button
+                      disabled={view.update === 0}
                         variant="contained"
                         color="primary"
                         size="small"
@@ -152,7 +159,7 @@ class Managers extends Component {
                         {params.row.active === 1 ? <BlockIcon fontSize="small"/> : <CheckCircleIcon fontSize="small" /> }
                       </Button>
                     </div>
-                  ),
+                  )},
             },
         ];
         const flexBasis = '25%';
@@ -186,14 +193,17 @@ class Managers extends Component {
                         <Typography variant="h6" style={{flexGrow: 1}}>
                             <HomeIcon />  <span>Cadastro / Responsáveis</span>
                         </Typography>
-                        <Link to="responsaveis/novo" style={{textDecoration: 'none'}} >
+                        {
+                            this.state.session.permissions.find(x => x.module === module_id).create === 1 ?(
+                                <Link to="responsaveis/novo" style={{textDecoration: 'none'}} >
                         <Button variant="contained" size="small" fullWidth color="primary"
                             style={{
                             background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
                             }}>
                                 Novo <Add style={{color: 'white'}} fontSize="small"/>
                             </Button>
-                        </Link>
+                        </Link>) : ('')
+                        }
                         
                     </Toolbar>
                     
