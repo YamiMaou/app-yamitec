@@ -65,6 +65,7 @@ class ProvidersController extends Controller
                     "city" => 'foo',
                     "street" => 'foo',
                     "zipcode" => 'foo',
+                    "provider_id" => $provider->id,
                 ];
 
                 Address::create($address_data);
@@ -89,6 +90,7 @@ class ProvidersController extends Controller
                 $contact_data = [
                     "phone1" => 'foo',
                     "email" => 'foo',
+                    "provider_id" => $provider->id,
                 ];
     
                 Contact::create($contact_data);
@@ -109,7 +111,8 @@ class ProvidersController extends Controller
             if ($request->contract_clone == true):
                 $contract_data = [
                     "rate" => 10,
-                    "accession_date" => date('NOW')
+                    "accession_date" => '2020-10-09',
+                    "provider_id" => $provider->id,
                 ];
     
                 Contract::create($contract_data);
