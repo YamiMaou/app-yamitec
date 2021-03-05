@@ -4,6 +4,18 @@ namespace App\Library;
 
 class ExportClass
 {
+    public static function getXls($data,$filename = 'reportxls'){
+        // Configurações header para forçar o download  
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+        header('Cache-Control: max-age=0');
+        // Se for o IE9, isso talvez seja necessário
+        header('Cache-Control: max-age=1');
+        // Envia o conteúdo do arquivo  
+        echo $data;  
+        exit();
+        //return response()->stream($callback, 200, $headers);
+    }
     /**
      * @author Maou Yami (maou@yamitec.com)
      * @param array $columnNames

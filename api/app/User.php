@@ -39,7 +39,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function permissions(){
+        return $this->hasMany(\App\Models\Permission::class,'profile', 'function');
+    }
+
     public function contributor(){
         return $this->hasOne(\App\Models\Contributors::class,'user_id', 'id');
+    }
+
+    public function provider(){
+        return $this->hasOne(\App\Models\Provider::class,'user_id', 'id');
+    }
+
+    public function client(){
+        return $this->hasOne(\App\Models\Client::class,'user_id', 'id');
     }
 }

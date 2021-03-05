@@ -36,6 +36,18 @@ Route::put('resetpwd', 'Api\AccountController@resetPassword');
     ->middleware(['auth:api', 'scope:view-posts']);
 Route::put('/posts/{id}', 'Api\PostsController@update')
     ->middleware(['auth:api', 'scope:update-posts']);*/
+    Route::get('reportxls', function (){
+        //echo "ok";
+        $data = "<table border='1'>";
+        \App\Models\Audit::get(['id', 'user_id', 'justification', 'from', 'to'])->map(function($item) use($data) {
+            $data .= "<td>{$item->id}</td>";
+            $data .= "<td>{$item->justification}</td>";
+            $data .= "<td>".($item->contributors_id ? "COLABORADORES": ($item->providers_id ? "FORNECEDORES" : ($item->managers_id ? "RESPONSÁVEL" : "NADA"))) ."</td>";
+            //return array_values($item->toArray());
+        });
+        echo $data." ";
+        return \App\Library\ExportClass::getXls($data);
+    });
     Route::get('report', function (){
         //echo "ok";
         $model = \App\Models\Audit::get(['id', 'user_id', 'justification', 'from', 'to'])->map(function($item) {
