@@ -13,10 +13,16 @@ class Contract extends Model
         'accession_date',
         'end_date',
         'provider_id',
+        'contributors_id'
     ];
 
     public function provider()
     {
         return $this->belongsTo(Provider::class);
+    }
+
+    public function contributors()
+    {
+        return $this->belongsTo(Contributors::class);
     }
 }
