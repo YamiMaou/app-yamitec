@@ -12,18 +12,11 @@ use App\Models\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ProvidersController extends Controller
+class ProvidersController extends ControllersExtends
 {
     public function __construct()
     {
-        //parent::__construct(Provider::class, 'home');
-    }
-
-    public function index()
-    {
-        $providers = Provider::all();
-
-        return response()->json(['provider' => $providers]);
+        parent::__construct(Provider::class, 'home');
     }
 
     public function store(Request $request)
@@ -320,7 +313,7 @@ class ProvidersController extends Controller
         }
     }
 
-    public function show($provider_id)
+    public function show(Request $Request, $provider_id, $with=[])
     {
         try {
             $provider = Provider::findOrFail($provider_id);
