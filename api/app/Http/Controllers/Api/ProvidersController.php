@@ -19,6 +19,40 @@ class ProvidersController extends ControllersExtends
         parent::__construct(Provider::class, 'home');
     }
 
+    public function show(Request $Request, $provider_id, $with=[])
+    {
+        try {
+            $provider = Provider::findOrFail($provider_id);
+            $addr_clone = $provider->where('id', $provider_id)->get('addr_clone')[0];
+            $contact_clone = $provider->where('id', $provider_id)->get('contact_clone')[0];
+            $contract_clone = $provider->where('id', $provider_id)->get('contract_clone')[0];
+
+            if ($addr_clone->addr_clone == true):
+                $address = Provider::find($provider->matriz_id)->address()->get();
+            else:
+                $address = $provider->address()->get();
+            endif;
+
+            if ($contact_clone->contact_clone == true):
+                $contact = Provider::find($provider->matriz_id)->contact()->get();
+            else:
+                $contact = $provider->contact()->get();
+            endif;
+
+            if ($contract_clone->contract_clone == true):
+                $contract = Provider::find($provider->matriz_id)->contracts()->get();
+            else:
+                $contract = $provider->contracts()->get();
+            endif;
+
+            //$provider = 
+
+            return response()->json(['provider' => $provider, 'address' => $address, 'contact' => $contact, 'contract' => $contract]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
+        }
+    }
+    
     public function store(Request $request)
     {
         try {
@@ -308,40 +342,6 @@ class ProvidersController extends ControllersExtends
             endif;
 
             return response()->json(['provider' => $provider, 'addr' => $addr, 'contact' => $contact, 'contract' => $contract]);
-        } catch(\Exception $error) {
-            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
-        }
-    }
-
-    public function show(Request $Request, $provider_id, $with=[])
-    {
-        try {
-            $provider = Provider::findOrFail($provider_id);
-            $addr_clone = $provider->where('id', $provider_id)->get('addr_clone')[0];
-            $contact_clone = $provider->where('id', $provider_id)->get('contact_clone')[0];
-            $contract_clone = $provider->where('id', $provider_id)->get('contract_clone')[0];
-
-            if ($addr_clone->addr_clone == true):
-                $address = Provider::find($provider->matriz_id)->address()->get();
-            else:
-                $address = $provider->address()->get();
-            endif;
-
-            if ($contact_clone->contact_clone == true):
-                $contact = Provider::find($provider->matriz_id)->contact()->get();
-            else:
-                $contact = $provider->contact()->get();
-            endif;
-
-            if ($contract_clone->contract_clone == true):
-                $contract = Provider::find($provider->matriz_id)->contracts()->get();
-            else:
-                $contract = $provider->contracts()->get();
-            endif;
-
-            //$provider = 
-
-            return response()->json(['provider' => $provider, 'address' => $address, 'contact' => $contact, 'contract' => $contract]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao obter provider. ", "error" => $error->getMessage()], 201);
         }
