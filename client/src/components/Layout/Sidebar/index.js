@@ -30,6 +30,39 @@ function Sidebar(props) {
     right: false,
   });
   const authData = JSON.parse(localStorage.getItem("user"));
+  const menuItems = () => {
+    const views = [
+      {url: "/colaboradores", label: 'Colaboradores', icon: <PeopleIcon fontSize="small" />},
+      {url: "/clientes", label: 'Clientes', icon: <PeopleIcon fontSize="small" />},
+      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      //{url: "/Fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
+    ]
+    if(authData === null) return ('');
+    //console.log(authData);
+
+    return authData.permissions.map((v, k) => {
+      //console.log(v);
+      if(k > 2) return ('');
+      if(v.read === 0) return ('');
+      return(
+      <MenuItem>
+        <Link style={styles.link} to={views[v.module].url} >
+          <ListItemIcon>
+            <StyledBadge badgeContent={0} color="secondary">
+              {views[v.module].icon}
+            </StyledBadge>
+          </ListItemIcon>
+          <Typography variant="inherit">{views[v.module].label}</Typography>
+        </Link>
+      </MenuItem>)
+    });
+    let view = authData.permissions.find(x => x.module === 0)
+    view.read === 1
+  }
   const toggleDrawer = (anchor, open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
@@ -37,6 +70,7 @@ function Sidebar(props) {
     props.setMenu(!props.open)
     setState({ ...state, [anchor]: open });
   };
+
 
   return (
     <Drawer anchor="left" open={props.open} onClose={toggleDrawer("left", false)}>
@@ -59,46 +93,9 @@ function Sidebar(props) {
           </MenuItem>
           {
             authData !== null &&
-            (<div><MenuItem>
-              <Link style={styles.link} to="/colaboradores" >
-                <ListItemIcon>
-                  <StyledBadge badgeContent={0} color="secondary">
-                    <PeopleIcon fontSize="small"/>
-                  </StyledBadge>
-                </ListItemIcon>
-                <Typography variant="inherit">Colaboradores</Typography>
-              </Link>
-            </MenuItem>
-            <MenuItem>
-            <Link style={styles.link} to="/clientes" >
-              <ListItemIcon>
-                <StyledBadge badgeContent={0} color="secondary">
-                  <PeopleIcon fontSize="small"/>
-                </StyledBadge>
-              </ListItemIcon>
-              <Typography variant="inherit">Clientes</Typography>
-            </Link>
-          </MenuItem>
-          <MenuItem>
-            <Link style={styles.link} to="/responsaveis" >
-              <ListItemIcon>
-                <StyledBadge badgeContent={0} color="secondary">
-                  <PeopleIcon fontSize="small"/>
-                </StyledBadge>
-              </ListItemIcon>
-              <Typography variant="inherit">Responsaveis</Typography>
-            </Link>
-          </MenuItem>
-            <MenuItem>
-            <Link style={styles.link} to="/fornecedores" >
-              <ListItemIcon>
-                <StyledBadge badgeContent={0} color="secondary">
-                  <PeopleIcon fontSize="small"/>
-                </StyledBadge>
-              </ListItemIcon>
-              <Typography variant="inherit">Fornecedores</Typography>
-            </Link>
-          </MenuItem></div>)
+            (<div>
+              {menuItems()}
+             </div>)
           }
         </MenuList>
         <Divider />
