@@ -20,6 +20,10 @@ class Provider extends Model
         'contract_clone',
         'providertype_id'
     ];
+    public function audits()
+    {
+        return $this->hasOne(Audit::class,'providers_id','id')->with(['user'])->latest();
+    }
 
     public function providerFiles()
     {

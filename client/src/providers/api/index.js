@@ -203,6 +203,28 @@ export const putApiContributors = async (id,params = {}) => {
   }
 }
 
+/// list provider types
+export const getApiProviderTypes = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/providertypes/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwib3JnYW5pemF0aW9uX2lkIjoxLCJpYXQiOjE2MTIzMDIyNTYsImV4cCI6MTYxMjkwNzA1Nn0.mnNuXdmqF487x_K4zfOkhhrkdJ6rwLB61NaSPhGZyJo'//localStorage.getItem('token')
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+
 /// list providers
 export const getApiProviders = async (params = '',id = undefined) => {
   localStorage.setItem("sessionTime", 900)

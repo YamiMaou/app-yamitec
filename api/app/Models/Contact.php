@@ -15,6 +15,7 @@ class Contact extends Model
         'linkedin',
         'facebook',
         'instagram',
+        'site',
         'contributors_id',
         'manager_id',
         'client_id',

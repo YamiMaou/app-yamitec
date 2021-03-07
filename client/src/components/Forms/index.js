@@ -98,17 +98,17 @@ const CheckBoxInput = (props) => {
     }
     return (
         <div key={`check-${props.id}`} style={{ display: 'flex',...props.style }}>
-            <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '10%'  }}
+            <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '15%'  }}
                 control={<Checkbox checked={value} disabled={props.disabled ?? false} onChange={handleChange} name={props.id} id={props.id} />}
                 label={props.label}
             />
-            {value ? ('') : (
+            {(props.justification === undefined && value) ||(props.justification === undefined) ? ('') : (
                 <TextInputCustom key={`input-just`}
                 id={'justification'}
                 disabled={value}
                 type={'text'}
                 value={props.justification ?? ""}
-                style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '75%' }}
+                style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '70%' }}
                 label={'Justificativa'}
                 onChange={JustChange}
                 onBlur={JustChange} />
@@ -319,6 +319,7 @@ const SelectInput = (props) => {
             }
         }
         props.onChange(e)
+        console.log(e.target.value)
         setValue(e.target.value);
     }
     return (
@@ -417,6 +418,7 @@ class LForms extends Component {
                     inputValues[params.json][id] = value;
                 }
             }
+            console.log(inputValues);
             formValidate[id] = value;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
         }
