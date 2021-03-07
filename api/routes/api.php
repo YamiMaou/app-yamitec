@@ -97,6 +97,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // PROVIDETYPES
     Route::resource('/providertypes', 'Api\ProvidertypesController')->middleware(['auth:api', 'scope:view-posts']);
     // ACCOUNT_MANAGER
-    Route::resource('/account-managers', 'Api\AccountManagers')->middleware(['auth:api', 'scope:view-posts']);
+    Route::resource('/account-managers', 'Api\AccountManagersController')->middleware(['auth:api', 'scope:view-posts']);
+    // BONUS
+    Route::resource('/bonuses', 'Api\BonusesController')->middleware(['auth:api', 'scope:view-posts']);
 
 });

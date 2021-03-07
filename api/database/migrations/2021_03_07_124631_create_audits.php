@@ -20,23 +20,23 @@ class CreateAudits extends Migration
             ->references('id')->on('users')
             ->onDelete('cascade');
 
-            $table->unsignedBigInteger('clients_id')->nullable();
-            $table->foreign('clients_id')
+            $table->unsignedBigInteger('client_id')->nullable();
+            $table->foreign('client_id')
             ->references('id')->on('clients')
             ->onDelete('cascade');
 
-            $table->unsignedBigInteger('contributors_id')->nullable();
-            $table->foreign('contributors_id')
+            $table->unsignedBigInteger('contributor_id')->nullable();
+            $table->foreign('contributor_id')
             ->references('id')->on('contributors')
             ->onDelete('cascade');
 
-            $table->unsignedBigInteger('managers_id')->nullable();
-            $table->foreign('managers_id')
+            $table->unsignedBigInteger('manager_id')->nullable();
+            $table->foreign('manager_id')
             ->references('id')->on('managers')
             ->onDelete('cascade');
 
-            $table->unsignedBigInteger('providers_id')->nullable();
-            $table->foreign('providers_id')
+            $table->unsignedBigInteger('provider_id')->nullable();
+            $table->foreign('provider_id')
             ->references('id')->on('providers')
             ->onDelete('cascade');
 
