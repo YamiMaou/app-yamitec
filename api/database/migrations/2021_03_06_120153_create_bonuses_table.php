@@ -16,7 +16,7 @@ class CreateBonusesTable extends Migration
         Schema::create('bonuses', function (Blueprint $table) {
             $table->id();
 
-            $table->int('indication_qtty')->nullable();
+            $table->integer('indication_qtty')->nullable();
             $table->decimal('discount_percent', 4, 2)->nullable();
 
             $table->timestamps();
