@@ -17,4 +17,8 @@ class Audit extends Model
         'to'
     ];
     //
+    public function user()
+    {
+        return $this->hasOne(\App\User::class,'id', 'user_id')->latest();
+    }
 }

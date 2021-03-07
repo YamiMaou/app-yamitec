@@ -163,12 +163,12 @@ class LCardGrid extends Component {
     }
     async setPage(params = { page: 1 }) {
         this.setState({ ...this.state, loading: true })
-        let cleanfilters = this.state.filters;
+        let cleanfilters = {};
         Object.entries(this.state.filters).map((item) => {
-            if (item[1].length >= 1) {
-                if (item[1] !== "Todos") {
+            if(item[1].length >= 1 ) {
+                if(item[1] !== "Todos"){
                     cleanfilters[item[0]] = item[1];
-                   // console.log(item);
+                    console.log(item);
                 }
             }
         });

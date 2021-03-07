@@ -12,7 +12,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiClients, getApiDownloadFile } from '../../../providers/api'
+import { postApiManagers, getApiDownloadFile } from '../../../providers/api'
 import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
@@ -42,7 +42,7 @@ class CreateManagers extends Component {
         const request = async (data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             this.setState({ ...this.state, loading: true });
-            let response = await postApiClients(data);
+            let response = await postApiManagers(data);
             if (response.data.success) {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.setState({ ...this.state, loading: false });

@@ -197,7 +197,7 @@ class EditContributors extends Component {
                         loading={this.state.loading}
                     />
                 }
-                { this.state.data.id !== undefined  &&
+                { this.state.data.audits  &&
                     <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 720 ? 210 : 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>

@@ -203,6 +203,28 @@ export const putApiContributors = async (id,params = {}) => {
   }
 }
 
+/// list provider types
+export const getApiProviderTypes = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/providertypes/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwib3JnYW5pemF0aW9uX2lkIjoxLCJpYXQiOjE2MTIzMDIyNTYsImV4cCI6MTYxMjkwNzA1Nn0.mnNuXdmqF487x_K4zfOkhhrkdJ6rwLB61NaSPhGZyJo'//localStorage.getItem('token')
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+
 /// list providers
 export const getApiProviders = async (params = '',id = undefined) => {
   localStorage.setItem("sessionTime", 900)
@@ -431,6 +453,84 @@ export const putApiManagers = async (id,params = {}) => {
     },
     data,
     url: apiHost +  `/managers/${id}`,
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+/// list bonus
+export const getApiBonus = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/bonus/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+/// create bonus
+export const postApiBonus = async (params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = new FormData();
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, val);
+    });
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost + '/bonus',
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error ,message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+/// update bonus
+export const putApiBonus = async (id,params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  params.justification = params.justification  ?? " ";
+  const data = new FormData();
+  data.append("_method", "put");
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, `${val}`);
+    });
+    
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost +  `/bonus/${id}`,
   };
   try{
     const response = await axios(options);  // wrap in async function

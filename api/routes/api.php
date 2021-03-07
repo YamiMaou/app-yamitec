@@ -63,6 +63,10 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/posts', 'Api\PostsController');
     // COLABORATORS
     Route::resource('/contributors', 'Api\ContributorsController');
+    // COLABORATORS
+    Route::resource('/bonus', 'Api\BonusController');
+    // COLABORATORS
+    Route::resource('/accountmanagers', 'Api\AccountManagerController');
     
     // PROVIDERS
     Route::resource('/providers', 'Api\ProvidersController')->middleware(['auth:api', 'scope:view-posts']);

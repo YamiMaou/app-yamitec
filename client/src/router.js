@@ -30,6 +30,10 @@ import Managers from './pages/Managers';
 import CreateManagers from './pages/Managers/create';
 import EditManagers from './pages/Managers/edit';
 
+import Bonus from './pages/Bonificacao';
+import CreateBonus from './pages/Bonificacao/create';
+import EditBonus from './pages/Bonificacao/edit';
+
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
 import { themeStyle } from './components/Layout/Header/style'
@@ -123,6 +127,10 @@ const AppRouter = (props) => {
               <Route path="/responsaveis" exact={true} render={() => (isAuth ? <Managers /> : <Redirect push to="/login" />)} />
               <Route path="/responsaveis/novo" exact={true} render={() => (isAuth ? <CreateManagers /> : <Redirect push to="/login" />)} />
               <Route path="/responsaveis/:id" exact={true} render={() => (isAuth ? <EditManagers /> : <Redirect push to="/login" />)} />
+              
+              <Route path="/bonificacao" exact={true} render={() => (isAuth ? <Bonus /> : <Redirect push to="/login" />)} />
+              <Route path="/bonificacao/novo" exact={true} render={() => (isAuth ? <CreateBonus /> : <Redirect push to="/login" />)} />
+              <Route path="/bonificacao/:id" exact={true} render={() => (isAuth ? <EditBonus /> : <Redirect push to="/login" />)} />
 
               <Route path="*">
                 <Box>
