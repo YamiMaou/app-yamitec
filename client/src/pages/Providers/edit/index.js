@@ -167,6 +167,10 @@ class EditProviders extends Component {
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
 
+                            if(v1.validate.decimal !== undefined){
+                                if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
+                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                            }
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
                                     campo = { id: v1.column, message: `O Campo ${v1.label}, tamanho máximo de ${v1.validate.max} caracteres exêdido` };
@@ -204,7 +208,7 @@ class EditProviders extends Component {
                 fields: [
                     {
                         column: 'active', label: 'Ativo', type: 'checkbox', value: this.state.data['active'] == 1 ? true : false, disabled: false,
-                        justification: this.state.data['audits'] ? this.state.data['audits'].justification : '',
+                        justification: this.state.data['audits'] ? this.state.data['audits'].justification == null ? " " : this.state.data['audits'].justification : '',
                         flexBasis: "100%"
                     },
                     {
@@ -288,7 +292,7 @@ class EditProviders extends Component {
                     { column: 'contract_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis: "100%" },
                     { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].accession_date },
                     { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].end_date },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].rate },
+                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: { required: true, decimal: true }, flexBasis: '20%', value: this.state.data['contracts'].rate },
                 ]
             }
         ];
@@ -361,7 +365,8 @@ class EditProviders extends Component {
                         validate={(values) => { return validateFields(forms, values) }}
                         loading={this.state.loading}
                     >
-                        <div>
+                        {this.state.data.id !== undefined && 
+                        (<div>
                             <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
                                     <Typography>
@@ -390,7 +395,8 @@ class EditProviders extends Component {
                                     </div>
                                 </CardContent>
                             </Card>
-                        </div>
+                        </div>)
+                        }
                     </LForms>
                 }
                 { this.state.data.audits &&

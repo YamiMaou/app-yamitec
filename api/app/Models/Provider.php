@@ -41,7 +41,9 @@ class Provider extends Model
             Manager::class,
             'manager_providers',
             'provider_id',
-            'manager_id'
+            'manager_id',
+            'anexo',
+            'logo'
         );
     }
 
@@ -78,6 +80,15 @@ class Provider extends Model
     public function files()
     {
         return $this->hasMany(Files::class);
+    }
+
+    public function logo()
+    {
+        return $this->hasMany(Files::class,'id', 'logo')->latest();
+    }
+    public function anexo()
+    {
+        return $this->hasOne(Files::class,'id', 'anexo')->latest();
     }
 
     public function address()

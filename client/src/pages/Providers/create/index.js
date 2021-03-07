@@ -88,6 +88,11 @@ class CreateProviders extends Component {
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
+                            
+                            if(v1.validate.decimal !== undefined){
+                                if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
+                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                            }
 
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
@@ -210,7 +215,7 @@ class CreateProviders extends Component {
                     { column: 'contract_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis : "100%" },
                     { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: {required: true}, flexBasis: '20%' },
                     { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: {required: true}, flexBasis: '20%' },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: {required: true}, flexBasis: '20%' },
+                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: {decimal: true, required: true}, flexBasis: '20%' },
                 ]
             }
         ]

@@ -84,6 +84,11 @@ class CreateBonus extends Component {
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
 
+                            if(v1.validate.decimal !== undefined){
+                                if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
+                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                            }
+
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
                                     campo = {id: v1.column, message: `O Campo ${v1.label}, tamanho máximo de ${v1.validate.max} caracteres exêdido` };
@@ -119,8 +124,8 @@ class CreateBonus extends Component {
             {
                 title: 'Bonificação',
                 fields: [
-                    { column: 'indication_qtty', label: 'Quantidade', type: 'text',  value: 1, flexBasis : "45%" },
-                    { column: 'discount_percent', label: 'Desconto (%)', type: 'text', validate: {min: 1, number: true, required: true},flexBasis: '45%' },
+                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: {min: 1, number: true, required: true},  value: 1, flexBasis : "45%" },
+                    { column: 'discount_percent', label: 'Desconto (%)', type: 'text', validate: {min: 1, decimal: true, required: true},flexBasis: '45%' },
                 ]
             },
             
