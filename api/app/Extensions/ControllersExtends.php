@@ -156,15 +156,16 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $request->validate($this->validate);
         }
         try {
+            
             $files = new FilesController();
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
             //$data['user_id'] = $request->user()->id;
-            
-            
             unset($data["_token"]);
             unset($data["_method"]);
             unset($data["justification"]);
+            unset($data["created_at"]);
+            unset($data["updated_at"]);
             
             if (count($this->with) > 0) {
                 $i = 0;

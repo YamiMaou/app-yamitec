@@ -85,10 +85,11 @@ class FilesController extends Controller
                         unset($request[$foreign]);
                         unset($request['path']);
                         unset($request['name']);
+                        
                     continue;
                 }
             }
-
+            //print_r($lrequest);
             return (Object) ["type" => "upload", "message" => "Arquivos Armazenados com sucesso!", "request" => $lrequest ];
         } catch (\Exception $error) {
             return (Object) ["type" => "error", "request" => [], "message" => "Problema ao armazenar arquivos. ", "error" => $error->getMessage()];

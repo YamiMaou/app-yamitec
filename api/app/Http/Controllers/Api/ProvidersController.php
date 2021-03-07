@@ -64,7 +64,10 @@ class ProvidersController extends ControllersExtends
                 if ($provider->cnpj == $request->cnpj)
                     return response()->json(["CPF já cadastrado!"]);
             endif;
-
+            $validate = $request;
+            $files = new \App\Http\Controllers\FilesController();
+            $files = $files->multUpload($request, 'contributors');
+            $data = $files->request;
             // type = 1 para matriz e 0 para filial
             $provider_data = [
                 "type" => $request->type,
@@ -78,7 +81,8 @@ class ProvidersController extends ControllersExtends
                 "contract_clone" => $request->contract_clone ? true : false,
                 "providertype_id" => $request->providertype_id
             ];
-
+            $request['anexo'] = $data['anexo'] ?? null;
+            $request['logo'] = $data['anexo'] ?? null;
             $provider = Provider::create($provider_data);
 
             if ($request->addr_clone == null):
@@ -182,7 +186,8 @@ class ProvidersController extends ControllersExtends
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
                 "matriz_id" => $request->matriz_id,
-
+                "logo" => $request['logo'] == "[object Object]" ? $data['logo'] : $request['logo'],
+                "anexo" => $request['anexo'] == "[object Object]" ? $data['anexo'] : $request['anexo'],
             ];
 
             $provider->update($provider_data);
