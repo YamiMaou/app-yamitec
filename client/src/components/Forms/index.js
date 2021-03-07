@@ -96,13 +96,16 @@ const CheckBoxInput = (props) => {
         props.onChange(e);
         setJust(value);
     }
+    console.log(props.justification)
     return (
         <div key={`check-${props.id}`} style={{ display: 'flex',...props.style }}>
             <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '15%'  }}
                 control={<Checkbox checked={value} disabled={props.disabled ?? false} onChange={handleChange} name={props.id} id={props.id} />}
                 label={props.label}
             />
-            {(props.justification === undefined && value) ||(props.justification === undefined) ? ('') : (
+            {
+                
+            (props.justification === undefined && value) || (props.justification === undefined) ? ('') : (
                 <TextInputCustom key={`input-just`}
                 id={'justification'}
                 disabled={value}
@@ -516,8 +519,8 @@ class LForms extends Component {
                             </div>
                         )
                     })
-
                 }
+                 {(this.props.children ?? '')}
                 {!this.props.loading ? 
                 (<div><Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
                     if (this.props.validate === undefined) {

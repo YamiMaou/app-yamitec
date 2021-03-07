@@ -42,7 +42,7 @@ class Contributors extends Model
 
     public function audits()
     {
-        return $this->hasOne(\App\Models\Audit::class, 'contributors_id','id')->latest();
-    }  
+        return $this->hasOne(Audit::class,'contributors_id','id')->with(['user'])->latest();
+    }
 
 }

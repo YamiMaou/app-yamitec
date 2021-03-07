@@ -45,7 +45,7 @@ class Client extends Model
 
     public function audits()
     {
-        return $this->hasOne(\App\Models\Audit::class, 'clients_id','id')->latest();
-    } 
+        return $this->hasOne(Audit::class,'clients_id','id')->with(['user'])->latest();
+    }
 
 }

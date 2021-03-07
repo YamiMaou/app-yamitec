@@ -22,7 +22,7 @@ class ProvidersController extends ControllersExtends
     public function show(Request $Request, $provider_id, $with=[])
     {
         try {
-            $provider = Provider::with(['audits'])->findOrFail($provider_id);
+            $provider = Provider::with(['audits','managers'])->findOrFail($provider_id);
             $addr_clone = $provider->where('id', $provider_id)->get('addr_clone')[0];
             $contact_clone = $provider->where('id', $provider_id)->get('contact_clone')[0];
             $contract_clone = $provider->where('id', $provider_id)->get('contract_clone')[0];

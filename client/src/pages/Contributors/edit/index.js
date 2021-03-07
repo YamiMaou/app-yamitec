@@ -128,8 +128,8 @@ class EditContributors extends Component {
                 fields: [
                     { 
                         column: 'active', label: 'Ativo', type: 'checkbox',  value: this.state.data['active'] == 1 ? true : false, disabled: false, 
-                        justification: this.state.data['audits'] ? this.state.data['audits'].justification : '', 
-                        flexBasis : "10%" 
+                        justification: this.state.data['audits'] ? this.state.data['audits'].justification == null ? " " : this.state.data['audits'].justification : '', 
+                        flexBasis : "100%" 
                     },
                     { column: 'cpf', value: this.state.data['cpf'], label: 'CPF', type: 'text', mask: InputCpf, validate: { min: 11, number: true, required: true }, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', value: this.state.data['name'], label: 'Nome', type: 'text', validate: { max: 50, required: true }, flexBasis },
@@ -198,7 +198,7 @@ class EditContributors extends Component {
                         loading={this.state.loading}
                     />
                 }
-                { this.state.data.id !== undefined  &&
+                { this.state.data.audits  &&
                     <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 720 ? 210 : 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>

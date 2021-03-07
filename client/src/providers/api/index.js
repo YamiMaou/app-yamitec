@@ -463,6 +463,84 @@ export const putApiManagers = async (id,params = {}) => {
   }
 }
 
+/// list bonus
+export const getApiBonus = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/bonus/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+/// create bonus
+export const postApiBonus = async (params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = new FormData();
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, val);
+    });
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost + '/bonus',
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error ,message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+/// update bonus
+export const putApiBonus = async (id,params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  params.justification = params.justification  ?? " ";
+  const data = new FormData();
+  data.append("_method", "put");
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, `${val}`);
+    });
+    
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost +  `/bonus/${id}`,
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
 /// list audits
 export const getApiAudits = async (params = '',id = undefined) => {
   localStorage.setItem("sessionTime", 900)

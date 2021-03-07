@@ -36,6 +36,7 @@ class ClientsController extends ControllersExtends
             $data_user = [
                 'name' => $resquest->name,
                 'email' => $resquest->email,
+                'profile_id' => 1, 
                 'password' => Hash::make($resquest->cpf),
             ];
     

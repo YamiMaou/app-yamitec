@@ -36,8 +36,8 @@ function Sidebar(props) {
       {url: "/clientes", label: 'Clientes', icon: <PeopleIcon fontSize="small" />},
       {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
       {url: "/fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
-      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
-      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      {url: "/bonificacao", label: 'Bonificação', icon: <PeopleIcon fontSize="small" />},
+      {url: "/contas", label: 'Ger. Contas', icon: <PeopleIcon fontSize="small" />},
       {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
       //{url: "/Fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
     ]
@@ -46,10 +46,10 @@ function Sidebar(props) {
 
     return authData.permissions.map((v, k) => {
       //console.log(v);
-      if(k > 3) return ('');
+      if(k > 5) return ('');
       if(v.read === 0) return ('');
       return(
-      <MenuItem>
+      <MenuItem key={`sidebar-menu-ind-${k}`} >
         <Link style={styles.link} to={views[v.module].url} >
           <ListItemIcon>
             <StyledBadge badgeContent={0} color="secondary">

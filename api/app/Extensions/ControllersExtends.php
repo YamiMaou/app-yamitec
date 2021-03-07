@@ -159,8 +159,8 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = new FilesController();
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
-            $data['user_id'] = $request->user()->id;
-            $this->saveLog($id, $request, $modelName);
+            //$data['user_id'] = $request->user()->id;
+            
             
             unset($data["_token"]);
             unset($data["_method"]);
@@ -180,7 +180,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             } else {
                 $this->model->where('id', $id)->update($data);
             }
-           
+            $this->saveLog($id, $request, $modelName);
             return response()->json(["success"=> true,"type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch (Exception $error) {
             return response()->json(["success"=> false,"type" => "error", "message" => "Problema ao Atualizar.", "error" => $error->getMessage(), "trace" => $error->getTraceAsString()], 500);
