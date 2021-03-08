@@ -110,7 +110,7 @@ const AppRouter = (props) => {
 
           <Router>
             <Switch>
-              <Route path="/login" exact={true} component={Login} />
+              <Route path="/login" exact={true} render={() => (!isAuth ? <Login /> : <Redirect push to="/" />)} />
               <Route path="/reset/:token" exact={true} component={ResetPassword} />
               <Route path="/" exact={true} render={() => (isAuth ? <Home /> : <Redirect push to="/login" />)} />
               <Route path="/colaboradores" exact={true} render={() => (isAuth ? <Contributors /> : <Redirect push to="/login" />)} />

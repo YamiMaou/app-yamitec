@@ -129,7 +129,7 @@ function FullScreenInvoiceDialog(props) {
             
          
             <CardActions style={{flexDirection: 'column'}}>
-            <div style={{marginLeft: 10, alignSelf: 'start', cursor:'pointer', color:'#025ea2'}}>
+            <div style={{marginBottom: 10, marginLeft: 10, alignSelf: 'start', cursor:'pointer', color:'#025ea2'}}>
               <a onClick={() => {
                 setResetpwd(true);
               }
@@ -175,7 +175,7 @@ function FullScreenInvoiceDialog(props) {
             
          
           <CardActions style={{flexDirection: 'column'}}>
-            <div style={{marginLeft: 10,  alignSelf: 'start', cursor:'pointer', color:'#025ea2'}}>
+            <div style={{marginBottom: 10, marginLeft: 10,  alignSelf: 'start', cursor:'pointer', color:'#025ea2'}}>
               <a onClick={() => {
                 setResetpwd(false);
               }
