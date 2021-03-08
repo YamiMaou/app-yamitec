@@ -42,7 +42,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 function FullScreenInvoiceDialog(props) {
-  const [loginError, setLoginerror] = React.useState(false);
+  const [loginError, setLoginerror] = React.useState({success: false, message: ''});
   const [resetError, setReseterror] = React.useState({success: false, message: ''});
   const [loading, setloading] = React.useState(false);
   const [resetpwd, setResetpwd] = React.useState(false);
@@ -62,11 +62,11 @@ function FullScreenInvoiceDialog(props) {
     let data = await postResetPassword(dados);
     if(data !== undefined) {
       if(data.data.success){
-        setLoginerror(false);
+        setLoginerror({success: false, message: ''});
         setloading(false);
         window.location.href="/";
       }else{
-        setLoginerror(true)
+        setLoginerror({success: true, message: ''})
         setloading(false);
       }
       setReseterror({success: true, message: data.data.message})
@@ -82,11 +82,11 @@ function FullScreenInvoiceDialog(props) {
         localStorage.setItem("user", JSON.stringify(data.data.data.user));
         localStorage.setItem("token", data.data.token);
         props.setAuth(data.data.data.user);
-        setLoginerror(false);
+        setLoginerror({success: false, message: ''})
         setloading(false);
         window.location.href="/";
       }else{
-        setLoginerror(true)
+        setLoginerror({success: true, message: data.data.message})
         setloading(false);
       }
     }
@@ -109,8 +109,8 @@ function FullScreenInvoiceDialog(props) {
                 }
               </InputMask> */}
               <TextField
-                error={loginError === true ? true : false}
-                helperText={ loginError ? "E-mail ou senha inválidos." : ""}
+                error={loginError.success}
+                helperText={ loginError.success ? loginError.message : ""}
                 type="text"
                 fullWidth id="email" type="text" label="E-Mail" variant="outlined" 
                 onChange={onChange}
@@ -129,7 +129,7 @@ function FullScreenInvoiceDialog(props) {
             
          
             <CardActions style={{flexDirection: 'column'}}>
-            <div style={{marginTop: 5, marginBottom: 5, alignSelf: 'start'}}>
+            <div style={{marginLeft: 10, alignSelf: 'start'}}>
               <a onClick={() => {
                 setResetpwd(true);
               }
@@ -173,8 +173,8 @@ function FullScreenInvoiceDialog(props) {
             </CardContent>
             
          
-          <CardActions style={{flexDirection: 'column'}}>
-            <div style={{marginTop: 5, marginBottom: 5, alignSelf: 'start'}}>
+          <CardActions style={{flexDirection: 'column', marginLeft:0}}>
+            <div style={{marginLeft: 10,  alignSelf: 'start'}}>
               <a onClick={() => {
                 setResetpwd(false);
               }

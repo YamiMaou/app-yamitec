@@ -24,7 +24,13 @@ class UsersController extends Controller
     public function login()
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            $user = \App\User::with(['permissions', 'contributor', 'client'])->find(Auth::id());
+            $user = \App\User::with(['permissions', 'contributor', 'client', 'manager'])->find(Auth::id());
+            $check = $user->contributor ?? $user->client ?? $user->manager;
+            if($check->active === 0 )
+                return response()->json(['success' => false, 'message' => 'Bloqueio Administrativo'], 201);
+            if(isset($check->provider) && $check->provider->active === 0)
+                return response()->json(['success' => false, 'message' => 'Bloqueio Administrativo'], 201);
+                
             $success = [ 
                 'success' => true,
                 'token' => $user->createToken('Yamitec',['view-posts', 'view-profile'])->accessToken,
@@ -34,7 +40,7 @@ class UsersController extends Controller
             ];
             return response()->json($success, $this->successStatus);
         } else {
-            return response()->json(['success' => false, 'message' => 'Acesso não autorizado'], 201);
+            return response()->json(['success' => false, 'message' => 'E-mail ou senha Inválidos'], 201);
         }
     }
     /**

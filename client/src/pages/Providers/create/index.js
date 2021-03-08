@@ -133,7 +133,7 @@ class CreateProviders extends Component {
                     {
                         column: 'providertype_id', label: 'Tipo Fornecedor', type: 'select',
                         json: true, 
-                        valueLabel: "value",
+                        valueLabel: "name",
                         values: this.state.providertypes,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
                         validate: {required: true },
                         //value: "Coordenador de usuários",
