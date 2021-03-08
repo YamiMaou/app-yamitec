@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Audit extends Model
 {
     protected $fillable = [
-        'providers_id',
-        'clients_id',
-        'managers_id',
-        'contributors_id',
+        'provider_id',
+        'client_id',
+        'manager_id',
+        'contributor_id',
         'user_id', 
         'justification', 
         'from', 

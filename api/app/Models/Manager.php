@@ -44,6 +44,6 @@ class Manager extends Model
 
     public function audits()
     {
-        return $this->hasOne(Audit::class,'managers_id','id')->with(['user'])->latest();
+        return $this->hasOne(Audit::class,'manager_id','id')->with(['user'])->latest();
     }
 }

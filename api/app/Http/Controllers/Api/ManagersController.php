@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Extensions\ControllersExtends;
 use App\Http\Controllers\Controller;
+use App\Models\Address;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Models\Manager;
@@ -42,6 +43,18 @@ class ManagersController extends ControllersExtends
             ];
     
             $manager = Manager::create($data_manager);
+
+            $data_address = [
+                'zipcode' => $resquest->zipcode,
+                'street' => $resquest->street,
+                'additional' => $resquest->additional,
+                'city' => $resquest->city,
+                'uf' => $resquest->uf,
+                'city' => $resquest->city,
+                'manager_id' => $manager->id,
+            ];
+    
+            Address::create($data_address);
     
             $data_contact = [
                 'phone1' => $resquest->phone1,

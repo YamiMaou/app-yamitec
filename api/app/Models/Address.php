@@ -17,6 +17,7 @@ class Address extends Model
         'contributors_id',
         'client_id',
         'provider_id',
+        'manager_id',
     ];
 
     public function contributors()
@@ -26,7 +27,7 @@ class Address extends Model
 
     public function manager()
     {
-        return $this->belongsTo(Manager::class, 'manager_id', 'id');
+        return $this->belongsTo(Manager::class);
     }
 
     public function client()
