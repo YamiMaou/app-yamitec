@@ -80,6 +80,7 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::get('/providers/affiliates/{provider_id}', 'Api\ProvidersController@allAffiliates')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_GET-PROVIDER
     Route::get('/providers/get/{provider_id}', 'Api\ProvidersController@getProvider')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_SHOW
     Route::get('/providers/show/{provider_id}', 'Api\ProvidersController@show')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_GET-MATRIX-BY-AFFILIATE-ID
     Route::get('/providers/affiliate/matrix/{affiliate_id}', 'Api\ProvidersController@getMatrizByAffiliateId')->middleware(['auth:api', 'scope:view-posts']);
@@ -95,4 +96,9 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/audits', 'Api\AuditsController');
     // PROVIDETYPES
     Route::resource('/providertypes', 'Api\ProvidertypesController')->middleware(['auth:api', 'scope:view-posts']);
+    // ACCOUNT_MANAGER
+    Route::resource('/account-managers', 'Api\AccountManagersController')->middleware(['auth:api', 'scope:view-posts']);
+    // BONUS
+    Route::resource('/bonuses', 'Api\BonusesController')->middleware(['auth:api', 'scope:view-posts']);
+
 });
