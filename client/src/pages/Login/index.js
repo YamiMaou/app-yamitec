@@ -129,7 +129,7 @@ function FullScreenInvoiceDialog(props) {
             
          
             <CardActions style={{flexDirection: 'column'}}>
-            <div style={{marginLeft: 10, alignSelf: 'start'}}>
+            <div style={{marginLeft: 10, alignSelf: 'start', cursor:'pointer', color:'#025ea2'}}>
               <a onClick={() => {
                 setResetpwd(true);
               }
@@ -138,6 +138,7 @@ function FullScreenInvoiceDialog(props) {
             {!loading ? (
             <Button variant="contained" size="large" fullWidth color="primary" disableElevation type="submit" form="loginform"
             style={{
+              marginLeft: 0, 
               background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
             }}>
               Entrar 
@@ -173,8 +174,8 @@ function FullScreenInvoiceDialog(props) {
             </CardContent>
             
          
-          <CardActions style={{flexDirection: 'column', marginLeft:0}}>
-            <div style={{marginLeft: 10,  alignSelf: 'start'}}>
+          <CardActions style={{flexDirection: 'column'}}>
+            <div style={{marginLeft: 10,  alignSelf: 'start', cursor:'pointer', color:'#025ea2'}}>
               <a onClick={() => {
                 setResetpwd(false);
               }
@@ -183,6 +184,7 @@ function FullScreenInvoiceDialog(props) {
             {!loading ? (
             <Button variant="contained" size="large" fullWidth color="primary" disableElevation type="submit" form="loginform"
             style={{
+              marginLeft: 0, 
               background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
             }}>
               SOLICITAR 
