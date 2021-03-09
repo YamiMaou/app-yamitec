@@ -53,7 +53,7 @@ function BlockDialog(props) {
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "Desb" }loqueio de colaborador</DialogTitle>
+          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "Desb" }loqueio de responsável</DialogTitle>
           <DialogContent>
             <DialogContentText>
             

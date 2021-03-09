@@ -130,6 +130,7 @@ class CreateProviders extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
+                    {column: 'teste', component: (<HomeIcon />)},
                     {
                         column: 'providertype_id', label: 'Tipo Fornecedor', type: 'select',
                         json: true, 

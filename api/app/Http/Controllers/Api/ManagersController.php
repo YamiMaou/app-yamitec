@@ -116,7 +116,7 @@ class ManagersController extends ControllersExtends
             $contact = Contact::where('client_id', $manager->id);
     
             $contact->update($data_contact);
-            parent::saveLog($id, $resquest, 'managers');
+            parent::saveLog($id, $resquest, 'manager');
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);

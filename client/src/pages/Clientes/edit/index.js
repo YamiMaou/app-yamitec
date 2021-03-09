@@ -178,7 +178,7 @@ class EditContributors extends Component {
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Typography variant="h6">
-                        <HomeIcon />  <span>Editar / Colaboradores</span>
+                        <HomeIcon />  <span>Editar / Cliente</span>
                     </Typography>
                 </AppBar>
                 {
@@ -200,10 +200,10 @@ class EditContributors extends Component {
                         </div>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Id:  <b>{this.state.data.id}</b>
+                                Id:  <b>{this.state.data.audits.user.id}</b>
                             </Typography>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
-                                Usuário:  <b>{this.state.data.user.name}</b>
+                                Usuário:  <b>{this.state.data.audits.user.name}</b>
                             </Typography>
                         </div>
                     </Paper>

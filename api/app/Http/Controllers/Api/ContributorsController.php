@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Extensions\ControllersExtends;
-use App\Models\Contributors;
+use App\Models\Contributor;
 use App\Models\Post;
 use App\User;
 use GuzzleHttp\Psr7\Request;
@@ -14,7 +14,7 @@ class ContributorsController extends ControllersExtends
 {   
     public function __construct()
     {
-        parent::__construct(Contributors::class, 'home');
+        parent::__construct(Contributor::class, 'home');
         parent::setValidate([
             "name" => "required|max:50",
             "cpf" => "required|unique:contributors|max:11",
@@ -32,14 +32,14 @@ class ContributorsController extends ControllersExtends
         $validate = $request;
         if(!isset($validate->cpf)){
             //print_r($validate->all());
-            $validate["user_id"] = $request->user()->id;
+            //$validate["user_id"] = $request->user()->id;
             return parent::update($validate, $id);
         }
         $files = new \App\Http\Controllers\FilesController();
-        $files = $files->multUpload($request, 'contributors');
+        $files = $files->multUpload($request, 'contributor');
         $data = $files->request;
         $contributors = [
-            "user_id" => $request->user()->id,
+            //"user_id" => $request->user()->id,
             "cpf" => $request->cpf,
             "name" => $request->name,
             "birthdate"=> $request->birthdate,
@@ -67,7 +67,7 @@ class ContributorsController extends ControllersExtends
             "instagram" => $request->instagram,
         ];
         parent::withAndChange([
-            \App\Models\Contributors::class => $contributors,
+            \App\Models\Contributor::class => $contributors,
             \App\Models\Address::class => $address,
             \App\Models\Contact::class => $contact,
         ],
@@ -79,7 +79,7 @@ class ContributorsController extends ControllersExtends
     public function store(Req $request){
         $validate = $request;
         $files = new \App\Http\Controllers\FilesController();
-        $files = $files->multUpload($request, 'contributors');
+        $files = $files->multUpload($request, 'contributor');
         $data = $files->request;
         //var_dump($request);
         $contributors = [
@@ -112,7 +112,7 @@ class ContributorsController extends ControllersExtends
             "instagram" => $request->instagram,
         ];
         parent::withAndChange([
-            \App\Models\Contributors::class => $contributors,
+            \App\Models\Contributor::class => $contributors,
             \App\Models\Address::class => $address,
             \App\Models\Contact::class => $contact,
         ],

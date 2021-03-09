@@ -174,7 +174,7 @@ class CreateContributors extends Component {
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Typography variant="h6">
-                        <HomeIcon />  <span>Cadastro / Clientes</span>
+                        <HomeIcon />  <span>Cadastro / Cliente</span>
                     </Typography>
                 </AppBar>
                 <LForms forms={forms}

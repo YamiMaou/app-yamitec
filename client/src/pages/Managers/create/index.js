@@ -168,7 +168,7 @@ class CreateManagers extends Component {
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Typography variant="h6">
-                        <HomeIcon />  <span>Cadastro / Responsáveis</span>
+                        <HomeIcon />  <span>Cadastro / Responsável</span>
                     </Typography>
                 </AppBar>
                 <LForms forms={forms}

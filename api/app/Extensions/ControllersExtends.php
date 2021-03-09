@@ -140,7 +140,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function update(Request $request, $id)
     {
-        $modelName = strtolower(str_replace('Controller','',(new \ReflectionClass($this->model))->getShortName()));
+        $modelName = strtolower(str_replace('Model','',(new \ReflectionClass($this->model))->getShortName()));
         if (count($this->validate) > 0) {
             foreach ($this->validate as $k => $val) {
                 $regras = "";

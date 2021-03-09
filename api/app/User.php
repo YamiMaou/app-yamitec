@@ -40,7 +40,7 @@ class User extends Authenticatable
     ];
 
     public function permissions(){
-        return $this->hasMany(\App\Models\Permission::class, 'id', 'profile_id');
+        return $this->hasMany(\App\Models\Permission::class, 'profile_id', 'profile_id');
     }
 
     public function contributor(){

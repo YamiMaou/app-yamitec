@@ -64,7 +64,7 @@ function FullScreenInvoiceDialog(props) {
       if(data.data.success){
         setLoginerror({success: false, message: ''});
         setloading(false);
-        window.location.href="/";
+        //window.location.href="/";
       }else{
         setLoginerror({success: true, message: ''})
         setloading(false);
