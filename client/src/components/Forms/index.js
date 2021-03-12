@@ -96,7 +96,7 @@ const CheckBoxInput = (props) => {
         props.onChange(e);
         setJust(value);
     }
-    console.log(props.justification)
+    //console.log(props.justification)
     return (
         <div key={`check-${props.id}`} style={{ display: 'flex',...props.style }}>
             <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '15%'  }}
@@ -428,8 +428,7 @@ class LForms extends Component {
 
         const classes = {
             m5: {
-                margin: 5,
-                marginTop: 25,
+                margin: 5, marginTop: 25,
                 width: window.innerWidth > 780 ? '30%' : '100%'
                 //flexBasis: '30%'
 
@@ -470,7 +469,8 @@ class LForms extends Component {
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "custom") {
                                                         let CustomComponent = input.component;
-                                                        return (<CustomComponent valueLabel={input.valueLabel} json={input.json}value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}/>) ?? ('Não existe');
+                                                        console.log(input.value + '  ' + input.value1);
+                                                        return (<CustomComponent valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}/>) ?? ('Não existe');
                                                     } else if (input.type == "date") {
                                                         return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {

@@ -213,7 +213,7 @@ class CreateProviders extends Component {
                         label: 'Matriz', 
                         type: 'custom',
                         json: true, 
-                        valueLabel: "name",
+                        valueLabel: "fantasy_name",
                         values: this.state.data,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
                         flexBasis,
                         component: TypeEmpresaInput},

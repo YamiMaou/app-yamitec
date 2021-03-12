@@ -41,9 +41,7 @@ class Provider extends Model
             Manager::class,
             'manager_providers',
             'provider_id',
-            'manager_id',
-            'anexo',
-            'logo'
+            'manager_id'
         );
     }
 
