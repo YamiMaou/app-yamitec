@@ -76,6 +76,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/provider/files', 'Api\ProviderFilesController')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_MANAGER
     Route::put('/providers/manager/{provider}/{manager}', 'Api\ProvidersController@addManageToProvider')->middleware(['auth:api', 'scope:view-posts']);
+    // PROVIDER_MANAGER-DESVINCULATE
+    Route::post('/providers/manager/remove', 'Api\ProvidersController@removeManageToProvider')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_ALL-AFFILIATES
     Route::get('/providers/affiliates/{provider_id}', 'Api\ProvidersController@allAffiliates')->middleware(['auth:api', 'scope:view-posts']);
     // PROVIDER_GET-PROVIDER
@@ -100,5 +102,7 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/account-managers', 'Api\AccountManagersController')->middleware(['auth:api', 'scope:view-posts']);
     // BONUS
     Route::resource('/bonuses', 'Api\BonusesController')->middleware(['auth:api', 'scope:view-posts']);
+    // PERMISSIONS
+    Route::resource('/permissions', 'Api\PermissionsController')->middleware(['auth:api', 'scope:view-posts']);
 
 });

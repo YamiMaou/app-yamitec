@@ -11,4 +11,9 @@ class Profile extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function permission()
+    {
+        return $this->belongsTo(Permission::class);
+    }
 }

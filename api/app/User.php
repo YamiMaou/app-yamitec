@@ -44,7 +44,7 @@ class User extends Authenticatable
     }
 
     public function contributor(){
-        return $this->hasOne(\App\Models\Contributors::class,'user_id', 'id');
+        return $this->hasOne(\App\Models\Contributor::class,'user_id', 'id');
     }
 
     public function provider(){
