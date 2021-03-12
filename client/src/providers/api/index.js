@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   apiHost = hostname;
 }
-apiHost = hostname;
+//apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({
@@ -531,6 +531,85 @@ export const putApiBonus = async (id,params = {}) => {
     },
     data,
     url: apiHost +  `/bonus/${id}`,
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+
+/// list accountmanager
+export const getApiAccountmanager = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/accountmanager/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+/// create accountmanager
+export const postApiAccountmanager = async (params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = new FormData();
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, val);
+    });
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost + '/accountmanager',
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error ,message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+/// update accountmanagers
+export const putApiAccountmanager = async (id,params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  params.justification = params.justification  ?? " ";
+  const data = new FormData();
+  data.append("_method", "put");
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, `${val}`);
+    });
+    
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost +  `/accountmanager/${id}`,
   };
   try{
     const response = await axios(options);  // wrap in async function

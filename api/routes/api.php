@@ -66,8 +66,7 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // COLABORATORS
     Route::resource('/bonus', 'Api\BonusController');
     // COLABORATORS
-    Route::resource('/accountmanagers', 'Api\AccountManagerController');
-    
+    Route::resource('/accountmanager', 'Api\AccountManagersController');
     // PROVIDERS
     Route::resource('/providers', 'Api\ProvidersController')->middleware(['auth:api', 'scope:view-posts']);
     // CONTRACT

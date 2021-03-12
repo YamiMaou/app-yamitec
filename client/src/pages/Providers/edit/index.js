@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
@@ -11,6 +11,13 @@ import Typography from '@material-ui/core/Typography';
 import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+//
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -18,9 +25,10 @@ import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import BlockIcon from '@material-ui/icons/Block';
 import EditIcon from '@material-ui/icons/Edit';
-
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import AddIcon from '@material-ui/icons/Add';
 import { setSnackbar } from '../../../actions/appActions'
-import { putApiProviders, getAddressByCepla, getApiProviders, getApiProviderTypes } from '../../../providers/api'
+import { putApiProviders, getApiManagers, getAddressByCepla, getApiProviders, getApiProviderTypes } from '../../../providers/api'
 import { validaEmail, validaCnpj, stringToaddDate } from '../../../providers/commonMethods'
 import { InputCep, InputCnpj, InputPhone, stringCpf } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
@@ -36,6 +44,71 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 // MODULE ID
 const module_id = 2
+const SelectInput = (props) => {
+    const [value, setValue] = useState(props.value ?? "Selecione");
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(value)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        props.onChange(e)
+        console.log(e.target.value)
+        setValue(e.target.value);
+    }
+    return (
+        <FormControl id={props.column} style={{ ...props.style, marginTop: '25px' }}>
+            <InputLabel id={props.column}>{props.label}</InputLabel>
+            <Select size="small"
+                labelId={props.id}
+                id={props.id}
+                name={props.name}
+                value={value}
+                error={error}
+                placeholder="Selecione"
+                //helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
+                onChange={handleChange}
+                onBlur={handleChange}
+            >
+                <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
+                    })
+                ) : (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
+                    })
+                )
+                }
+
+            </Select>
+        </FormControl>)
+}
+const TypeEmpresaInput = (props) => {
+    const [value, setValue] = useState(props.value);
+    const [value1, setValue1] = useState(props.value);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        props.onChange(e) ?? undefined;
+        setValue(e.target.value);
+    }
+    function handleChange1(e) {
+        const { value, id } = e.target;
+        props.onChange(e) ?? undefined;
+        setValue1(e.target.value);
+    }
+    return (<div style={{flexBasis: props.style.flexBasis, display: 'flex'}}>
+        <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{margin: 5, marginTop: 25,flexBasis: window.innerWidth < 768 ? '100%' : '50%' }} onChange={(e) => handleChange(e)} />
+        {value == 2 &&
+        <SelectInput valueLabel={props.valueLabel} json={props.json} value={value1 ?? undefined} helperText={props.helperText ?? ""} key={`input-${15001}`} id={props.column} label={props.label} name={props.column} values={props.values} style={{margin: 5, marginTop: 25,flexBasis: window.innerWidth < 768 ? '100%' : '50%' }} onChange={(e) => handleChange1(e) ?? undefined} />
+    }</div>)
+}
+
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
@@ -98,7 +171,10 @@ function BlockDialog(props) {
 class EditProviders extends Component {
     state = {
         data: {},
+        managers: [],
+        manager: 0,
         providers: [],
+        provManagers: [],
         loading: false
     }
     async componentDidMount() {
@@ -108,10 +184,11 @@ class EditProviders extends Component {
         }
         localStorage.setItem("sessionTime", 9000)
         const data = await getApiProviders({}, this.props.match.params.id);
-        const providers = await getApiProviders();
+        const providers = await getApiProviders({type: 1});
+        const managers = await getApiManagers();
         const providertypes = await getApiProviderTypes();
         console.log(data);
-        this.setState({ ...this.state, data, providers: providers.data, providertypes: providertypes.data });
+        this.setState({ ...this.state, data, providers: providers.data, provManagers: data.managers, managers: managers.data, providertypes: providertypes.data });
 
     }
 
@@ -166,6 +243,16 @@ class EditProviders extends Component {
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
+                            if(v1.validate.depends !== undefined){
+                                let val = values[v1.validate.depends.column];
+                                //console.log(v1.validate.depends.value);
+                                //return false;
+                                if (val == "Selecione") {
+                                    campo = { id: v1.column, message: `O Campo ${val.label} é inválido ` }
+                                }
+                                if (v1.validate.depends.value !== val)
+                                    campo = { id: v1.column, message: `O Campo ${v1.label} depende do valor ${v1.validate.depends.text} em ${v1.validate.depends.label}` }
+                            }
 
                             if(v1.validate.decimal !== undefined){
                                 if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
@@ -202,7 +289,9 @@ class EditProviders extends Component {
             return campo === undefined ? true : false
         }
         const flexBasis = '22%';
-        const forms = this.state.data.id == undefined ? [] : [
+        console.log('teste')
+        console.log(this.state.data)
+        const forms = (this.state.data === undefined || this.state.data.id === undefined) ? [] : [
             {
                 title: 'Dados Básicos',
                 fields: [
@@ -222,22 +311,16 @@ class EditProviders extends Component {
                         flexBasis
                     },
                     {
-                        column: 'type', label: 'Empresa', type: 'select',
-                        json: true,
-                        valueLabel: "value",
-                        values: [{ id: 1, value: "Matriz" }, { id: 0, value: "Filial" }],
-                        validate: { required: true },
-                        value: this.state.data['type'],
-                        flexBasis
-                    },
-                    {
-                        column: 'matriz_id', label: 'Matriz', type: 'select',
-                        json: true,
-                        values: this.state.providers,
+                        column: 'matriz_id', 
+                        label: 'Matriz', 
+                        type: 'custom',
+                        json: true, 
                         valueLabel: "fantasy_name",
-                        //validate: {required: true },
-                        value: this.state.data['matriz_id'],
-                        flexBasis, style: { width: '220px' }
+                        value:this.state.data['type'],
+                        value1: this.state.data['matriz_id'],
+                        values: this.state.providers,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
+                        flexBasis: '66%',
+                        component: TypeEmpresaInput
                     },
                     { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: { min: 11, number: true, required: true }, validateHandler: validaCnpj, flexBasis: '33%', helperText: "o valor digitado é inválido" },
                     { column: 'company_name', label: 'Razão Social', type: 'text', value: this.state.data['company_name'], validate: { max: 50, required: true }, flexBasis },
@@ -253,7 +336,7 @@ class EditProviders extends Component {
                 //flexFlow: 'row no-wrap',
                 //json: "address",
                 fields: [
-                    { column: 'addr_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis: "100%", value: this.state.data.addr_clone },
+                    { column: 'addr_clone', label: 'Clonar Matriz', type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
                     { column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: this.state.data['addresses'].zipcode },
                     { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: this.state.data['addresses'].street },
                     { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '' },
@@ -269,7 +352,7 @@ class EditProviders extends Component {
                 title: 'Contato',
                 //json: 'contact',
                 fields: [
-                    { column: 'contact_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis: "100%", value: this.state.data.contact_clone },
+                    { column: 'contact_clone', label: 'Clonar Matriz', type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }},flexBasis: "100%", value: this.state.data.contact_clone },
                     { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: this.state.data['contacts'].phone1 },
                     { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis, value: this.state.data['contacts'].phone2 },
                     { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: this.state.data['contacts'].email },
@@ -289,14 +372,14 @@ class EditProviders extends Component {
                 title: 'Contrato Atual',
                 //json: 'contact',
                 fields: [
-                    { column: 'contract_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis: "100%" },
+                    { column: 'contract_clone', label: 'Clonar Matriz', type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%" },
                     { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].accession_date },
                     { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].end_date },
                     { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: { required: true, decimal: true }, flexBasis: '20%', value: this.state.data['contracts'].rate },
                 ]
             }
         ];
-        const rows = this.state.data.managers ?? [];
+        const rows =  (this.state.provManagers !== undefined) ? this.state.provManagers : [];
         const columns = [
             {
                 field: 'cpf', headerName: 'CPF', flex: 0.7,
@@ -321,37 +404,29 @@ class EditProviders extends Component {
                     //let view = this.state.session.permissions.find(x => x.module === module_id)
                     return (
                         <div>
-                            <Link to={`/responsaveis/${params.value}`} style={{ textDecoration: 'none' }} >
-                                <Button
-                                   
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                >
-                                    <EditIcon fontSize="small" />
-                                </Button>
-                            </Link>
                             <Button
-                                
                                 variant="contained"
                                 color="primary"
                                 size="small"
                                 onClick={async (e) => {
-                                    const handle = (status) => {
-                                        params.row.active = status;
-                                    }
-                                    this.setState({ ...this.state, blockDialog: { open: true, id: params.value, active: params.row.active === 1 ? 0 : 1, handle } })
+                                    try{
+                                        await putApiProviders(`manager/${this.props.match.params.id}/${this.state.manager}/delete`)
+                                        const data = await getApiProviders({}, this.props.match.params.id);
+                                        this.setState({...this.state, provManagers: data.managers});
+                                    }catch(err){
+                                        console.log(err)
+                                    };
+                                    
                                 }}
                                 style={{ marginLeft: 16 }}
                             >
-                                {params.row.active === 1 ? <BlockIcon fontSize="small" /> : <CheckCircleIcon fontSize="small" />}
+                               <DeleteForeverIcon fontSize="small" />
                             </Button>
                         </div>
                     )
                 },
             },
         ];
-
         return (
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
@@ -360,22 +435,45 @@ class EditProviders extends Component {
                     </Typography>
                 </AppBar>
                 {
-                    <LForms forms={forms}
+                    <LForms 
+                        forms={forms}
                         request={(data) => { request(this.state.data, data) }}
                         validate={(values) => { return validateFields(forms, values) }}
                         loading={this.state.loading}
                     >
-                        {this.state.data.id !== undefined && 
+                        {this.state.data.id == undefined ? ('') :
                         (<div>
                             <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
                                     <Typography>
                                         <IndeterminateCheckBoxIcon /> Responsáveis
                                     </Typography>
+                                    <div  style={{
+                                            alignItems: 'center',
+                                            justifyContent: 'start',
+                                            display: 'flex'
+                                        }}>
+                                        <SelectInput valueLabel="value" 
+                                            json={true} 
+                                            valueLabel={'name'}
+                                            key={`input-${15019}`} id={"manager"} label={"Responsável"} name={"manager"} 
+                                            values={this.state.managers} 
+                                            style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
+                                            onChange={(e) => {
+                                                this.setState({...this.state, manager: e.target.value});
+                                            }} />
+                                            <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
+                                                await putApiProviders(`manager/${this.props.match.params.id}/${this.state.manager}`)
+                                                const data = await getApiProviders({}, this.props.match.params.id);
+                                                /*let data = {...this.state.data};
+                                                data = managers.managers*/
+                                                this.setState({...this.state, provManagers: data.managers });
+                                            }}><AddIcon /></Button>
+                                        </div>
                                     <div style={{
                                         alignItems: 'center',
                                         justifyContent: 'start',
-                                        height: 350
+                                        height: 350,
                                     }}>
                                         <DataGrid sx={{
                                             '& .MuiDataGrid-root': {
@@ -395,6 +493,7 @@ class EditProviders extends Component {
                                     </div>
                                 </CardContent>
                             </Card>
+                            
                         </div>)
                         }
                     </LForms>

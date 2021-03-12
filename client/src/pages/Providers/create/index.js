@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
@@ -19,6 +19,75 @@ import { InputCep, InputCnpj, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 
 import { withSnackbar  } from 'notistack';
+import { TextInput } from 'react-native';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+const SelectInput = (props) => {
+    const [value, setValue] = useState(props.value ?? "Selecione");
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(value)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        props.onChange(e)
+        console.log(e.target.value)
+        setValue(e.target.value);
+    }
+    return (
+        <FormControl id={props.column} style={{ ...props.style, marginTop: '25px' }}>
+            <InputLabel id={props.column}>{props.label}</InputLabel>
+            <Select size="small"
+                labelId={props.id}
+                id={props.id}
+                name={props.name}
+                value={value}
+                error={error}
+                placeholder="Selecione"
+                //helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
+                onChange={handleChange}
+                onBlur={handleChange}
+            >
+                <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
+                    })
+                ) : (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
+                    })
+                )
+                }
+
+            </Select>
+        </FormControl>)
+}
+const TypeEmpresaInput = (props) => {
+    const [value, setValue] = useState(1);
+    const [empresa, setEmpresa] = useState(1);
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        props.onChange(e) ?? undefined;
+        console.log(e.target.value)
+        setValue(e.target.value);
+    }
+    return (<div>
+        <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={(e) => handleChange(e)} />
+        {value == 2 &&
+        <SelectInput valueLabel={props.valueLabel} json={props.json} value={props.value ?? undefined} helperText={props.helperText ?? ""} key={`input-${15001}`} id={props.column} label={props.label} name={props.column} values={props.values} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={(e) => props.onChange(e) ?? undefined} />
+    }</div>)
+}
+
 class CreateProviders extends Component {
     
     state = {
@@ -130,7 +199,6 @@ class CreateProviders extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
-                    {column: 'teste', component: (<HomeIcon />)},
                     {
                         column: 'providertype_id', label: 'Tipo Fornecedor', type: 'select',
                         json: true, 
@@ -141,22 +209,14 @@ class CreateProviders extends Component {
                         flexBasis
                     },
                     {
-                        column: 'type', label: 'Empresa', type: 'select',
+                        column: 'matriz_id', 
+                        label: 'Matriz', 
+                        type: 'custom',
                         json: true, 
-                        valueLabel: "value",
-                        values: [{id: 1, value: "Matriz"},{id: 0, value: "Filial"}],
-                        validate: {required: true },
-                        //value: "Coordenador de usuários",
-                        flexBasis
-                    },
-                    {
-                        column: 'matriz_id', label: 'Matriz', type: 'select',
-                        json: true,
-                        values: this.state.data,
-                        //validate: {required: true },
-                        //value: "Coordenador de usuários",
-                        flexBasis, style:{width: '220px'}
-                    },
+                        valueLabel: "fantasy_name",
+                        values: this.state.data,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
+                        flexBasis,
+                        component: TypeEmpresaInput},
                     { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '33%', helperText: "o valor digitado é inválido" },
                     { column: 'company_name', label: 'Razão Social', type: 'text', validate: {max: 50, required: true}, flexBasis },
                     { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', validate: {max: 50, required: true}, flexBasis:'33%' },

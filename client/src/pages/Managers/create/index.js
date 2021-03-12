@@ -114,36 +114,10 @@ class CreateManagers extends Component {
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
                     {
-                        column: 'function', label: 'Função', type: 'select',
-                        values: [
-                            "Administração",
-                            "Coordenador de usuários", 
-                            "Coordenador de parceiros", 
-                            "Gerente", 
-                            "Operador de marketing", 
-                            "Vendedor"
-                        ],
+                        column: 'function', label: 'Função', type: 'text',
                         validate: {required: true },
                         flexBasis, style:{width: '220px'}
                     },
-                ]
-            },
-            {
-                id: 'addr',
-                title: 'Endereço',
-                fields: [
-                    {
-                        column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
-                    },
-                    { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
-                    {
-                        column: 'uf', label: 'Estado', type: 'select',
-                        validate: {required: true },
-                        values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        flexBasis, style:{minWidth: "192px"}
-                    },
-                    { column: 'city', label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
                 ]
             },
             {

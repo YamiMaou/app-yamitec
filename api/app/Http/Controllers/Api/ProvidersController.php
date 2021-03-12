@@ -32,7 +32,7 @@ class ProvidersController extends ControllersExtends
             else:
                 $address = $provider->address()->first();
             endif;
-
+            
             if ($contact_clone->contact_clone == true):
                 $contact = Provider::find($provider->matriz_id)->contact()->first();
             else:
@@ -178,17 +178,19 @@ class ProvidersController extends ControllersExtends
         $data = $files->request;
         try {
             $provider = Provider::findOrFail($id);
-
             $provider_data = [
-                "type" => $request->type,
                 "active" => $request->active,
                 "cnpj" => $request->cnpj,
+                "addr_clone" => $request->addr_clone,
+                "contact_clone" => $request->contact_clone,
+                "contract_clone" => $request->contract_clone,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
-                "matriz_id" => $request->matriz_id,
                 "logo" => $request['logo'] == "[object Object]" ? $data['logo'] : $request['logo'],
                 "anexo" => $request['anexo'] == "[object Object]" ? $data['anexo'] : $request['anexo'],
             ];
+            if(isset($provider_data["type"])) $provider_data["type"] = $request->type;
+            if(isset($provider_data["matriz_id"]))$provider_data["matriz_id"] = $request->matriz_id;
 
             $provider->update($provider_data);
 
