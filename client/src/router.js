@@ -38,6 +38,9 @@ import AccountManager from './pages/AccountManager';
 import CreateAccountManager from './pages/AccountManager/create';
 import EditAccountManager from './pages/AccountManager/edit';
 
+
+import Profiles from './pages/Profiles';
+
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
 import { themeStyle } from './components/Layout/Header/style'
@@ -140,6 +143,8 @@ const AppRouter = (props) => {
               <Route path="/contas/novo" exact={true} render={() => (isAuth ? <CreateAccountManager /> : <Redirect push to="/login" />)} />
               <Route path="/contas/:id" exact={true} render={() => (isAuth ? <EditAccountManager /> : <Redirect push to="/login" />)} />
 
+              <Route path="/perfis" exact={true} render={() => (isAuth ? <Profiles /> : <Redirect push to="/login" />)} />
+              
               <Route path="*">
                 <Box>
                   <View> Pagina não encontrada.</View>
