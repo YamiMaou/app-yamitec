@@ -46,7 +46,7 @@ function Sidebar(props) {
 
     return authData.permissions.map((v, k) => {
       //console.log(v);
-      if(k > 5) return ('');
+      if(k > 6) return ('');
       if(v.read === 0) return ('');
       return(
       <MenuItem key={`sidebar-menu-ind-${k}`} >

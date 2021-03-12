@@ -34,6 +34,10 @@ import Bonus from './pages/Bonificacao';
 import CreateBonus from './pages/Bonificacao/create';
 import EditBonus from './pages/Bonificacao/edit';
 
+import AccountManager from './pages/AccountManager';
+import CreateAccountManager from './pages/AccountManager/create';
+import EditAccountManager from './pages/AccountManager/edit';
+
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
 import { themeStyle } from './components/Layout/Header/style'
@@ -131,6 +135,10 @@ const AppRouter = (props) => {
               <Route path="/bonificacao" exact={true} render={() => (isAuth ? <Bonus /> : <Redirect push to="/login" />)} />
               <Route path="/bonificacao/novo" exact={true} render={() => (isAuth ? <CreateBonus /> : <Redirect push to="/login" />)} />
               <Route path="/bonificacao/:id" exact={true} render={() => (isAuth ? <EditBonus /> : <Redirect push to="/login" />)} />
+
+              <Route path="/contas" exact={true} render={() => (isAuth ? <AccountManager /> : <Redirect push to="/login" />)} />
+              <Route path="/contas/novo" exact={true} render={() => (isAuth ? <CreateAccountManager /> : <Redirect push to="/login" />)} />
+              <Route path="/contas/:id" exact={true} render={() => (isAuth ? <EditAccountManager /> : <Redirect push to="/login" />)} />
 
               <Route path="*">
                 <Box>
