@@ -20,7 +20,7 @@ class ManagersController extends ControllersExtends
 
     public function show(Request $request, $id, $with=[])
     {
-       return  parent::show($request, $id, ['user', 'addresses', 'contacts', 'audits']);
+       return  parent::show($request, $id, ['user', 'providers','addresses', 'contacts', 'audits']);
     }
     public function store(Request $resquest)
     {
