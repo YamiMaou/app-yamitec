@@ -271,6 +271,24 @@ class ProvidersController extends ControllersExtends
         }
     }
 
+     // DESVINCULA um responsável à um provider
+     public function removeManageToProvider(Request $request)
+     {
+         try {
+             $provider = Provider::findOrFail($request->provider_id);
+             $manager = Manager::findOrFail($request->manager_id);
+ 
+            if ($provider->managers()->detach($request->manager_id) == true):
+                return response()->json(["success"=> true, "type" => "desvinculate", "message" => "Responsável desvinculado com sucesso!"]);
+            else:
+                return response()->json(["success"=> false, "type" => "desvinculate", "message" => "Não foi possível desvincular responsável!"]);
+            endif;
+
+         } catch(\Exception $error) {
+             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao desvincular responsável. ", "error" => $error->getMessage()], 201);
+         }
+     }
+
     // busca todos os afiliados
     public function allAffiliates($provider_id)
     {
