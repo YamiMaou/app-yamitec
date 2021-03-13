@@ -183,8 +183,8 @@ class AccountManager extends Component {
             { column: 'launch_date_to', label: 'Até', type: 'date' },
             { column: 'cpf', label: 'CPF', type: 'text',  mask: InputCpf,  flexBasis },
             { column: 'cnpj', label: 'CNPJ', type: 'text',  mask: InputCpf,  flexBasis },
-            { column: 'name', label: 'Nome', type: 'text', flexBasis },
             { column: 'status', label: 'Situação', type: 'select', values: ["Todos", "Efetuada", "Dependente"], value: "Todos", flexBasis },
+            { column: 'name', label: 'Nome', type: 'text', flexBasis: '33%' },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 

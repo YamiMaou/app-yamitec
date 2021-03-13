@@ -35,7 +35,7 @@ function Sidebar(props) {
       {url: "/colaboradores", label: 'Colaboradores', icon: <PeopleIcon fontSize="small" />},
       {url: "/clientes", label: 'Clientes', icon: <PeopleIcon fontSize="small" />},
       {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
-      {url: "/fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
+      //{url: "/fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
       {url: "/bonificacao", label: 'Bonificação', icon: <PeopleIcon fontSize="small" />},
       {url: "/contas", label: 'Ger. Contas', icon: <PeopleIcon fontSize="small" />},
       {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
@@ -46,7 +46,7 @@ function Sidebar(props) {
 
     return authData.permissions.map((v, k) => {
       //console.log(v);
-      if(k > 6) return ('');
+      if(k > 4) return ('');
       if(v.read === 0) return ('');
       return(
       <MenuItem key={`sidebar-menu-ind-${k}`} >
