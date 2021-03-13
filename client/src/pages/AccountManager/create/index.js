@@ -127,15 +127,15 @@ class CreateAccountManager extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'launch_date', label: 'Data', type: 'date', validate: {required: true}, flexBasis, style:{maxWidth: '210px'} },
-                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 14, number: true, required: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {number: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {number: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'status', label: 'Situação', type: 'select', 
+                    /*{ column: 'status', label: 'Situação', type: 'select', 
                         json: true, 
                         valueLabel: "value",
                         values: [{id: 1, value: "Efetuada"},{id: 2, value: "Dependente"}], 
                         validate: {required: true}, flexBasis, style:{maxWidth: '210px'} 
-                    },
+                    },*/
                     { column: 'bill_type', label: 'Tipo', type: 'select', 
                         json: true, 
                         valueLabel: "value",

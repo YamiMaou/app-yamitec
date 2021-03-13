@@ -16,6 +16,8 @@ class Provider extends Model
         'fantasy_name',
         'matriz_id',
         'addr_clone',
+        'anexo',
+        'logo',
         'contact_clone',
         'contract_clone',
         'providertype_id',

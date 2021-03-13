@@ -166,7 +166,7 @@ class LDataGrid extends Component {
         page: 1,
         filter: 'flex',
         loading: true,
-        firstLoad: true
+        firstLoad: this.props.autoload ?? true
     }
     async setPage(params = { page: 1 }) {
         this.setState({ ...this.state, loading: true })
@@ -191,7 +191,7 @@ class LDataGrid extends Component {
     async componentDidMount() {
         //this.setPage();
         let filters = {};
-        this.props.filterInputs.map(input => { 
+        !this.props.filterInputs ?? this.props.filterInputs.map(input => { 
             filters[input.column] = input.value ?? "";
         });
 
@@ -251,7 +251,8 @@ class LDataGrid extends Component {
         const columns: ColDef[] = this.props.columns;
         return (
             <div>
-                <Card className={classes.root} style={{ marginBottom: 15 }}>
+                {this.props.filterInputs == undefined ? ('') : 
+                (<Card className={classes.root} style={{ marginBottom: 15 }}>
                     <CardContent>
                         <Typography onClick={() => {
                             this.setState({ ...this.state, filter: this.state.filter == 'none' ? 'flex' : 'none' })
@@ -260,9 +261,9 @@ class LDataGrid extends Component {
                     </Typography>
 
                         <div id="filter-form" style={{
-                            alignItems: 'center',
+                            alignItems: 'start',
                             flexFlow: 'row wrap',
-                            justifyContent: 'space-around',
+                            justifyContent: 'space-between',
                             display: this.state.filter,
                         }}>
                             {
@@ -296,7 +297,7 @@ class LDataGrid extends Component {
                                     } else if (input.type == "date") {
                                         return <DateInput id={input.column} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />)
+                                        return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }
@@ -306,7 +307,7 @@ class LDataGrid extends Component {
                             </div>
                         </div>
                     </CardContent>
-                </Card>
+                </Card>)}
 
                 <Card>
                     <CardContent>

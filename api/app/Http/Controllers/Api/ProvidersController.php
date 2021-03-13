@@ -174,8 +174,9 @@ class ProvidersController extends ControllersExtends
             return parent::update($validate, $id);
         }
         $files = new \App\Http\Controllers\FilesController();
-        $files = $files->multUpload($request, 'providers');
-        $data = $files->request;
+        $files = $files->multUpload($request, 'provider');
+        $data = $files->data;
+        print_r($files);
         try {
             $provider = Provider::findOrFail($id);
             $provider_data = [
@@ -186,8 +187,8 @@ class ProvidersController extends ControllersExtends
                 "contract_clone" => $request->contract_clone,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
-                "logo" => $request['logo'] == "[object Object]" ? $data['logo'] : $request['logo'],
-                "anexo" => $request['anexo'] == "[object Object]" ? $data['anexo'] : $request['anexo'],
+                "logo" => $request['logo'] == "[object File]" ? $data['file_logo'] : $request['logo'],
+                "anexo" => $request['anexo'] == "[object File]" ? $data['file_anexo'] : $request['anexo'],
             ];
             if(isset($provider_data["type"])) $provider_data["type"] = $request->type;
             if(isset($provider_data["matriz_id"]))$provider_data["matriz_id"] = $request->matriz_id;

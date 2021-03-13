@@ -29,7 +29,7 @@ import CardContent from '@material-ui/core/CardContent';
 
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { putApiManagers, getApiManagers, putApiProviders, getApiProviders } from '../../../providers/api'
+import { putApiManagers, getApiManagers, deleteApiManagersProviders, putApiProviders, getApiProviders } from '../../../providers/api'
 import { validaEmail, validaCpf, stringToaddDate } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone, stringCnpj } from '../../../providers/masks'
@@ -289,7 +289,7 @@ class EditContributors extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        await putApiProviders(`manager/${this.state.provider}/${this.props.match.params.id}/delete`)
+                                        await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
                                         const data = await getApiManagers({}, this.props.match.params.id);
                                         this.setState({ ...this.state, provManagers: data.providers });
                                     } catch (err) {
