@@ -28,6 +28,9 @@ class CreateClientsTable extends Migration
             $table->foreign('provider_id')->references('id')->on('providers')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->unsignedBigInteger('audit_id')->nullable();
+            $table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

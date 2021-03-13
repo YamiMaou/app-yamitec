@@ -16,9 +16,30 @@ class Audit extends Model
         'from', 
         'to'
     ];
-    //
+    
+
     public function user()
     {
         return $this->hasOne(\App\User::class,'id', 'user_id')->latest();
+    }
+
+    public function provider()
+    {
+        return $this->hasOne(Provider::class)->latest();
+    }
+
+    public function client()
+    {
+        return $this->hasOne(Client::class)->latest();
+    }
+
+    public function manager()
+    {
+        return $this->hasOne(Manager::class)->latest();
+    }
+
+    public function contributor()
+    {
+        return $this->hasOne(Contributor::class)->latest();
     }
 }
