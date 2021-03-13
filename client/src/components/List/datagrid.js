@@ -261,9 +261,9 @@ class LDataGrid extends Component {
                     </Typography>
 
                         <div id="filter-form" style={{
-                            alignItems: 'center',
+                            alignItems: 'start',
                             flexFlow: 'row wrap',
-                            justifyContent: 'space-around',
+                            justifyContent: 'space-between',
                             display: this.state.filter,
                         }}>
                             {
@@ -297,7 +297,7 @@ class LDataGrid extends Component {
                                     } else if (input.type == "date") {
                                         return <DateInput id={input.column} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />)
+                                        return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }

@@ -130,12 +130,12 @@ class CreateAccountManager extends Component {
                     { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {number: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {number: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'status', label: 'Situação', type: 'select', 
+                    /*{ column: 'status', label: 'Situação', type: 'select', 
                         json: true, 
                         valueLabel: "value",
                         values: [{id: 1, value: "Efetuada"},{id: 2, value: "Dependente"}], 
                         validate: {required: true}, flexBasis, style:{maxWidth: '210px'} 
-                    },
+                    },*/
                     { column: 'bill_type', label: 'Tipo', type: 'select', 
                         json: true, 
                         valueLabel: "value",

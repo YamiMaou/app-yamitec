@@ -112,25 +112,31 @@ class AccountManager extends Component {
     render() {
         const rows : RowsProp = this.state.data.data ?? [];
         const columns: ColDef[] = [
-            { field: 'launch_date', headerName: 'Lançamento', flex: 0.7,
+            { field: 'launch_date', headerName: 'Data', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return stringToDate(params.value, 'DD/MM/YYYY');
                 }
             },
-            { field: 'cpf', headerName: 'CPF', flex: 1,
+            { field: 'cpf', headerName: 'CPF/Cnpj', flex: 1,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return stringCpf(params.value);
-                }
-            },
-            { field: 'cnpj', headerName: 'CNPJ', flex: 1,
-                valueFormatter: (params: ValueFormatterParams) => {
-                    return stringCnpj(params.value);
+                    if(params.row.cpf.length > 0 && params.row.cnpj.length > 0){
+                        return stringCpf(params.row.cpf) + ' | ' + stringCnpj(params.row.cnpj);
+                    }else if(params.row.cpf.length > 0){
+                        return stringCpf(params.row.cpf);
+                    }else if(params.row.cnpj.length > 0){
+                        return stringCnpj(params.row.cnpj);
+                    }
                 }
             },
             { field: 'name', headerName: 'Nome',flex: 0.7 },
-            { field: 'bill_type', headerName: 'Tipo',flex: 0.5,
+            { field: 'bill_type', headerName: 'Lançamento',flex: 0.5,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return params.value === 1 ? "Receita" : "Despesas";
+                }
+            },
+            { field: 'amount', headerName: 'Valor',flex: 0.5,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return 'R$ '+params.value.replace('.', ',');
                 }
             },
             {
@@ -138,7 +144,7 @@ class AccountManager extends Component {
                 headerName: 'Situação',
                 flex: 0.5,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return params.value === 1 ? "Efetuada" : "Dependente";
+                    return params.value === 1 ? "Pago" : "A Pagar";
                 }
             },{
                 field: 'id',
@@ -183,8 +189,8 @@ class AccountManager extends Component {
             { column: 'launch_date_to', label: 'Até', type: 'date' },
             { column: 'cpf', label: 'CPF', type: 'text',  mask: InputCpf,  flexBasis },
             { column: 'cnpj', label: 'CNPJ', type: 'text',  mask: InputCpf,  flexBasis },
-            { column: 'status', label: 'Situação', type: 'select', values: ["Todos", "Efetuada", "Dependente"], value: "Todos", flexBasis },
-            { column: 'name', label: 'Nome', type: 'text', flexBasis: '33%' },
+            { column: 'status', label: 'Situação', type: 'select', values: ["Todos", "Efetuada", "Dependente"], value: "Todos", grow: 2  },
+            { column: 'name', label: 'Nome', type: 'text'},
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 
