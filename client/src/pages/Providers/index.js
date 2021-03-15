@@ -29,6 +29,7 @@ import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
+import { stringToDate } from '../../providers/commonMethods';
 
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
@@ -114,8 +115,20 @@ class Providers extends Component {
                 }
             },
             { field: 'company_name', headerName: 'Razão Social',flex: 2 },
-            { field: 'created_at', headerName: 'Data de Adesão', flex: 1 },
-            { field: 'type', headerName: 'Tipo', flex: 1 },
+            { 
+                field: 'created_at', 
+                headerName: 'Data de Adesão', 
+                flex: 1,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return stringToDate(params.value, 'DD/MM/YYYY')
+                } 
+            },
+            { 
+                field: 'type', headerName: 'Tipo', flex: 1,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return params.value === 1 ? "Matriz" : "Filial"
+                } 
+            },
             {
                 field: 'active',
                 headerName: 'Situação',
@@ -159,11 +172,8 @@ class Providers extends Component {
         ];
         const flexBasis = '25%';
         const filter = [
-            { column: 'cnpj', label: 'CNPJ', type: 'text', 
-            mask: InputCnpj, 
-            flexBasis },
+            { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj,  flexBasis },
             { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis },
-            { column: 'created_at', label: 'Adesão', type: 'date' },
             {
                 column: 'type', label: 'Tipo', type: 'select',
                 values: [
@@ -175,6 +185,8 @@ class Providers extends Component {
                 flexBasis
             },
             { column: 'active', label: 'Situação', type: 'select', values: ["Todos", "Ativo", "Inativo"], value: "Todos", flexBasis },
+            { column: 'created_at', label: 'Periodo de Adesão', type: 'date' },
+            { column: 'created_at_to', label: ' até', type: 'date' },
             
         ]
 

@@ -36,7 +36,7 @@ class ContributorsController extends ControllersExtends
             return parent::update($validate, $id);
         }
         $files = new \App\Http\Controllers\FilesController();
-        $files = $files->multUpload($request, 'contributor');
+        $files = $files->multUpload($request, 'contributor', $id);
         $data = $files->request;
         $contributors = [
             //"user_id" => $request->user()->id,

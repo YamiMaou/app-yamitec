@@ -112,7 +112,7 @@ class EditContributors extends Component {
 
                         if (v1.validateHandler !== undefined) {
                             if (v1.validateHandler(value) == false)
-                                campo = { id: v1.column, message: `O Campo ${v1.label} não possui é inválido ` }
+                                campo = { id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                         }
                     }
                 })

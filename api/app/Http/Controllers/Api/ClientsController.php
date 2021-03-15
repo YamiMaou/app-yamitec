@@ -139,7 +139,7 @@ class ClientsController extends ControllersExtends
     
             $contact->update($data_contact);
             parent::saveLog($id, $resquest, 'client');
-            return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
+            return response()->json(["success"=> true, "type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
         }

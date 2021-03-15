@@ -68,7 +68,7 @@ class ManagersController extends ControllersExtends
     
             Contact::create($data_contact);
 
-            return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
+            return response()->json(["success"=> true, "type" => "show", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
@@ -113,11 +113,11 @@ class ManagersController extends ControllersExtends
                 'manager_id' => $manager->id,
             ];
 
-            $contact = Contact::where('client_id', $manager->id);
+            $contact = Contact::where('manager_id', $manager->id);
     
             $contact->update($data_contact);
             parent::saveLog($id, $resquest, 'manager');
-            return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
+            return response()->json(["success"=> true, "type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
         }

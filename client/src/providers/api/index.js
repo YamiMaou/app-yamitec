@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   apiHost = hostname;
 }
-apiHost = hostname;
+//apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({
@@ -174,12 +174,12 @@ export const postApiContributors = async (params = {}) => {
 /// update contributors
 export const putApiContributors = async (id,params = {}) => {
   localStorage.setItem("sessionTime", 900)
-  params.justification = params.justification  ?? " ";
   const data = new FormData();
   data.append("_method", "put");
+  data.append("justification",params.justification  ?? " ")
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
       //`${key}=${encodeURIComponent(val)}`
     });
     //.join('&');
@@ -284,12 +284,11 @@ export const putApiProviders = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
       //`${key}=${encodeURIComponent(val)}`
     });
     //.join('&');
-    
-  const options = {
+ const options = {
     method: 'POST',
     //mode: 'cors', // pode ser cors ou basic(default)
     headers: {
@@ -363,7 +362,7 @@ export const putApiClients = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
     });
     
   const options = {
@@ -441,7 +440,7 @@ export const putApiManagers = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
     });
     
   const options = {
@@ -547,7 +546,7 @@ export const putApiBonus = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
     });
     
   const options = {
@@ -626,7 +625,7 @@ export const putApiAccountmanager = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
     });
     
   const options = {
@@ -656,7 +655,7 @@ export const putApiProfiles = async (id,params = {}) => {
   data.append("_method", "put");
   Object.entries(params)
     .map(([key, val]) => {
-      data.append(key, `${val}`);
+      data.append(key, (typeof string == "string") ? `${val}` : val);
     });
     
   const options = {
