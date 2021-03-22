@@ -23,6 +23,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     private $isApi = true;
     private $with = [];
     private $validate = [];
+    private $storeId = 0;
 
     public function __construct($model = null, $template = null, $isApi = true)
     {
@@ -129,9 +130,11 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 unset($data["file"]);
                 unset($data["_token"]);
                 unset($data["_method"]);
-                $this->model->create($data);
+                $this->storeId = $this->model->create($data);
                 //FilesController::upload($request, $this->model, $obj->id);
             }
+
+            $this->saveLog($this->storeId, $request, $modelName);
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch (Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);

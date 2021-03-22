@@ -76,6 +76,7 @@ class ClientsController extends ControllersExtends
     
             Contact::create($data_address);
 
+            parent::saveLog($client->id, $resquest, 'client');
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
