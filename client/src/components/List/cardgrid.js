@@ -126,10 +126,16 @@ const SelectInput = (props) => {
                 onChange={handleChange}
                 onBlur={handleChange}
             >
-                {
-                    props.values.map(val => {
-                        return <MenuItem value={val}>{val}</MenuItem>
+                <MenuItem key={`input-00-1`} value="Todos">Todos</MenuItem>
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
                     })
+                ) : (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
+                    })
+                )
                 }
 
             </Select>
@@ -288,7 +294,7 @@ class LCardGrid extends Component {
                                     } else if (input.type == "date") {
                                         return <DateInput label={input.label}  id={input.column} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onChange={onChangeInputs}  onBlur={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} />)
+                                        return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }

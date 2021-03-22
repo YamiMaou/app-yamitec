@@ -64,7 +64,7 @@ class Provider extends Model
 
     public function filials()
     {
-        return $this->hasMany(Provider::class, 'matriz_id', 'id');
+        return $this->hasMany(Provider::class, 'matriz_id', 'id')->with(['contact', 'address']);
     }
 
     public function allfilials()

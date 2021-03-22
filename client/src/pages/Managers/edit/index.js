@@ -289,9 +289,15 @@ class EditContributors extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
-                                        const data = await getApiManagers({}, this.props.match.params.id);
-                                        this.setState({ ...this.state, provManagers: data.providers });
+                                        if(this.state.provManagers.length > 1){
+                                            await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
+                                            const data = await getApiManagers({}, this.props.match.params.id);
+                                            this.setState({ ...this.state, provManagers: data.providers });
+                                        }else{
+                                            this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
+                                        }
+
+                                        
                                     } catch (err) {
                                         console.log(err)
                                     };

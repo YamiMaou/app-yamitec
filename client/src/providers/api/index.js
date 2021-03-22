@@ -648,7 +648,7 @@ export const putApiAccountmanager = async (id,params = {}) => {
 }
 
 /// update accountmanagers
-export const putApiProfiles = async (id,params = {}) => {
+export const putApiPermissions = async (id,params = {}) => {
   localStorage.setItem("sessionTime", 900)
   params.justification = params.justification  ?? " ";
   const data = new FormData();
@@ -666,7 +666,7 @@ export const putApiProfiles = async (id,params = {}) => {
       'Authorization': 'Bearer ' + token
     },
     data,
-    url: apiHost +  `/accountmanager/${id}`,
+    url: apiHost +  `/permissions/${id}`,
   };
   try{
     const response = await axios(options);  // wrap in async function

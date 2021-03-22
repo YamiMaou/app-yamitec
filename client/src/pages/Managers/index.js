@@ -22,7 +22,7 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiManagers, putApiManagers } from '../../providers/api'
+import { getApiManagers,getApiProviders, putApiManagers } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
@@ -95,13 +95,16 @@ class Managers extends Component {
     state = {
         session: JSON.parse(localStorage.getItem("user")),
         managers: [],
+        providers:[],
         pageRequest: {},
         blockDialog: {open: false, id: undefined,active: 0, handle: undefined},
        
     }
     
-    componentDidMount() {
+    async componentDidMount() {
         const session = JSON.parse(localStorage.getItem("user"));
+        const providers = await getApiProviders();
+        this.setState({...this.state, providers: providers.data})
         if(session == null){
             window.location.href = '/login';
             return;
@@ -169,16 +172,10 @@ class Managers extends Component {
             flexBasis },
             { column: 'name', label: 'Nome', type: 'text', flexBasis },
             {
-                column: 'function', label: 'Função', type: 'select',
-                values: [
-                    "Todos",
-                    "Administração",
-                    "Coordenador de usuários", 
-                    "Coordenador de parceiros", 
-                    "Gerente", 
-                    "Operador de marketing", 
-                    "Vendedor"
-                ],
+                column: 'provider_id', label: 'Farmácia/Grupo', type: 'select',
+                json: true,
+                valueLabel: 'fantasy_name',
+                values: this.state.providers ?? [],
                 value: "Todos",
                 flexBasis
             },

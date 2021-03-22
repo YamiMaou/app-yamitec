@@ -30,7 +30,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { setSnackbar } from '../../../actions/appActions'
 import { putApiProviders, getApiManagers, deleteApiManagersProviders,getAddressByCepla, getApiProviders, getApiProviderTypes } from '../../../providers/api'
 import { validaEmail, validaCnpj, stringToaddDate } from '../../../providers/commonMethods'
-import { InputCep, InputCnpj, InputPhone, stringCpf } from '../../../providers/masks'
+import { InputCep, InputCnpj, InputPhone, stringCpf, stringCnpj } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 import { withSnackbar } from 'notistack';
 import { DataGrid } from '@material-ui/data-grid';
@@ -194,7 +194,7 @@ class EditProviders extends Component {
             data, 
             providers: providers.data, 
             provManagers: data.managers, 
-            provProviders: data.filialls,
+            provProviders: data.filials,
             managers: managers.data, 
             providertypes: providertypes.data 
         });
@@ -420,9 +420,14 @@ class EditProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try{
-                                        await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
-                                        const data = await getApiProviders({}, this.props.match.params.id);
-                                        this.setState({...this.state, provManagers: data.managers});
+                                        if(this.state.provManagers.length > 1){
+                                            await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
+                                            const data = await getApiProviders({}, this.props.match.params.id);
+                                            this.setState({...this.state, provManagers: data.managers});
+                                        }else{
+                                            this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
+                                        }
+                                       
                                     }catch(err){
                                         console.log(err)
                                     };
@@ -464,7 +469,13 @@ class EditProviders extends Component {
                     return params.row.contact ? params.row.contact.email : '';
                 }
             },
-            { field: 'function', headerName: 'Função', flex: 0.7 }, 
+            { field: 'function', headerName: 'Função', flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
+                    //console.log(provider)
+                    return 'Administração';
+                }
+             }, 
             {
                 field: 'id',
                 headerName: 'Ações',
@@ -479,9 +490,14 @@ class EditProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        //await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
-                                        const data = await getApiManagers({}, this.props.match.params.id);
-                                        this.setState({ ...this.state, provProviders: data.providers });
+                                        if(this.state.provProviders.length > 1){
+                                            await putApiProviders(params.row.id,{matriz_id: null,type: 1})
+                                            //await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
+                                            const data = await getApiProviders({}, this.props.match.params.id);
+                                            this.setState({ ...this.state, provProviders: data.filials });
+                                        }else{
+                                            this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
+                                        }
                                     } catch (err) {
                                         console.log(err)
                                     };
@@ -526,7 +542,7 @@ class EditProviders extends Component {
                                             json={true} 
                                             valueLabel={'name'}
                                             key={`input-${15019}`} id={"manager"} label={"Responsável"} name={"manager"} 
-                                            values={this.state.providers} 
+                                            values={this.state.managers} 
                                             style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                             onChange={(e) => {
                                                 this.setState({...this.state, manager: e.target.value});
@@ -583,9 +599,9 @@ class EditProviders extends Component {
                                                 this.setState({...this.state, provider: e.target.value});
                                             }} />
                                             <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
-                                                await putApiProviders(`manager/${this.state.provider}/${this.props.match.params.id}`)
-                                                const data = await getApiManagers({}, this.props.match.params.id);
-                                                this.setState({...this.state, provManagers: data.providers });
+                                                await putApiProviders(this.state.provider,{matriz_id: this.state.data.matriz_id > 0 ? this.state.data.matriz_id : this.props.match.params.id})
+                                                const data = await getApiProviders({}, this.props.match.params.id);
+                                                this.setState({...this.state, provManagers: data.filials });
                                             }}><AddIcon /></Button>
                                         </div>
                                     <div style={{

@@ -119,7 +119,7 @@ const DateInput = (props) => {
 //
 
 const SelectInput = (props) => {
-    const [value, setValue] = useState(props.values[0]);
+    const [value, setValue] = useState(props.value ?? props.values[0]);
     function handleChange(e) {
         props.onBlur(e)
         setValue(e.target.value);
@@ -131,14 +131,20 @@ const SelectInput = (props) => {
                 labelId={props.id}
                 id={props.id}
                 name={props.name}
-                value={props.value}
+                value={value}
                 onChange={handleChange}
                 onBlur={handleChange}
             >
-                {
-                    props.values.map(val => {
-                        return <MenuItem value={val}>{val}</MenuItem>
+                <MenuItem key={`input-00-1`} value="Todos">Todos</MenuItem>
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
                     })
+                ) : (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
+                    })
+                )
                 }
 
             </Select>
@@ -172,16 +178,18 @@ class LDataGrid extends Component {
     async setPage(params = { page: 1 }) {
         this.setState({ ...this.state, loading: true })
         let cleanfilters = {};
+        console.log(this.state.filters);
         Object.entries(this.state.filters).map((item) => {
-            if(item[1].length >= 1 ) {
+            if(`${item[1]}`.length >= 1) {
                 if(item[1] !== "Todos"){
                     cleanfilters[item[0]] = item[1];
                     console.log(item);
                 }
+            }else{
+                console.log(item[0]+" tamanho "+`${item[1]}`.length);
             }
         });
-
-        let query = Object.assign({queryType : 'like', withId: "name", page: params.page}, cleanfilters);
+        let query = Object.assign({queryType : 'like', withId: "name", page: params.page ?? 1}, cleanfilters);
         console.log(query);
         const data = await this.props.pageRequest(query);
         if (data !== undefined) {
@@ -298,7 +306,7 @@ class LDataGrid extends Component {
                                     } else if (input.type == "date") {
                                         return <DateInput id={input.column} value={this.state.filters[input.column] ?? ""} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
+                                        return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }

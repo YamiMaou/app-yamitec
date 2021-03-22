@@ -29,11 +29,11 @@ class ContributorsController extends ControllersExtends
 
     public function update(Req $request, $id)
     {
-        $validate = $request;
-        if(!isset($validate->cpf)){
+        //$validate = $request;
+        if(!isset($request->cpf)){
             //print_r($validate->all());
             //$validate["user_id"] = $request->user()->id;
-            return parent::update($validate, $id);
+            return parent::update($request, $id);
         }
         $files = new \App\Http\Controllers\FilesController();
         $files = $files->multUpload($request, 'contributor', $id);
@@ -73,7 +73,7 @@ class ContributorsController extends ControllersExtends
         ],
         ["permiss" => true, "key" => "contributors_id"]);
 
-        return parent::update($validate, $id);
+        return parent::update($request, $id);
     }   
 
     public function store(Req $request){
