@@ -18,7 +18,8 @@ class Contributor extends Model
         'contact',
         'anexo',
         'birthdate',
-        'justify'
+        'justify',
+        'audit_id'
     ];
 
     public function addresses()
@@ -43,6 +44,11 @@ class Contributor extends Model
     public function audits()
     {
         return $this->hasOne(Audit::class,'contributor_id','id')->with(['user'])->latest();
+    }
+    // verificar análoga acima
+    public function audit()
+    {
+        return $this->belongsTo(Audit::class)->latest();
     }
 
 }

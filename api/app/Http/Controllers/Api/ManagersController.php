@@ -66,7 +66,9 @@ class ManagersController extends ControllersExtends
                 'manager_id' => $manager->id,
             ];
     
-            Contact::create($data_contact);
+            $id = Contact::create($data_contact);
+
+            parent::saveLog($id, $resquest, 'manager');
 
             return response()->json(["success"=> true, "type" => "show", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {

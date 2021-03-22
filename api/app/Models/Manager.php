@@ -14,7 +14,8 @@ class Manager extends Model
         'cpf',
         'name',
         'function',
-        'user_id'
+        'user_id',
+        'audit_id'
     ];
 
     public function providers()
@@ -45,5 +46,10 @@ class Manager extends Model
     public function audits()
     {
         return $this->hasOne(Audit::class,'manager_id','id')->with(['user'])->latest();
+    }
+    // veficar análoga acima
+    public function audit()
+    {
+        return $this->belongsTo(Audit::class)->latest();
     }
 }

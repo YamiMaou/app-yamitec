@@ -15,7 +15,8 @@ class Client extends Model
         'birth_date',
         'active',
         'note',
-        'user_id'
+        'user_id',
+        'audit_id'
     ];
 
     public function providers()
@@ -46,6 +47,11 @@ class Client extends Model
     public function audits()
     {
         return $this->hasOne(Audit::class,'client_id','id')->with(['user'])->latest();
+    }
+    // verificar análoga acima
+    public function audit()
+    {
+        return $this->belongsTo(Audit::class)->latest();
     }
 
 }

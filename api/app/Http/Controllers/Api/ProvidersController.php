@@ -199,6 +199,8 @@ public function index(Request $request)
                 Contract::create($contract_data);
             endif;
 
+            parent::saveLog($provider->id, $request, 'providers');
+
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);

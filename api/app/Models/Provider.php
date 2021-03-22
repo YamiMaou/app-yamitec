@@ -20,7 +20,8 @@ class Provider extends Model
         'logo',
         'contact_clone',
         'contract_clone',
-        'providertype_id'
+        'providertype_id',
+        'audit_id'
     ];
     public function audits()
     {
@@ -104,6 +105,11 @@ class Provider extends Model
     public function providertype()
     {
         return $this->belongsTo(Providertype::class);
+    }
+    // verificar análoga acima
+    public function audit()
+    {
+        return $this->belongsTo(Audit::class)->latest();
     }
 
 }
