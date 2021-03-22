@@ -111,8 +111,8 @@ class CreateAccountManager extends Component {
                             campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                         }
                         if(v1.validateHandler !== undefined){
-                            if (v1.validateHandler(value) == false)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label}  é inválido ` }
+                            //if (v1.validateHandler(value) == false)
+                                    //campo = {id: v1.column, message: `O Campo ${v1.label}  é inválido ` }
                         }
                     })
                 })
@@ -127,7 +127,7 @@ class CreateAccountManager extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'launch_date', label: 'Data', type: 'date', validate: {required: true}, flexBasis, style:{maxWidth: '210px'} },
-                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {number: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {number: true}, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {number: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
                     /*{ column: 'status', label: 'Situação', type: 'select', 

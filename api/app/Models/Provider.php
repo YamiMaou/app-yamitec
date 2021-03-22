@@ -25,7 +25,7 @@ class Provider extends Model
     ];
     public function audits()
     {
-        return $this->hasOne(Audit::class,'providers_id','id')->with(['user'])->latest();
+        return $this->hasOne(Audit::class,'provider_id','id')->with(['user'])->latest();
     }
 
     public function providerFiles()
@@ -80,16 +80,16 @@ class Provider extends Model
 
     public function files()
     {
-        return $this->hasMany(Files::class);
+        return $this->hasMany(File::class);
     }
 
-    public function logo()
+    public function file_logo()
     {
-        return $this->hasMany(Files::class,'id', 'logo')->latest();
+        return $this->hasOne(File::class,'id', 'logo')->latest();
     }
-    public function anexo()
+    public function file_anexo()
     {
-        return $this->hasOne(Files::class,'id', 'anexo')->latest();
+        return $this->hasOne(File::class,'id', 'anexo')->latest();
     }
 
     public function address()

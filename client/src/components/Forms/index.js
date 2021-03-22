@@ -139,6 +139,7 @@ const FileInput = (props) => {
 
         props.onChange({ target: { id, value: e.target.files[0], type: 'file' } })
         setValue(e.target.value);
+        setFile(e.target.file);
     }
     return (
         <FormControl style={props.style}>
@@ -410,8 +411,6 @@ class LForms extends Component {
                     //let request = await params.handle(value)
                     //value = request[id] ?? '';
                 }
-
-
                 if (params.json === undefined) {
                     inputValues[id] = value
                 } else {

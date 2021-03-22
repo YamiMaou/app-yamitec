@@ -325,7 +325,7 @@ class EditContributors extends Component {
                             <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
                                     <Typography>
-                                        <IndeterminateCheckBoxIcon /> Responsáveis
+                                        <IndeterminateCheckBoxIcon /> Fornecedores
                                     </Typography>
                                     <div  style={{
                                             alignItems: 'center',

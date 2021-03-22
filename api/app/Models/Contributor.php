@@ -24,12 +24,12 @@ class Contributor extends Model
 
     public function addresses()
     {
-        return $this->hasOne(Address::class,'contributor_id');
+        return $this->hasOne(Address::class,'contributors_id');
     }
 
     public function contacts()
     {
-        return $this->hasOne(Contact::class,'contributor_id');
+        return $this->hasOne(Contact::class,'contributors_id');
     }
     public function user()
     {

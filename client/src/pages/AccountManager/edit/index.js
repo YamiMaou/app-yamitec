@@ -114,8 +114,8 @@ class EditContributors extends Component {
                         }
 
                         if (v1.validateHandler !== undefined) {
-                            if (v1.validateHandler(value) == false)
-                                campo = { id: v1.column, message: `O Campo ${v1.label} não possui é inválido ` }
+                            //if (v1.validateHandler(value) == false)
+                                //campo = { id: v1.column, message: `O Campo ${v1.label} não possui é inválido ` }
                         }
                     }
                 })
@@ -131,8 +131,8 @@ class EditContributors extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'launch_date', label: 'Data', type: 'date', value: this.state.data['launch_date'], validate: {required: true}, flexBasis, style:{maxWidth: '210px'} },
-                    { column: 'cpf', label: 'CPF', type: 'text', value: this.state.data['cpf'], mask: InputCpf, validate: {min: 11, number: true, required: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: {min: 14, number: true, required: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    { column: 'cpf', label: 'CPF', type: 'text', value: this.state.data['cpf'], mask: InputCpf, validate: {number: true},validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: {number: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
                     { column: 'name', label: 'Nome', type: 'text', value: this.state.data['name'], validate: {max: 50, required: true}, flexBasis },
                     { column: 'status', label: 'Situação', type: 'select', 
                         json: true, 

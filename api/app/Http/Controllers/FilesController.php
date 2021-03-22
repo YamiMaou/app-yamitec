@@ -69,6 +69,7 @@ class FilesController extends Controller
         try {
             $lrequest = [];
             foreach ($request->all() as $k => $v) {
+                $lrequest[$k] = $v;
                 if ($request->hasFile($k)) {
                     $fileName = time() . '.' . $request->file($k)->extension();
 
@@ -80,21 +81,33 @@ class FilesController extends Controller
                         $request['path'] = $path;
                         $request['name'] = $fileName;
                         $create = $this->file->create($request->all());
-                        $lrequest['file_'.$k] = $create->id;
+                        $lrequest[$k] = $create->id;
                         unset($request[$foreign]);
                         unset($request['path']);
                         unset($request['name']);
                         
                     continue;
-                }else{
-                    $lrequest[$k] = $v;
                 }
             }
             //print_r($lrequest);
-            return (Object) ["type" => "upload", "message" => "Arquivos Armazenados com sucesso!", "request" => $lrequest, "data" => $lrequest ];
+            return (Object) ["type" => "upload", "message" => "Arquivos Armazenados com sucesso!", "request" => $lrequest ];
         } catch (\Exception $error) {
             return (Object) ["type" => "error", "request" => [], "message" => "Problema ao armazenar arquivos. ", "error" => $error->getMessage()];
         }
+    }
+
+    public function uploadSingle($request, $field){
+            $fileName = time() . '.' . $request->file($field)->extension();
+
+            $path = $request->file($field)->storeAs("uploads", $fileName);
+            $fileDataStore = [
+                'path' => $path,
+                'name' => $fileName
+            ];
+                $create = $this->file->create($fileDataStore);
+                unset($request['path']);
+                unset($request['name']);
+                return $create->id;
     }
 
     public function download(Request $request)

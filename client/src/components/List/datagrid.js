@@ -77,8 +77,8 @@ const DateInput = (props) => {
     const [value, setValue] = useState(props.value);
     const [error, setError] = useState(false);
     function handleChange(e) {
-        setValue(e.target.value);
-        console.log(e.target.value)
+        console.log(value)
+        setValue(e.target.value)
         try {
             //let e = { target: { id: props.id, value: `${selectvalue.toJSON().split('T')[0]}` } }
             if (props.validate !== undefined) {
@@ -102,8 +102,9 @@ const DateInput = (props) => {
                 style={{width: '100%'}} 
                 id={props.id}
                 label={props.label ?? 'Data'}
+                value={value}
                 type="date"
-                defaultValue={value}
+                //defaultValue={value}
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={error}
@@ -243,7 +244,7 @@ class LDataGrid extends Component {
             this.props.filterInputs.map(input => { 
                 filters[input.column] = input.value ?? "";
             });
-
+            
             this.setState({...this.state, filters});
         }
         const rows: RowsProp = this.state.data.data ?? [];
@@ -295,7 +296,7 @@ class LDataGrid extends Component {
                                                 </FormControl>)
 
                                     } else if (input.type == "date") {
-                                        return <DateInput id={input.column} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
+                                        return <DateInput id={input.column} value={this.state.filters[input.column] ?? ""} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
                                     } else if (input.type == "select") {
                                         return (<SelectInput id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }

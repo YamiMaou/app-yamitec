@@ -14,15 +14,53 @@ use Illuminate\Support\Facades\DB;
 
 class ProvidersController extends ControllersExtends
 {
+    private $model;
     public function __construct()
     {
+        $this->model = new \App\Models\Provider();
         parent::__construct(Provider::class, 'home');
     }
 
+public function index(Request $request)
+    {
+        $params = $request->all();
+        unset($params['queryType']);
+        unset($params['withId']);
+        unset($params['page']);
+        unset($params['pageSize']);
+        $data = $this->model->paginate($request->pageSize)->withQueryString();
+        if(count($params) > 0){
+            $launch_from = $params['created_at'] ?? '';
+            $launch_to = $params['created_at_to'] ?? '';
+            unset($params['created_at']);
+            unset($params['created_at_to']);
+            $data = $this->model->where(function($query) use($launch_from, $launch_to){
+                if(strlen($launch_from) > 8){
+                    $query->where('created_at','>=', $launch_from);
+                }
+                if(strlen($launch_to) > 8){
+                    $query->where('created_at','<=', $launch_to);
+                }
+            })->where(function($query) use($params, $request){
+                foreach($params as $k=>$v){
+                    if($request->queryType == "like"){
+                        $query->where($k,'like', '%'.$v.'%');
+                        if($k == $request->withId){
+                            $query->orWhere('id','like', '%'.$v.'%');
+                        }
+                    }else{
+                        $query->where($k,'=', $v);
+                    }
+                }
+            })->paginate(10);
+            //echo $data->toSql();
+        }
+        return $data;
+    }
     public function show(Request $Request, $provider_id, $with=[])
     {
         try {
-            $provider = Provider::with(['audits','managers'])->findOrFail($provider_id);
+            $provider = Provider::with(['audits','file_anexo', 'file_logo','managers','filials'])->findOrFail($provider_id);
             $addr_clone = $provider->where('id', $provider_id)->get('addr_clone')[0];
             $contact_clone = $provider->where('id', $provider_id)->get('contact_clone')[0];
             $contract_clone = $provider->where('id', $provider_id)->get('contract_clone')[0];
@@ -62,11 +100,11 @@ class ProvidersController extends ControllersExtends
             $provider = DB::table('providers')->where('cnpj', $request->cnpj)->first();
             if ($provider):
                 if ($provider->cnpj == $request->cnpj)
-                    return response()->json(["CPF já cadastrado!"]);
+                    return response()->json(["CNPJ já cadastrado!"]);
             endif;
             $validate = $request;
             $files = new \App\Http\Controllers\FilesController();
-            $files = $files->multUpload($request, 'contributors');
+            $files = $files->multUpload($request, 'contributor');
             $data = $files->request;
             // type = 1 para matriz e 0 para filial
             $provider_data = [
@@ -79,10 +117,12 @@ class ProvidersController extends ControllersExtends
                 "addr_clone" => $request->addr_clone ? true : false,
                 "contact_clone" => $request->contact_clone ? true : false,
                 "contract_clone" => $request->contract_clone ? true : false,
-                "providertype_id" => $request->providertype_id
+                "providertype_id" => $request->providertype_id,
+                "anexo" =>  $data['anexo'],
+                "logo" =>  $data['logo'],
             ];
             $request['anexo'] = $data['anexo'] ?? null;
-            $request['logo'] = $data['anexo'] ?? null;
+            $request['logo'] = $data['logo'] ?? null;
             $provider = Provider::create($provider_data);
 
             if ($request->addr_clone == null):
@@ -170,17 +210,20 @@ class ProvidersController extends ControllersExtends
 
     public function update(Request $request, $id)
     {
-        $validate = $request;
-        if(!isset($validate->cnpj)){
+        //$validate = $request;
+        if(!isset($request->cnpj)){
             parent::saveLog($id,$request,"providers");
-            return parent::update($validate, $id);
+            return parent::update($request, $id);
         }
+        
+        //var_dump($request->hasFile('file_logo'));
+        
         $files = new \App\Http\Controllers\FilesController();
-        $files = $files->multUpload($request, 'provider');
-        $data = $files->data;
-        print_r($files);
+        $files = $files->multUpload($request, 'provider', $id);
+        $data = $files->request;
         try {
             $provider = Provider::findOrFail($id);
+            //exit();
             $provider_data = [
                 "active" => $request->active,
                 "cnpj" => $request->cnpj,
@@ -189,9 +232,10 @@ class ProvidersController extends ControllersExtends
                 "contract_clone" => $request->contract_clone,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
-                "logo" => $request['logo'] == "[object File]" ? $data['file_logo'] : $request['logo'],
-                "anexo" => $request['anexo'] == "[object File]" ? $data['file_anexo'] : $request['anexo'],
             ];
+            $provider_data["logo"] = $data['file_logo'] == "[object Object]" ? $request['logo'] : $data['file_logo'];
+            $provider_data["anexo"] = $data['file_anexo'] == "[object Object]" ? $request['anexo'] : $data['file_anexo'];
+            
             if(isset($provider_data["type"])) $provider_data["type"] = $request->type;
             if(isset($provider_data["matriz_id"]))$provider_data["matriz_id"] = $request->matriz_id;
 

@@ -28,7 +28,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AddIcon from '@material-ui/icons/Add';
 import { setSnackbar } from '../../../actions/appActions'
-import { putApiProviders, getApiManagers, getAddressByCepla, getApiProviders, getApiProviderTypes } from '../../../providers/api'
+import { putApiProviders, getApiManagers, deleteApiManagersProviders,getAddressByCepla, getApiProviders, getApiProviderTypes } from '../../../providers/api'
 import { validaEmail, validaCnpj, stringToaddDate } from '../../../providers/commonMethods'
 import { InputCep, InputCnpj, InputPhone, stringCpf } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
@@ -174,6 +174,8 @@ class EditProviders extends Component {
         managers: [],
         manager: 0,
         providers: [],
+        provider: 0,
+        provProviders: [],
         provManagers: [],
         loading: false
     }
@@ -188,7 +190,14 @@ class EditProviders extends Component {
         const managers = await getApiManagers();
         const providertypes = await getApiProviderTypes();
         console.log(data);
-        this.setState({ ...this.state, data, providers: providers.data, provManagers: data.managers, managers: managers.data, providertypes: providertypes.data });
+        this.setState({ ...this.state, 
+            data, 
+            providers: providers.data, 
+            provManagers: data.managers, 
+            provProviders: data.filialls,
+            managers: managers.data, 
+            providertypes: providertypes.data 
+        });
 
     }
 
@@ -208,6 +217,7 @@ class EditProviders extends Component {
             data = Object.assign({}, state, data);
             delete data.addresses;
             delete data.contacts;
+            delete data.contracts;
             let response = await putApiProviders(this.props.match.params.id, data);
             //console.log(response);
             if (response.data.success) {
@@ -325,8 +335,8 @@ class EditProviders extends Component {
                     { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: { min: 11, number: true, required: true }, validateHandler: validaCnpj, flexBasis: '33%', helperText: "o valor digitado é inválido" },
                     { column: 'company_name', label: 'Razão Social', type: 'text', value: this.state.data['company_name'], validate: { max: 50, required: true }, flexBasis },
                     { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', value: this.state.data['fantasy_name'], validate: { max: 50, required: true }, flexBasis: '33%' },
-                    { column: 'anexo', label: 'Documento', type: 'file', value: this.state.data['anexo'], flexBasis },
-                    { column: 'logo', label: 'Logo marca', type: 'file', value: this.state.data['logo'], validate: { required: true }, flexBasis },
+                    { column: 'file_anexo', label: 'Documento', type: 'file', file: this.state.data['file_anexo'] ? this.state.data['file_anexo'].name : '', flexBasis },
+                    { column: 'file_logo', label: 'Logo marca', type: 'file', file: this.state.data['file_logo'] ? this.state.data['file_logo'].name : '', validate: { required: true }, flexBasis },
 
                 ]
             },
@@ -410,7 +420,7 @@ class EditProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try{
-                                        await putApiProviders(`manager/${this.props.match.params.id}/${this.state.manager}/delete`)
+                                        await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
                                         const data = await getApiProviders({}, this.props.match.params.id);
                                         this.setState({...this.state, provManagers: data.managers});
                                     }catch(err){
@@ -427,6 +437,65 @@ class EditProviders extends Component {
                 },
             },
         ];
+
+        //
+        // Providers Grid
+        const rowsProv = (this.state.provProviders !== undefined) ? this.state.provProviders : [];
+        const columnsProv = [
+            {
+                field: 'company_name', headerName: 'Farmácia', flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return params.value +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
+                }
+            },
+           { 
+            field: 'phone1', headerName: 'Telefone', flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
+                    //console.log(provider)
+                    return params.row.contact ? params.row.contact.phone1 : '-';
+                }
+            },
+            { 
+                field: 'email', headerName: 'E-mail',flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
+                    //console.log(provider)
+                    return params.row.contact ? params.row.contact.email : '';
+                }
+            },
+            { field: 'function', headerName: 'Função', flex: 0.7 }, 
+            {
+                field: 'id',
+                headerName: 'Ações',
+                flex: 1,
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
+                    //let view = this.state.session.permissions.find(x => x.module === module_id)
+                    return (
+                        <div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={async (e) => {
+                                    try {
+                                        //await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
+                                        const data = await getApiManagers({}, this.props.match.params.id);
+                                        this.setState({ ...this.state, provProviders: data.providers });
+                                    } catch (err) {
+                                        console.log(err)
+                                    };
+
+                                }}
+                                style={{ marginLeft: 16 }}
+                            >
+                                <DeleteForeverIcon fontSize="small" />
+                            </Button>
+                        </div>
+                    )
+                },
+            },
+        ]
         return (
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
@@ -457,7 +526,7 @@ class EditProviders extends Component {
                                             json={true} 
                                             valueLabel={'name'}
                                             key={`input-${15019}`} id={"manager"} label={"Responsável"} name={"manager"} 
-                                            values={this.state.managers} 
+                                            values={this.state.providers} 
                                             style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                             onChange={(e) => {
                                                 this.setState({...this.state, manager: e.target.value});
@@ -494,6 +563,54 @@ class EditProviders extends Component {
                                 </CardContent>
                             </Card>
                             
+                            <Card style={{ marginBottom: 15 }}>
+                                <CardContent>
+                                    <Typography>
+                                        <IndeterminateCheckBoxIcon /> Fornecedores
+                                    </Typography>
+                                    <div  style={{
+                                            alignItems: 'center',
+                                            justifyContent: 'start',
+                                            display: 'flex'
+                                        }}>
+                                        <SelectInput valueLabel="value" 
+                                            json={true} 
+                                            valueLabel={'company_name'}
+                                            key={`input-${15019}`} id={"provider"} label={"Fornecedores"} name={"provider"} 
+                                            values={this.state.providers} 
+                                            style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
+                                            onChange={(e) => {
+                                                this.setState({...this.state, provider: e.target.value});
+                                            }} />
+                                            <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
+                                                await putApiProviders(`manager/${this.state.provider}/${this.props.match.params.id}`)
+                                                const data = await getApiManagers({}, this.props.match.params.id);
+                                                this.setState({...this.state, provManagers: data.providers });
+                                            }}><AddIcon /></Button>
+                                        </div>
+                                    <div style={{
+                                        alignItems: 'center',
+                                        justifyContent: 'start',
+                                        height: 350,
+                                    }}>
+                                        <DataGrid sx={{
+                                            '& .MuiDataGrid-root': {
+                                                '& .MuiDataGrid-viewport': {
+                                                    maxWidth: '600px',
+                                                },
+                                            }
+                                        }}
+                                            rows={rowsProv} columns={columnsProv}
+                                            spacing={0}
+                                            stickyHeader
+                                            disableClickEventBubbling
+                                            disableColumnMenu={true}
+                                            localeText={DEFAULT_LOCALE_TEXT}
+                                            pageSize={10} rowsPerPageOptions={[10]} pagination
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>)
                         }
                     </LForms>
