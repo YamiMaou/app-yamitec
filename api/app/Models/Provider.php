@@ -112,4 +112,14 @@ class Provider extends Model
         return $this->belongsTo(Audit::class)->latest();
     }
 
+    public function contributors()
+    {
+        return $this->belongsToMany(
+            Contributor::class,
+            'contributor_providers',
+            'provider_id',
+            'contributor_id'
+        );
+    }
+
 }
