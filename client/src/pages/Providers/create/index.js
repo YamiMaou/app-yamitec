@@ -12,10 +12,10 @@ import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiProviders, getApiProviders, getApiProviderTypes } from '../../../providers/api'
+import { postApiProviders, getApiProviders, getApiProviderTypes, getApiContributors } from '../../../providers/api'
 import { validaEmail, validaCnpj, isFutureData } from '../../../providers/commonMethods'
 
-import { InputCep, InputCnpj, InputPhone } from '../../../providers/masks'
+import { InputCep, InputCnpj, InputPhone, InputDecimal } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 
 import { withSnackbar  } from 'notistack';
@@ -92,17 +92,29 @@ class CreateProviders extends Component {
     
     state = {
         data: [],
+        fields: {},
         providertypes: [],
+        contributors: [],
         states: []
     }
     async componentDidMount() {
         const data = await getApiProviders({type: "Matriz", active: 1});
+        const contributors = await getApiContributors({active: 1});
         const providertypes = await getApiProviderTypes();
-        this.setState({...this.state, data: data.data, providertypes: providertypes.data});
+        this.setState({
+            ...this.state, 
+            data: data.data, 
+            contributors: contributors.data,
+            providertypes: providertypes.data
+        });
         localStorage.setItem("sessionTime", 900);
 
     }
-
+    onChange(e){
+        this.setState({...this.state, fields: e});
+        console.log(this.state.fields);
+        console.log(this.state.fields['type'] == 1);
+    }
     render() {
         //console.log(this.state.data)
          // to use snackbar Provider
@@ -205,7 +217,7 @@ class CreateProviders extends Component {
                         valueLabel: "name",
                         values: this.state.providertypes,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
                         validate: {required: true },
-                        //value: "Coordenador de usuários",
+                        value: "Selecione",
                         flexBasis
                     },
                     {
@@ -232,7 +244,7 @@ class CreateProviders extends Component {
                 //flexFlow: 'row no-wrap',
                 //json: "address",
                 fields: [
-                    { column: 'addr_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis : "100%" },
+                    { column: 'addr_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
                     
                     {
                         column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
@@ -253,7 +265,7 @@ class CreateProviders extends Component {
                 title: 'Contato',
                 //json: 'contact',
                 fields: [
-                    { column: 'contact_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis : "100%" },
+                    { column: 'contact_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
                     { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
                     { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
                     { column: 'email', label: 'E-mail', type: 'email', validate: {max: 100}, validateHandler: validaEmail, flexBasis: '20%' },
@@ -273,10 +285,20 @@ class CreateProviders extends Component {
                 title: 'Contrato Atual',
                 //json: 'contact',
                 fields: [
-                    { column: 'contract_clone', label: 'Clonar Matriz', type: 'checkbox', flexBasis : "100%" },
+                    { column: 'contract_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
                     { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: {required: true}, flexBasis: '20%' },
                     { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: {required: true}, flexBasis: '20%' },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: {decimal: true, required: true}, flexBasis: '20%' },
+                    { 
+                        column: 'contributor_id', 
+                        label: 'Vendedor', 
+                        type: 'select',
+                        validate:{required: true}, 
+                        json: true,
+                        valueLabel: 'name',
+                        values: this.state.contributors,
+                        flexBasis: '20%'
+                    },
+                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', mask: InputDecimal, validate: {decimal: true, required: true}, flexBasis: '20%' },
                 ]
             }
         ]
@@ -289,6 +311,7 @@ class CreateProviders extends Component {
                     </Typography>
                 </AppBar>
                 <LForms forms={forms}
+                    onChange={(e) => {this.onChange(e)}}
                     request={request} 
                     validate={(values) => { return validateFields(forms,values)}}
                     loading={this.state.loading}

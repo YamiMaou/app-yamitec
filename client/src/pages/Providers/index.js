@@ -109,12 +109,12 @@ class Providers extends Component {
         
         const rows : RowsProp = this.state.providers.data ?? [];
         const columns: ColDef[] = [
-            { field: 'cnpj', headerName: 'CNPJ', flex: 0.7,
+            { field: 'cnpj', headerName: 'CNPJ', flex: 1,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return stringCnpj(params.value);
                 }
             },
-            { field: 'company_name', headerName: 'Razão Social',flex: 2 },
+            { field: 'company_name', headerName: 'Razão Social',flex: 1.2 },
             { 
                 field: 'created_at', 
                 headerName: 'Data de Adesão', 
@@ -177,14 +177,13 @@ class Providers extends Component {
             {
                 column: 'type', label: 'Tipo', type: 'select',
                 values: [
-                    "Todos",
                     "Matriz",
                     "Filial",
                 ],
                 value: "Todos",
                 flexBasis
             },
-            { column: 'active', label: 'Situação', type: 'select', values: ["Todos", "Ativo", "Inativo"], value: "Todos", flexBasis },
+            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis },
             { column: 'created_at', label: 'Periodo de Adesão', type: 'date' },
             { column: 'created_at_to', label: ' até', type: 'date' },
             

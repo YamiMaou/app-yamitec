@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, useState, useRef, useEffect   } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
@@ -9,25 +9,98 @@ import Paper from '@material-ui/core/Paper';
 import HomeIcon from '@material-ui/icons/Home';
 import Typography from '@material-ui/core/Typography';
 import Snackbar from '@material-ui/core/Snackbar';
+import AddIcon from '@material-ui/icons/Add';
+import { DataGrid } from '@material-ui/data-grid';
+import { DEFAULT_LOCALE_TEXT } from '../../../providers/langs/datagrid';
 import LForms from '../../../components/Forms';
 //
+
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+//
+import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+//
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiManagers, getApiDownloadFile } from '../../../providers/api'
+import { postApiManagers, getApiProviders, getApiDownloadFile } from '../../../providers/api'
 import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 
 import { withSnackbar  } from 'notistack';
+const SelectInput = (props) => {
+    const [value, setValue] = useState(props.value ?? "Selecione");
+    const [error, setError] = useState(false);
+    function handleChange(e) {
+        const { value, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(value)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        props.onChange(e)
+        console.log(e.target.value)
+        setValue(e.target.value);
+    }
+    return (
+        <FormControl id={props.column} style={{ ...props.style, marginTop: '25px' }}>
+            <InputLabel id={props.column}>{props.label}</InputLabel>
+            <Select size="small"
+                labelId={props.id}
+                id={props.id}
+                name={props.name}
+                value={value}
+                error={error}
+                placeholder="Selecione"
+                //helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
+                onChange={handleChange}
+                onBlur={handleChange}
+            >
+                <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
+                    })
+                ) : (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
+                    })
+                )
+                }
+
+            </Select>
+        </FormControl>)
+}
+
 class CreateManagers extends Component {
     
     state = {
         managers: [],
+        providers: [],
+        provider: undefined,
+        provManagers: [],
         states: []
     }
     async componentDidMount() {
         localStorage.setItem("sessionTime", 900)
+        const providers = await getApiProviders();
+        this.setState({...this.state, providers: providers.data});
 
+    }
+    setProviders(){
+        let provManagers = this.state.provManagers;
+        let provider = this.state.providers.filter(x => x.id == this.state.provider)
+        provManagers.push(provider[0]);
+        this.setState({...this.state, provManagers});
     }
 
     render() {
@@ -136,6 +209,70 @@ class CreateManagers extends Component {
                     { column: 'instagram', label: 'Usuário do Instagram', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
                 ]
             }
+        ];
+
+        // Providers Grid
+        const rows = this.state.provManagers;
+        const columns = [
+            {
+                field: 'company_name', headerName: 'Farmácia', flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return params.value +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
+                }
+            },
+           { 
+            field: 'phone1', headerName: 'Telefone', flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
+                    //console.log(provider)
+                    return params.row.contact ? params.row.contact.phone1 : '-';
+                }
+            },
+            { 
+                field: 'email', headerName: 'E-mail',flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
+                    //console.log(provider)
+                    return params.row.contact ? params.row.contact.email : '';
+                }
+            },
+            { field: 'function', headerName: 'Função', flex: 0.7 }, 
+            {
+                field: 'id',
+                headerName: 'Ações',
+                flex: 1,
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
+                    //let view = this.state.session.permissions.find(x => x.module === module_id)
+                    return (
+                        <div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={async (e) => {
+                                    try {
+                                        if(this.state.provManagers.length > 1){
+                                            await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
+                                            const data = await getApiManagers({}, this.props.match.params.id);
+                                            this.setState({ ...this.state, provManagers: data.providers });
+                                        }else{
+                                            this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
+                                        }
+
+                                        
+                                    } catch (err) {
+                                        console.log(err)
+                                    };
+
+                                }}
+                                style={{ marginLeft: 16 }}
+                            >
+                                <DeleteForeverIcon fontSize="small" />
+                            </Button>
+                        </div>
+                    )
+                },
+            },
         ]
 
         return (
@@ -148,8 +285,57 @@ class CreateManagers extends Component {
                 <LForms forms={forms}
                     request={request} 
                     validate={(values) => { return validateFields(forms,values)}}
-                    loading={this.state.loading}
-                />
+                    loading={this.state.loading} >
+                        <div>
+                            <Card style={{ marginBottom: 15 }}>
+                                <CardContent>
+                                    <Typography>
+                                        <IndeterminateCheckBoxIcon /> Fornecedores
+                                    </Typography>
+                                    <div  style={{
+                                            alignItems: 'center',
+                                            justifyContent: 'start',
+                                            display: 'flex'
+                                        }}>
+                                        <SelectInput valueLabel="value" 
+                                            json={true} 
+                                            valueLabel={'company_name'}
+                                            key={`input-${15019}`} id={"manager"} label={"Farmácia/Grupo"} name={"manager"} 
+                                            values={this.state.providers} 
+                                            style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
+                                            onChange={(e) => {
+                                                this.setState({...this.state, provider: e.target.value});
+                                            }} />
+                                            <Button variant="contained" color="primary" size="small" disableElevation onClick={() => {
+                                                this.setProviders();
+                                            }}><AddIcon /></Button>
+                                        </div>
+                                    <div style={{
+                                        alignItems: 'center',
+                                        justifyContent: 'start',
+                                        height: 350,
+                                    }}>
+                                        <DataGrid sx={{
+                                            '& .MuiDataGrid-root': {
+                                                '& .MuiDataGrid-viewport': {
+                                                    maxWidth: '600px',
+                                                },
+                                            }
+                                        }}
+                                            rows={rows} columns={columns}
+                                            spacing={0}
+                                            stickyHeader
+                                            disableClickEventBubbling
+                                            disableColumnMenu={true}
+                                            localeText={DEFAULT_LOCALE_TEXT}
+                                            pageSize={10} rowsPerPageOptions={[10]} pagination
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            
+                        </div>
+                    </LForms>
             </Fragment>
         )
     }

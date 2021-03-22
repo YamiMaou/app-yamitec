@@ -109,7 +109,7 @@ export function validaCnpj(value) {
   let digitos = cnpj.substring(tamanho);
   let soma = 0;
   let pos = tamanho - 7;
-  for (i = tamanho; i >= 1; i--) {
+  for (let i = tamanho; i >= 1; i--) {
     soma += numeros.charAt(tamanho - i) * pos--;
     if (pos < 2)
           pos = 9;
@@ -122,7 +122,7 @@ export function validaCnpj(value) {
   numeros = cnpj.substring(0,tamanho);
   soma = 0;
   pos = tamanho - 7;
-  for (i = tamanho; i >= 1; i--) {
+  for (let i = tamanho; i >= 1; i--) {
     soma += numeros.charAt(tamanho - i) * pos--;
     if (pos < 2)
           pos = 9;

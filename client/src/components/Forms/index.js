@@ -72,7 +72,7 @@ const CheckBoxInput = (props) => {
     const [value, setValue] = useState(props.value == "1" ? true : false ?? false);
     const [error, setError] = useState(false);
     const [just, setJust] = useState(props.justification);
-   
+
     function handleChange(e) {
         const { checked, id } = e.target;
         if (props.validate !== undefined) {
@@ -82,8 +82,8 @@ const CheckBoxInput = (props) => {
                 setError(true)
             }
         }
-        if(checked == true){
-            props.onChange({target: {id: 'justification', value: ''}});
+        if (checked == true) {
+            props.onChange({ target: { id: 'justification', value: '' } });
             setJust("");
         }
         let target = { id, value: checked ? "1" : "0", type: 'checkbox' };
@@ -98,25 +98,25 @@ const CheckBoxInput = (props) => {
     }
     //console.log(props.justification)
     return (
-        <div key={`check-${props.id}`} style={{ display: 'flex',...props.style }}>
-            <FormControlLabel style={{flexBasis: window.innerWidth < 768 ? '100%' : '15%'  }}
+        <div key={`check-${props.id}`} style={{ display: 'flex', ...props.style }}>
+            <FormControlLabel style={{ flexBasis: window.innerWidth < 768 ? '100%' : '15%' }}
                 control={<Checkbox checked={value} disabled={props.disabled ?? false} onChange={handleChange} name={props.id} id={props.id} />}
                 label={props.label}
             />
             {
-                
-            (props.justification === undefined && value) || (props.justification === undefined) ? ('') : (
-                <TextInputCustom key={`input-just`}
-                id={'justification'}
-                disabled={value}
-                type={'text'}
-                value={props.justification ?? ""}
-                style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '70%' }}
-                label={'Justificativa'}
-                onChange={JustChange}
-                onBlur={JustChange} />
-            )}
-           
+
+                (props.justification === undefined && value) || (props.justification === undefined) ? ('') : (
+                    <TextInputCustom key={`input-just`}
+                        id={'justification'}
+                        disabled={value}
+                        type={'text'}
+                        value={props.justification ?? ""}
+                        style={{ ...props.style, flexBasis: window.innerWidth < 768 ? '100%' : '70%' }}
+                        label={'Justificativa'}
+                        onChange={JustChange}
+                        onBlur={JustChange} />
+                )}
+
         </div>
     )
 }
@@ -144,38 +144,51 @@ const FileInput = (props) => {
     return (
         <FormControl style={props.style}>
             { file === undefined || replace ?
-                (<Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
-                    { value !== undefined ?
-                        <b style={{ color: 'red' }}>
-                            <a href={`file:///${value}`}>{value.split(/(\\|\/)/g).pop()} </a>
-                        </b> : props.label}
-                    <input type="file" hidden
-                        onChange={handleChange}
-                        onBlur={handleChange}
-                        name={props.id}
-                        id={props.id}
-                    />
-                </Button>) :
+                (<div style={{ display: 'flex' }}>
+                    { value === undefined ?
+                        <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
+                            {props.label}
+                            <input type="file" hidden
+                                onChange={handleChange}
+                                onBlur={handleChange}
+                                name={props.id}
+                                id={props.id}
+                            />
+                        </Button> :
+                         <div style={{ display: 'flex' }}>
+                            <Button style={props.style} variant="outlined" component="label">
+                                {value.split(/(\\|\/)/g).pop().substring(0, 7) + '...'}
+                            </Button>
+                            <Button style={{ marginTop: 25, height: 60 }} variant="outlined" size="small"
+                            >
+                                <Icon name="remove" size={16} color="red" onClick={() => {
+                                    setValue(undefined);
+                                }} />
+                            </Button>
+                        </div>
+                    }
+                </div>
+                ) :
                 (
-                    <div style={{display:'flex'}}>
+                    <div style={{ display: 'flex' }}>
                         <Button style={props.style} variant="outlined" component="label"
                             onClick={() => {
                                 getApiDownloadFile(file);
                             }}
                             endIcon={
                                 <Icon name="arrow-circle-down"
-                                size={22} color="#025ea2"
-                            />
+                                    size={22} color="#025ea2"
+                                />
                             }>
                             Baixar Arquivo
                         </Button>
-                        <Button style={{marginTop: 25, height: 60}} variant="outlined" size="small"
-                           >
-                            <Icon name="remove" size={16} color="red"  onClick={() => {
+                        <Button style={{ marginTop: 25, height: 60 }} variant="outlined" size="small"
+                        >
+                            <Icon name="remove" size={16} color="red" onClick={() => {
                                 setReplace(true);
-                            }}/>
+                            }} />
                         </Button>
-                        
+
                     </div>
                 )}
         </FormControl>)
@@ -269,7 +282,7 @@ const DateInput = (props) => {
     return (
         <form noValidate style={{ ...props.style, marginTop: 20 }} >
             <TextField
-                style={{width: '100%'}} 
+                style={{ width: '100%' }}
                 id={props.id}
                 label={props.label ?? 'Data'}
                 type="date"
@@ -385,7 +398,7 @@ class LForms extends Component {
             let formValidate = this.state.formValidate;
             let value = e.target.value;
             let id = e.target.id ?? e.target.name;
-            
+
             if (idNumbers.includes(e.target.id)) {
                 value = value.replace(/[^\d]+/g, '');
             }
@@ -420,8 +433,9 @@ class LForms extends Component {
                     inputValues[params.json][id] = value;
                 }
             }
-            console.log(inputValues);
+            //console.log(inputValues);
             formValidate[id] = value;
+            this.props.onChange ? this.props.onChange(formValidate) : undefined;
             this.setState({ ...this.state, inputVal: inputValues, formValidate });
         }
 
@@ -468,16 +482,16 @@ class LForms extends Component {
                                                 form.fields.map((input, ind1) => {
                                                     if (input.type == "custom") {
                                                         let CustomComponent = input.component;
-                                                        console.log(input.value + '  ' + input.value1);
-                                                        return (<CustomComponent valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}/>) ?? ('Não existe');
+                                                        //console.log(input.value + '  ' + input.value1);
+                                                        return (<CustomComponent valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />) ?? ('Não existe');
                                                     } else if (input.type == "date") {
                                                         return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput valueLabel={input.valueLabel} json={input.json}value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return (<SelectInput valueLabel={input.valueLabel} json={input.json} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
-                                                                style={{ ...classes.m5,width: window.innerWidth > 720 ? '190px' : '100%' }}
+                                                                style={{ ...classes.m5, width: window.innerWidth > 720 ? '190px' : '100%' }}
                                                                 file={input.file}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
@@ -522,23 +536,23 @@ class LForms extends Component {
                         )
                     })
                 }
-                 {(this.props.children ?? '')}
-                {!this.props.loading ? 
-                (<div><Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
-                    if (this.props.validate === undefined) {
-                        this.props.request(this.state.inputVal);
-                    } else {
-                        if (this.props.validate(this.state.formValidate)) {
+                {(this.props.children ?? '')}
+                {!this.props.loading ?
+                    (<div><Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
+                        if (this.props.validate === undefined) {
                             this.props.request(this.state.inputVal);
-                            //console.log(this.state)
+                        } else {
+                            if (this.props.validate(this.state.formValidate)) {
+                                this.props.request(this.state.inputVal);
+                                //console.log(this.state)
+                            }
                         }
-                    }
-                }}> Salvar</Button>
-                <Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => { this.props.history.goBack(); }} > Cancelar</Button>
-                </div>) : (
-                <CircularProgress style={{display: 'flex', margin: 'auto'}} />
-                )}
-        </div>
+                    }}> Salvar</Button>
+                        <Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => { this.props.history.goBack(); }} > Cancelar</Button>
+                    </div>) : (
+                        <CircularProgress style={{ display: 'flex', margin: 'auto' }} />
+                    )}
+            </div>
         )
     }
 }

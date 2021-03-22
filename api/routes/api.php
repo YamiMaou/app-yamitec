@@ -31,7 +31,9 @@ Route::get('/profile', 'Api\UsersController@details')
     ->middleware(['auth:api', 'scope:view-profile']);
 Route::post('reset', 'Api\UsersController@resetPassword');
 Route::put('resetpwd', 'Api\AccountController@resetPassword');
-
+Route::get('teste', function(Request $request){
+    echo $request->provider_id;
+});
 // POSTS
 /*Route::get('/posts', 'Api\PostsController@index')
     ->middleware(['auth:api', 'scope:view-posts']);

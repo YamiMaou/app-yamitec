@@ -192,6 +192,7 @@ class EditProviders extends Component {
         console.log(data);
         this.setState({ ...this.state, 
             data, 
+            fields: {},
             providers: providers.data, 
             provManagers: data.managers, 
             provProviders: data.filials,
@@ -200,7 +201,10 @@ class EditProviders extends Component {
         });
 
     }
-
+    onChange(e){
+        console.log(e);
+        this.setState({...this.state, fields: e});
+    }
     render() {
         const closeSnack = (event, reason) => {
             if (reason === 'clickaway') {
@@ -346,7 +350,7 @@ class EditProviders extends Component {
                 //flexFlow: 'row no-wrap',
                 //json: "address",
                 fields: [
-                    { column: 'addr_clone', label: 'Clonar Matriz', type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
+                    { column: 'addr_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
                     { column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: this.state.data['addresses'].zipcode },
                     { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: this.state.data['addresses'].street },
                     { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '' },
@@ -362,7 +366,7 @@ class EditProviders extends Component {
                 title: 'Contato',
                 //json: 'contact',
                 fields: [
-                    { column: 'contact_clone', label: 'Clonar Matriz', type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }},flexBasis: "100%", value: this.state.data.contact_clone },
+                    { column: 'contact_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }},flexBasis: "100%", value: this.state.data.contact_clone },
                     { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: this.state.data['contacts'].phone1 },
                     { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis, value: this.state.data['contacts'].phone2 },
                     { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: this.state.data['contacts'].email },
@@ -382,7 +386,7 @@ class EditProviders extends Component {
                 title: 'Contrato Atual',
                 //json: 'contact',
                 fields: [
-                    { column: 'contract_clone', label: 'Clonar Matriz', type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%" },
+                    { column: 'contract_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%" },
                     { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].accession_date },
                     { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].end_date },
                     { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: { required: true, decimal: true }, flexBasis: '20%', value: this.state.data['contracts'].rate },
@@ -522,6 +526,7 @@ class EditProviders extends Component {
                 {
                     <LForms 
                         forms={forms}
+                        onChange={(e) => {this.onChange(e)}}
                         request={(data) => { request(this.state.data, data) }}
                         validate={(values) => { return validateFields(forms, values) }}
                         loading={this.state.loading}
