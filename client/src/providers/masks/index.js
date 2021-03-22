@@ -19,4 +19,4 @@ export const InputCep = [/[0-9]/, /\d/,  /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/
 
 export const InputPhone = ['(',/[0-9]/, /\d/,')', /\d/,' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
 
-export const InputDecimal = [/[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, ',' ,/\d/, /\d/]
+export const InputDecimal = [/[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, ',' ,/\d/, /\d/]

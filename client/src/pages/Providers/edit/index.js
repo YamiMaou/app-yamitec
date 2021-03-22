@@ -462,7 +462,7 @@ class EditProviders extends Component {
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
                     //console.log(provider)
-                    return params.row.contact ? params.row.contact.phone1 : '-';
+                    return params.row.contacts ? params.row.contacts.phone1 : '-';
                 }
             },
             { 
@@ -470,7 +470,7 @@ class EditProviders extends Component {
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
                     //console.log(provider)
-                    return params.row.contact ? params.row.contact.email : '';
+                    return params.row.contacts ? params.row.contacts.email : '';
                 }
             },
             { field: 'function', headerName: 'Função', flex: 0.7,

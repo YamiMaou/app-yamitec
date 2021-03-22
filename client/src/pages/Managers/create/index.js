@@ -7,10 +7,11 @@ import { withRouter } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar';
 import Paper from '@material-ui/core/Paper';
 import HomeIcon from '@material-ui/icons/Home';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Typography from '@material-ui/core/Typography';
 import Snackbar from '@material-ui/core/Snackbar';
 import AddIcon from '@material-ui/icons/Add';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid, RowsProp, ColDef} from '@material-ui/data-grid';
 import { DEFAULT_LOCALE_TEXT } from '../../../providers/langs/datagrid';
 import LForms from '../../../components/Forms';
 //
@@ -31,7 +32,7 @@ import { setSnackbar } from '../../../actions/appActions'
 import { postApiManagers, getApiProviders, getApiDownloadFile } from '../../../providers/api'
 import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
-import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
+import { InputCep, InputCpf, InputPhone, stringCnpj } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 
 import { withSnackbar  } from 'notistack';
@@ -96,10 +97,12 @@ class CreateManagers extends Component {
         this.setState({...this.state, providers: providers.data});
 
     }
-    setProviders(){
+    async setProviders(){
         let provManagers = this.state.provManagers;
-        let provider = this.state.providers.filter(x => x.id == this.state.provider)
-        provManagers.push(provider[0]);
+        let provider = this.state.providers.filter(x => x.id == this.state.provider);
+        const prov = await getApiProviders({}, this.state.provider);
+        provManagers.push(prov);
+        console.log(provManagers);
         this.setState({...this.state, provManagers});
     }
 
@@ -212,10 +215,10 @@ class CreateManagers extends Component {
         ];
 
         // Providers Grid
-        const rows = this.state.provManagers;
-        const columns = [
+        const rows: RowsProp = this.state.provManagers;
+        const columns: ColDef[] = [
             {
-                field: 'company_name', headerName: 'Farmácia', flex: 0.7,
+                field: 'company_name', headerName: 'Farmácia', flex: 1.2,
                 valueFormatter: (params: ValueFormatterParams) => {
                     return params.value +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
                 }
@@ -224,8 +227,8 @@ class CreateManagers extends Component {
             field: 'phone1', headerName: 'Telefone', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
-                    //console.log(provider)
-                    return params.row.contact ? params.row.contact.phone1 : '-';
+                    //console.log(params.row)
+                    return params.row.contacts ? params.row.contacts.phone1 : '-';
                 }
             },
             { 
@@ -233,7 +236,7 @@ class CreateManagers extends Component {
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
                     //console.log(provider)
-                    return params.row.contact ? params.row.contact.email : '';
+                    return params.row.contacts ? params.row.contacts.email : '';
                 }
             },
             { field: 'function', headerName: 'Função', flex: 0.7 }, 
@@ -251,13 +254,14 @@ class CreateManagers extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        if(this.state.provManagers.length > 1){
-                                            await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
-                                            const data = await getApiManagers({}, this.props.match.params.id);
-                                            this.setState({ ...this.state, provManagers: data.providers });
-                                        }else{
+                                        //if(this.state.provManagers.length > 1){
+                                            let providers = this.state.providers;
+                                            providers.slice(providers.findIndex(x => x.id == params.value),1)
+                                            this.setState({...this.state, providers });
+                                            console.log(this.state.providers)
+                                        /*}else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
+                                        }*/
 
                                         
                                     } catch (err) {
@@ -315,6 +319,7 @@ class CreateManagers extends Component {
                                         justifyContent: 'start',
                                         height: 350,
                                     }}>
+                                        { rows.length == 0 ? ('') :  
                                         <DataGrid sx={{
                                             '& .MuiDataGrid-root': {
                                                 '& .MuiDataGrid-viewport': {
@@ -329,7 +334,7 @@ class CreateManagers extends Component {
                                             disableColumnMenu={true}
                                             localeText={DEFAULT_LOCALE_TEXT}
                                             pageSize={10} rowsPerPageOptions={[10]} pagination
-                                        />
+                                        /> }
                                     </div>
                                 </CardContent>
                             </Card>
