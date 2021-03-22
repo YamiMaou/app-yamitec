@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\Contributor;
 use App\Models\Manager;
 use App\Models\Provider;
 use Illuminate\Http\Request;
@@ -291,6 +292,9 @@ public function index(Request $request)
             if ($provider->contract_clone == false):
                 $contract->update($contract_data);
             endif;
+
+            $this->addSellerToProvider($provider->id, $request->contributor_id);
+
             parent::saveLog($id,$request,"providers");
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception $error) {
@@ -314,6 +318,25 @@ public function index(Request $request)
             return response()->json(["success"=> true, "type" => "vinculate", "message" => "Responsável vinculado com sucesso!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao vincular responsável. ", "error" => $error->getMessage()], 201);
+        }
+    }
+
+    // vincula um vendedor à um provider
+    public function addSellerToProvider($provider_id, $seller_id)
+    {
+        try {
+            $provider = Provider::findOrFail($provider_id);
+            $contributor = Contributor::findOrFail($seller_id);
+    
+            if ($provider->managers->find($seller_id)):
+              return response()->json(["success"=> false, "type" => "vinculate", "message" => "Vendedor já é vinculado!"]);
+            endif;
+
+            $provider->managers()->attach($contributor);
+
+            return response()->json(["success"=> true, "type" => "vinculate", "message" => "Vendedor vinculado com sucesso!"]);
+        } catch(\Exception $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao vincular vendedor. ", "error" => $error->getMessage()], 201);
         }
     }
 

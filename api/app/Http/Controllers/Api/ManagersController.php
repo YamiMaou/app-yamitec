@@ -19,6 +19,11 @@ class ManagersController extends ControllersExtends
        parent::__construct(Manager::class, 'home');
     }
 
+    public function index(Request $request)
+    {
+        
+    }
+
     public function show(Request $request, $id, $with=[])
     {
        return  parent::show($request, $id, ['user', 'providers','addresses', 'contacts', 'audits']);
@@ -127,10 +132,10 @@ class ManagersController extends ControllersExtends
 
     }
 
-    public function getManagersByProvider($provider_id)
+    public function getManagersByProvider(Request $request)
     {
        try {
-            $provider = Provider::findOrFail($provider_id);
+            $provider = Provider::findOrFail($request->provider_id);
 
             $managers = $provider->managers()->get();
 
