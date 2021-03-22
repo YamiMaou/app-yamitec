@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Models\Manager;
+use App\Models\Provider;
 use Illuminate\Support\Facades\Hash;
 use \App\User;
 
@@ -124,5 +125,18 @@ class ManagersController extends ControllersExtends
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
         }
 
+    }
+
+    public function getManagersByProvider($provider_id)
+    {
+       try {
+            $provider = Provider::findOrFail($provider_id);
+
+            $managers = $provider->managers()->get();
+
+            return response()->json(["managers"=> $managers]);
+       } catch(\Exception  $error) {
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Pesquisar. ", "error" => $error->getMessage()], 201);
+        }
     }
 }

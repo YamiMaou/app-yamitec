@@ -93,6 +93,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/clients', 'Api\ClientsController')->middleware(['auth:api', 'scope:view-posts']);
     // MANAGERS
     Route::resource('/managers', 'Api\ManagersController')->middleware(['auth:api', 'scope:view-posts']);
+    // MANAGERS-GET-PROVIDERS           
+    Route::get('/managers/all-managers/{provider_id}', 'Api\ManagersController@getManagersByProvider')->middleware(['auth:api', 'scope:view-posts']);
     // AUDIT
     Route::resource('/audits', 'Api\AuditsController');
     // PROVIDETYPES
