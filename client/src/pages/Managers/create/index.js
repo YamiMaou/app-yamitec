@@ -29,7 +29,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiManagers, getApiProviders, getApiDownloadFile } from '../../../providers/api'
+import { postApiManagers, getApiProviders, getApiDownloadFile, getApiManagers } from '../../../providers/api'
 import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone, stringCnpj } from '../../../providers/masks'
@@ -49,7 +49,7 @@ const SelectInput = (props) => {
             }
         }
         props.onChange(e)
-        console.log(e.target.value)
+        //console.log(e.target.value)
         setValue(e.target.value);
     }
     return (
@@ -97,16 +97,15 @@ class CreateManagers extends Component {
         this.setState({...this.state, providers: providers.data});
 
     }
-    async setProviders(){
-        let provManagers = this.state.provManagers;
-        let provider = this.state.providers.filter(x => x.id == this.state.provider);
-        const prov = await getApiProviders({}, this.state.provider);
-        provManagers.push(prov);
-        console.log(provManagers);
-        this.setState({...this.state, provManagers});
-    }
-
     render() {
+        const setProviders = async () => {
+            let provManagers = this.state.provManagers;
+            this.setState({...this.state, provManagers: undefined});
+            const prov = await getApiProviders({}, this.state.provider);
+            provManagers.push(prov);
+            console.log(provManagers);
+            this.setState({...this.state, provManagers});
+        }
          // to use snackbar Provider
         const closeSnack = (event, reason) => {
             if (reason === 'clickaway') {
@@ -117,6 +116,11 @@ class CreateManagers extends Component {
         
         const request = async (data) => {
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
+            let providers = [];
+            this.state.provManagers.map(values => {
+                providers.push(values.id);
+            });
+            data.providers = providers;
             this.setState({ ...this.state, loading: true });
             let response = await postApiManagers(data);
             if (response.data.success) {
@@ -254,14 +258,17 @@ class CreateManagers extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        //if(this.state.provManagers.length > 1){
-                                            let providers = this.state.providers;
-                                            providers.slice(providers.findIndex(x => x.id == params.value),1)
-                                            this.setState({...this.state, providers });
-                                            console.log(this.state.providers)
-                                        /*}else{
+                                        if(this.state.provManagers.length > 1){
+                                            let provManagers = this.state.provManagers;
+                                            await getApiManagers({}, 1);
+                                            let index = provManagers.findIndex(x => x.id == params.row.id)
+                                            this.setState({...this.state, provManagers: undefined});
+                                            provManagers.splice(index,1)
+                                            this.setState({...this.state, provManagers });
+                                            console.log(this.state.provManagers)
+                                        }else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }*/
+                                        }
 
                                         
                                     } catch (err) {
@@ -310,8 +317,9 @@ class CreateManagers extends Component {
                                             onChange={(e) => {
                                                 this.setState({...this.state, provider: e.target.value});
                                             }} />
-                                            <Button variant="contained" color="primary" size="small" disableElevation onClick={() => {
-                                                this.setProviders();
+                                            <Button variant="contained" color="primary" size="small" disableElevation 
+                                            onClick={() => {
+                                                setProviders();
                                             }}><AddIcon /></Button>
                                         </div>
                                     <div style={{
@@ -319,7 +327,7 @@ class CreateManagers extends Component {
                                         justifyContent: 'start',
                                         height: 350,
                                     }}>
-                                        { rows.length == 0 ? ('') :  
+                                        { rows == undefined || rows.length == 0 ? ('') :  
                                         <DataGrid sx={{
                                             '& .MuiDataGrid-root': {
                                                 '& .MuiDataGrid-viewport': {

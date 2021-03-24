@@ -18,4 +18,9 @@ class AccountManager extends Model
         'note',
         'launch_date'
     ];
+
+    public function audits()
+    {
+        return $this->hasOne(Audit::class,'accountmanager_id','id')->with(['user'])->latest();
+    }
 }

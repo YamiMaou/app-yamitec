@@ -223,7 +223,7 @@ class LCardGrid extends Component {
                 delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {
-                    value = `${value.toJSON().split('T')[0]}`
+                   // value = `${value.toJSON().split('T')[0]}`
                 }
                 if (e.target.id == 'nome') {
                     //filters["withId"] = "name"
@@ -292,7 +292,52 @@ class LCardGrid extends Component {
                                                 </FormControl>)
 
                                     } else if (input.type == "date") {
-                                        return <DateInput label={input.label}  id={input.column} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onChange={onChangeInputs}  onBlur={onChangeInputs} />
+                                        let dvalue = "";
+                                            if(this.state.filters[input.column] !== undefined){
+                                                //console.log(this.state.filters[input.column])
+                                                dvalue = this.state.filters[input.column].split('-');
+                                                dvalue = `${dvalue[2]}/${dvalue[1]}/${dvalue[0]}`;
+                                                //console.log(dvalue)
+                                            }
+
+                                            return (
+                                                <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                    <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
+                                                    <Input
+                                                        value={this.state.filters[input.column] ?? ""}
+                                                        onChange={(e) => {
+                                                            let dateValue = e.target.value.split('/');
+                                                            console.log(`${dateValue[2]}-${dateValue[1]}-${dateValue[0]}`)
+                                                            onChangeInputs({target: { id: input.column, value: `${dateValue[2]}-${dateValue[1]}-${dateValue[0]}`}})
+                                                            try {
+                                                                //let e = { target: { id: props.id, value: `${selectvalue.toJSON().split('T')[0]}` } }
+                                                                if (input.validate !== undefined) {
+                                                                    if (input.validate(e.target.value)) {
+                                                                        //setError(false);
+                                                                    } else {
+                                                                       // setError(true)
+                                                                    }
+                                                                }
+                                                            } catch (err) {
+                                                                //console.log(err);
+                                                            }
+                                                        }}
+                                                        onFocus={(e) => {
+                                                            if (e.target.value.length == 0) {
+                                                                //alert(e.target.value);
+                                                                e.target.setSelectionRange(0, e.target.value.length)
+                                                            }
+                                                        }}
+                                                        name={input.column}
+                                                        id={input.column}
+                                                        value={dvalue ?? ""}
+                                                        inputProps={{
+                                                            mask: [/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
+                                                            }}
+                                                            inputComponent={TextMaskCustom}
+                                                        />
+                                                </FormControl>
+                                            )
                                     } else if (input.type == "select") {
                                         return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }

@@ -19,11 +19,6 @@ class ManagersController extends ControllersExtends
        parent::__construct(Manager::class, 'home');
     }
 
-    public function index(Request $request)
-    {
-        
-    }
-
     public function show(Request $request, $id, $with=[])
     {
        return  parent::show($request, $id, ['user', 'providers','addresses', 'contacts', 'audits']);
@@ -49,8 +44,10 @@ class ManagersController extends ControllersExtends
             ];
     
             $manager = Manager::create($data_manager);
+            if(explode(',',$resquest->providers) !== null)
+                $manager->providers()->attach(explode(',',$resquest->providers));
 
-            $data_address = [
+            /*$data_address = [
                 'zipcode' => $resquest->zipcode,
                 'street' => $resquest->street,
                 'additional' => $resquest->additional,
@@ -60,7 +57,7 @@ class ManagersController extends ControllersExtends
                 'manager_id' => $manager->id,
             ];
     
-            Address::create($data_address);
+            Address::create($data_address);*/
     
             $data_contact = [
                 'phone1' => $resquest->phone1,
@@ -72,9 +69,9 @@ class ManagersController extends ControllersExtends
                 'manager_id' => $manager->id,
             ];
     
-            $id = Contact::create($data_contact);
+            Contact::create($data_contact);
 
-            parent::saveLog($id, $resquest, 'manager');
+            parent::saveLog($manager->id, $resquest, 'manager');
 
             return response()->json(["success"=> true, "type" => "show", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {

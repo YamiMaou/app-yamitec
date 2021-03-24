@@ -73,12 +73,14 @@ function TextMaskCustom(props) {
 
 //
 const DateInput = (props) => {
-    let valueDate = new Date(props.value)
+    //let valueDate = new Date(props.value)
     const [value, setValue] = useState(props.value);
     const [error, setError] = useState(false);
     function handleChange(e) {
         console.log(value)
         setValue(e.target.value)
+        let dateValue = value.split('/');
+        console.log(dateValue);
         try {
             //let e = { target: { id: props.id, value: `${selectvalue.toJSON().split('T')[0]}` } }
             if (props.validate !== undefined) {
@@ -97,23 +99,26 @@ const DateInput = (props) => {
 
     }
     return (
-        <form noValidate style={{ ...props.style, marginTop: 20 }} >
-            <TextField
-                style={{width: '100%'}} 
-                id={props.id}
-                label={props.label ?? 'Data'}
+        <FormControl style={{ ...props.style }} >
+            <InputLabel htmlFor="formatted-text-mask-input">{props.label}</InputLabel>
+            <Input
                 value={value}
-                type="date"
-                //defaultValue={value}
                 onChange={handleChange}
-                onBlur={handleChange}
-                error={error}
-                helperText={error == true ? props.helperText ?? "Data inválida" : ""}
-                InputLabelProps={{
-                    shrink: true,
+                onFocus={(e) => {
+                    if (e.target.value.length == 0) {
+                        //alert(e.target.value);
+                        e.target.setSelectionRange(0, e.target.value.length)
+                    }
                 }}
+                name={props.name}
+                id={props.id}
+                inputProps={{
+                    mask: [/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
+                }}
+                inputComponent={TextMaskCustom}
             />
-        </form>
+        </FormControl>
+
     );
 }
 //
@@ -151,21 +156,21 @@ const SelectInput = (props) => {
         </FormControl>)
 }
 const StyledDataGrid = withStyles({
-    root:{
+    root: {
         '& div.MuiDataGrid-root .MuiDataGrid-viewport': {
             width: "600px",
             background: "blue"
-      },
+        },
     }
-  })(DataGrid);
-  const useStyles = makeStyles(theme => ({
+})(DataGrid);
+const useStyles = makeStyles(theme => ({
     root: {
-      "& div.react-grid-Container": {
-        color: "red",
-        // color: theme.palette.text.color
-      }
+        "& div.react-grid-Container": {
+            color: "red",
+            // color: theme.palette.text.color
+        }
     }
-  }));
+}));
 class LDataGrid extends Component {
     state = {
         data: [],
@@ -180,16 +185,16 @@ class LDataGrid extends Component {
         let cleanfilters = {};
         console.log(this.state.filters);
         Object.entries(this.state.filters).map((item) => {
-            if(`${item[1]}`.length >= 1) {
-                if(item[1] !== "Todos"){
+            if (`${item[1]}`.length >= 1) {
+                if (item[1] !== "Todos") {
                     cleanfilters[item[0]] = item[1];
                     console.log(item);
                 }
-            }else{
-                console.log(item[0]+" tamanho "+`${item[1]}`.length);
+            } else {
+                console.log(item[0] + " tamanho " + `${item[1]}`.length);
             }
         });
-        let query = Object.assign({queryType : 'like', withId: "name", page: params.page ?? 1}, cleanfilters);
+        let query = Object.assign({ queryType: 'like', withId: "name", page: params.page ?? 1 }, cleanfilters);
         console.log(query);
         const data = await this.props.pageRequest(query);
         if (data !== undefined) {
@@ -200,11 +205,11 @@ class LDataGrid extends Component {
     async componentDidMount() {
         //this.setPage();
         let filters = {};
-        !this.props.filterInputs ?? this.props.filterInputs.map(input => { 
+        !this.props.filterInputs ?? this.props.filterInputs.map(input => {
             filters[input.column] = input.value ?? "";
         });
 
-        this.setState({...this.state, filters});
+        this.setState({ ...this.state, filters });
 
     }
 
@@ -230,7 +235,7 @@ class LDataGrid extends Component {
             if (idNumbers.includes(e.target.id)) {
                 value = value.replace(/[^\d]+/g, '');
             }
-            if (value.length == 0 ) {
+            if (value.length == 0) {
                 delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {
@@ -243,50 +248,97 @@ class LDataGrid extends Component {
                     value = value.replace(/[^\d]+/g, '');
                 }
                 filters[e.target.id ?? e.target.name] = value
-                this.setState({...this.state, filters});
+                this.setState({ ...this.state, filters });
             }
         }
 
         const onClearFilter = () => {
             let filters = {};
-            this.props.filterInputs.map(input => { 
+            this.props.filterInputs.map(input => {
                 filters[input.column] = input.value ?? "";
             });
-            
-            this.setState({...this.state, filters});
+
+            this.setState({ ...this.state, filters });
         }
         const rows: RowsProp = this.state.data.data ?? [];
-          
+
         const columns: ColDef[] = this.props.columns;
         return (
             <div>
-                {this.props.filterInputs == undefined ? ('') : 
-                (<Card className={classes.root} style={{ marginBottom: 15 }}>
-                    <CardContent>
-                        <Typography onClick={() => {
-                            this.setState({ ...this.state, filter: this.state.filter == 'none' ? 'flex' : 'none' })
-                        }}>
-                            <FilterListIcon /> Filtros
+                {this.props.filterInputs == undefined ? ('') :
+                    (<Card className={classes.root} style={{ marginBottom: 15 }}>
+                        <CardContent>
+                            <Typography onClick={() => {
+                                this.setState({ ...this.state, filter: this.state.filter == 'none' ? 'flex' : 'none' })
+                            }}>
+                                <FilterListIcon /> Filtros
                     </Typography>
 
-                        <div id="filter-form" style={{
-                            alignItems: 'start',
-                            flexFlow: 'row wrap',
-                            justifyContent: 'space-between',
-                            display: this.state.filter,
-                        }}>
-                            {
-                                this.props.filterInputs.map(input => {
-                                    if (input.type == "text") {
-                                        if (input.mask === undefined)
-                                            return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
-                                        else
+                            <div id="filter-form" style={{
+                                alignItems: 'start',
+                                flexFlow: 'row wrap',
+                                justifyContent: 'space-between',
+                                display: this.state.filter,
+                            }}>
+                                {
+                                    this.props.filterInputs.map(input => {
+                                        if (input.type == "text") {
+                                            if (input.mask === undefined)
+                                                return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            else
+                                                return (
+                                                    <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                        <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
+                                                        <Input
+                                                            value={this.state.filters[input.column] ?? ""}
+                                                            onChange={onChangeInputs}
+                                                            onFocus={(e) => {
+                                                                if (e.target.value.length == 0) {
+                                                                    //alert(e.target.value);
+                                                                    e.target.setSelectionRange(0, e.target.value.length)
+                                                                }
+                                                            }}
+                                                            name={input.column}
+                                                            id={input.column}
+                                                            value={this.state.filters[input.column] ?? ""}
+                                                            inputProps={{
+                                                                mask: input.mask
+                                                            }}
+                                                            inputComponent={TextMaskCustom}
+                                                        />
+                                                    </FormControl>)
+
+                                        } else if (input.type == "date") {
+                                            let dvalue = "";
+                                            if(this.state.filters[input.column] !== undefined){
+                                                //console.log(this.state.filters[input.column])
+                                                dvalue = this.state.filters[input.column].split('-');
+                                                dvalue = `${dvalue[2]}/${dvalue[1]}/${dvalue[0]}`;
+                                                //console.log(dvalue)
+                                            }
+
                                             return (
                                                 <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
                                                     <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                     <Input
                                                         value={this.state.filters[input.column] ?? ""}
-                                                        onChange={onChangeInputs}
+                                                        onChange={(e) => {
+                                                            let dateValue = e.target.value.split('/');
+                                                            console.log(`${dateValue[2]}-${dateValue[1]}-${dateValue[0]}`)
+                                                            onChangeInputs({target: { id: input.column, value: `${dateValue[2]}-${dateValue[1]}-${dateValue[0]}`}})
+                                                            try {
+                                                                //let e = { target: { id: props.id, value: `${selectvalue.toJSON().split('T')[0]}` } }
+                                                                if (input.validate !== undefined) {
+                                                                    if (input.validate(e.target.value)) {
+                                                                        //setError(false);
+                                                                    } else {
+                                                                       // setError(true)
+                                                                    }
+                                                                }
+                                                            } catch (err) {
+                                                                //console.log(err);
+                                                            }
+                                                        }}
                                                         onFocus={(e) => {
                                                             if (e.target.value.length == 0) {
                                                                 //alert(e.target.value);
@@ -295,62 +347,60 @@ class LDataGrid extends Component {
                                                         }}
                                                         name={input.column}
                                                         id={input.column}
-                                                        value={this.state.filters[input.column] ?? ""}
+                                                        value={dvalue ?? ""}
                                                         inputProps={{
-                                                            mask: input.mask
-                                                        }}
-                                                        inputComponent={TextMaskCustom}
-                                                    />
-                                                </FormControl>)
-
-                                    } else if (input.type == "date") {
-                                        return <DateInput id={input.column} value={this.state.filters[input.column] ?? ""} label={input.label}  style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} onBlur={onChangeInputs} onChange={onChangeInputs} />
-                                    } else if (input.type == "select") {
-                                        return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
-                                    }
-                                })
-                            }
-                            <div>
-                                <Button size="small" style={{ margin: 5 }} startIcon={<SearchIcon />} variant="contained" color="primary" onClick={() => { this.setPage(this.state.filters); this.setState({...this.state, firstLoad : false}) }}> Pesquisar</Button>
-                                <Button size="small" style={{ margin: 5 }} startIcon={<ReorderIcon />} variant="contained" color="primary" onClick={() => {onClearFilter()}} > Limpar</Button>
+                                                            mask: [/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
+                                                            }}
+                                                            inputComponent={TextMaskCustom}
+                                                        />
+                                                </FormControl>
+                                            )
+                                        } else if (input.type == "select") {
+                                            return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
+                                        }
+                                    })
+                                }
+                                <div>
+                                    <Button size="small" style={{ margin: 5 }} startIcon={<SearchIcon />} variant="contained" color="primary" onClick={() => { this.setPage(this.state.filters); this.setState({ ...this.state, firstLoad: false }) }}> Pesquisar</Button>
+                                    <Button size="small" style={{ margin: 5 }} startIcon={<ReorderIcon />} variant="contained" color="primary" onClick={() => { onClearFilter() }} > Limpar</Button>
+                                </div>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>)}
+                        </CardContent>
+                    </Card>)}
 
                 <Card>
                     <CardContent>
                         {!this.state.firstLoad &&
-                        <div style={{ height: 700, width: '100%' }}>
-                            <DataGrid
-                            sx={{
-                                '& .MuiDataGrid-root':{
-                                    '& .MuiDataGrid-viewport': {
-                                  maxWidth: '600px',
-                                },
-                            }
-                              }}
-                             rows={rows} columns={columns}
-                                spacing={0}
-                                stickyHeader
-                                sortModel={this.props.sortModel}
-                                disableClickEventBubbling
-                                disableColumnMenu={true}
-                                loading={this.state.loading}
-                                localeText={DEFAULT_LOCALE_TEXT}
-                                paginationMode="server"
-                                rowCount={this.state.data.total ?? 0}
-                                pageSize={10} rowsPerPageOptions={[10]} pagination
-                                /*onPageSizeChange={(params) => {
-                                    this.setPage({ page: params.page, pageSize: params.pageSize });
-                                }}*/
-                                onPageChange={(params) => {
-                                    let filters = Object.assign({}, this.state.filters,{ page: params.page, pageSize: params.pageSize });
-                                    this.setState({...this.state, filters});
-                                    this.setPage(filters);
-                                }}
-                            />
-                        </div> }
+                            <div style={{ height: 700, width: '100%' }}>
+                                <DataGrid
+                                    sx={{
+                                        '& .MuiDataGrid-root': {
+                                            '& .MuiDataGrid-viewport': {
+                                                maxWidth: '600px',
+                                            },
+                                        }
+                                    }}
+                                    rows={rows} columns={columns}
+                                    spacing={0}
+                                    stickyHeader
+                                    sortModel={this.props.sortModel}
+                                    disableClickEventBubbling
+                                    disableColumnMenu={true}
+                                    loading={this.state.loading}
+                                    localeText={DEFAULT_LOCALE_TEXT}
+                                    paginationMode="server"
+                                    rowCount={this.state.data.total ?? 0}
+                                    pageSize={10} rowsPerPageOptions={[10]} pagination
+                                    /*onPageSizeChange={(params) => {
+                                        this.setPage({ page: params.page, pageSize: params.pageSize });
+                                    }}*/
+                                    onPageChange={(params) => {
+                                        let filters = Object.assign({}, this.state.filters, { page: params.page, pageSize: params.pageSize });
+                                        this.setState({ ...this.state, filters });
+                                        this.setPage(filters);
+                                    }}
+                                />
+                            </div>}
                     </CardContent>
                     <CardActionArea>
                     </CardActionArea>
@@ -367,6 +417,6 @@ const mapStateToProps = store => ({
 
 });
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({setSnackbar}, dispatch);
+    bindActionCreators({ setSnackbar }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(LDataGrid)

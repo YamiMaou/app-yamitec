@@ -85,8 +85,8 @@ class CreateBonus extends Component {
                             }
 
                             if(v1.validate.decimal !== undefined){
-                                if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                                if (/^\s*-?(\d+(\,\d{1,2})?|\,\d{1,2})\s*$/.test(value) == false)
+                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e vírgula ` }
                             }
 
                             if (v1.validate.max !== undefined) {

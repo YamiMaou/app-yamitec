@@ -12,4 +12,11 @@ class BonusController extends ControllersExtends
     {
         parent::__construct(\App\Models\Bonus::class, 'home');
     }
+
+    public function store(Request $request){
+        $request->merge([
+            'discount_percent' => str_replace(',','.',$request->discount_percent),
+        ]);
+        return parent::store($request);
+    }
 }

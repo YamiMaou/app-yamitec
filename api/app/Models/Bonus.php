@@ -12,4 +12,9 @@ class Bonus extends Model
         'indication_qtty',
         'discount_percent'
     ];
+
+    public function audits()
+    {
+        return $this->hasOne(Audit::class,'bonus_id','id')->with(['user'])->latest();
+    }
 }

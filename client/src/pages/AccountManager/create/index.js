@@ -89,8 +89,10 @@ class CreateAccountManager extends Component {
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
                             if(v1.validate.decimal !== undefined){
-                                if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
+                                if(value.length > 0){
+                                    if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                                }
                             }
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)

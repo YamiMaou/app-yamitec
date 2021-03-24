@@ -93,15 +93,15 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function store(Request $request)
     {
-        
         if (count($this->validate) > 0) {
             $request->validate($this->validate);
         }
+        $modelName = strtolower(str_replace('Model','',(new \ReflectionClass($this->model))->getShortName()));
+                
         //var_dump( $request->all());
            // exit;
         try {
             if (count($this->with) > 0) {
-                $modelName = str_replace('Controller','',(new \ReflectionClass($this))->getShortName());
                 $files = new FilesController();
                 $files = $files->multUpload($request, $modelName);
                 $data = $files->request;
@@ -115,6 +115,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 foreach ($this->with["data"] as $model => $fields) {
                     if ($i == 0) {
                         $primary = $this->model->create($fields);
+                        $this->storeId = $primary;
                         $i++;
                         continue;
                     }
@@ -134,7 +135,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 //FilesController::upload($request, $this->model, $obj->id);
             }
 
-            $this->saveLog($this->storeId, $request, $modelName);
+            $this->saveLog($this->storeId->id, $request, $modelName);
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch (Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
@@ -144,6 +145,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     public function update(Request $request, $id)
     {
         $modelName = strtolower(str_replace('Model','',(new \ReflectionClass($this->model))->getShortName()));
+        
         if (count($this->validate) > 0) {
             foreach ($this->validate as $k => $val) {
                 $regras = "";
@@ -166,6 +168,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             //$data['user_id'] = $request->user()->id;
             unset($data["_token"]);
             unset($data["_method"]);
+            unset($data["audits"]);
             unset($data["justification"]);
             unset($data["created_at"]);
             unset($data["updated_at"]);
@@ -217,17 +220,18 @@ abstract class ControllersExtends extends Controller implements ControllersInter
 
     public function saveLog($id, $request, $modelName = ""){
         $data =  $request->all();
-        $just = $data['justification'];
+        $just = $data['justification'] ?? ' ';
         unset($data['_method']);
         unset($data['justification']);
-        $older = $this->model->where('id', $id )->first()->toArray();
+        $older = $this->model->where('id', $id )->first();
+        $older = $older !== null ? $older->toArray() : [];
         $od = [];
         foreach($older as $key=>$value){
             if(isset($data[$key])){
                 $od[$key] = $value;
             }
         }
-
+        
         $to = json_encode($data);
         $from = json_encode($od);
         $audit = new Audit();

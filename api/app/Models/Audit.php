@@ -11,6 +11,8 @@ class Audit extends Model
         'client_id',
         'manager_id',
         'contributor_id',
+        'accountmanager_id',
+        'bonus_id',
         'user_id', 
         'justification', 
         'from', 

@@ -52,4 +52,9 @@ class AccountManagersController extends ControllersExtends
         }
         return $data;
     }
+
+    public function show(Request $request, $id, $with=[])
+    {
+       return  parent::show($request, $id, ['audits']);
+    }
 }

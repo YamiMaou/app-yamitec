@@ -40,6 +40,16 @@ class CreateAudits extends Migration
             ->references('id')->on('providers')
             ->onDelete('cascade');
 
+            $table->unsignedBigInteger('accountmanager_id')->nullable();
+            $table->foreign('accountmanager_id')
+            ->references('id')->on('account_managers')
+            ->onDelete('cascade');
+
+            $table->unsignedBigInteger('bonus_id')->nullable();
+            $table->foreign('bonus_id')
+            ->references('id')->on('bonuses')
+            ->onDelete('cascade');
+
             $table->text('justification')->nullable();
             $table->text('to')->nullable();
             $table->text('from')->nullable();

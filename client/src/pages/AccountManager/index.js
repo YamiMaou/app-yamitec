@@ -144,7 +144,7 @@ class AccountManager extends Component {
                 headerName: 'Situação',
                 flex: 0.5,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return params.value === 1 ? "Pago" : "A Pagar";
+                    return params.value === 1 ? "Efetuado" : "Dependente";
                 }
             },{
                 field: 'id',
