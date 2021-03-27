@@ -15,7 +15,7 @@ import { setSnackbar } from '../../../actions/appActions'
 import { postApiBonus, getApiDownloadFile } from '../../../providers/api'
 import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
-import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
+import { InputCep, InputCpf, InputDecimal, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 
 import { withSnackbar  } from 'notistack';
@@ -53,7 +53,6 @@ class CreateBonus extends Component {
             } else {
                 console.log(response)
                 let errors = response.data ?? undefined;
-
                 //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
                 if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
@@ -125,7 +124,7 @@ class CreateBonus extends Component {
                 title: 'Bonificação',
                 fields: [
                     { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: {min: 1, number: true, required: true},  value: 1, flexBasis : "45%" },
-                    { column: 'discount_percent', label: 'Desconto (%)', type: 'text', validate: {min: 1, decimal: true, required: true},flexBasis: '45%' },
+                    { column: 'discount_percent', label: 'Desconto (%)', type: 'percent', validate: {min: 1, percent: true, required: true}, flexBasis: '45%' },
                 ]
             },
             
@@ -135,7 +134,7 @@ class CreateBonus extends Component {
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Typography variant="h6">
-                        <HomeIcon />  <span>Cadastro / Clientes</span>
+                        <HomeIcon />  <span>Cadastro / Bonificação</span>
                     </Typography>
                 </AppBar>
                 <LForms forms={forms}

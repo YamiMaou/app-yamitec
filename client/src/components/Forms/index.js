@@ -46,6 +46,48 @@ const idNumbers = [
     'cpf', 'cnpj', 'zipcode'
 ];
 
+// Decimal 
+
+const MaskedDecimalInput = (props) => {
+    const [value1, setValue] = useState(props.value ?? 0);
+    const [error, setError] = useState(false);
+    function getMoney( str )
+    {
+        return parseInt( str.replace(/[\D]+/g,'') );
+    }
+    function formatReal( int )
+    {
+        var tmp = int+'';
+        tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+        if( tmp.length > 6 && !props.percent )
+            tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, "$1,$2");
+        return tmp;
+    }
+    function handleChange(e) {
+        //const { value, id } = e.target;
+        let val = e.target.value.length > 0 ? e.target.value : '0';
+        if( val.length > 5 && props.percent )
+            return false;
+        if( val.length > 9 && props.decimal )
+            return false;
+        props.onChange(e) ?? undefined;
+        setValue(formatReal(getMoney(val)));
+    }
+    return (
+        <TextField key={`input-${props.id}`} size="small" style={props.style}
+            required={props.required ?? false}
+            disabled={props.disabled ?? false}
+            error={error}
+            type={props.type ?? "text"}
+            value={value1 ?? ''}
+            helperText={error == true ? props.helperText ?? "conteúdo inválido" : ""}
+            id={props.id} label={props.label}
+            onChange={handleChange}
+            onBlur={handleChange}
+        />
+    );
+}
+
 // MASKED INPUTS 
 
 function TextMaskCustom(props) {
@@ -202,7 +244,9 @@ function TextInputCustom(props) {
 
     function handleChange(e) {
         const { id } = e.target;
+        let e1 = {target: {id: e.target.id, name: e.target.name, type: e.target.type, value: e.target.value.replace(',', '.')}}
         let val = e.target.value;
+        
         setValue(val);
         if (props.validate !== undefined) {
             if (props.validate(val) !== false) {
@@ -211,10 +255,15 @@ function TextInputCustom(props) {
                 setError(true)
             }
         }
-        props.onChange(e)
-
+        if(props.decimal)
+        {
+            props.onChange(e1)
+        }else{
+            props.onChange(e)
+        }
+        //console.log(e1.target.value + ' - ' + e.target.value);
     }
-    //console.log(value);
+    
     if (props.mask === undefined)
         return (
             <TextField key={`input-${props.id}`} size="small" style={props.style}
@@ -484,6 +533,20 @@ class LForms extends Component {
                                                         let CustomComponent = input.component;
                                                         //console.log(input.value + '  ' + input.value1);
                                                         return (<CustomComponent valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />) ?? ('Não existe');
+                                                    } else if (input.type == "decimal" || input.type == "percent") {
+                                                        return <MaskedDecimalInput key={`input-${ind1}`}
+                                                            id={input.column}
+                                                            disabled={input.disabled ?? false}
+                                                            type="tel"
+                                                            value={input.value}
+                                                            style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }}
+                                                            id={input.column} label={input.label}
+                                                            decimal={input.validate ? input.validate.decimal !== undefined : undefined }
+                                                            percent={input.validate ? input.validate.percent !== undefined : undefined }
+                                                            validate={input.validateHandler}
+                                                            helperText={input.helperText ?? ""}
+                                                            onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
+                                                            onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "date") {
                                                         return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
@@ -522,6 +585,7 @@ class LForms extends Component {
                                                             style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }}
                                                             id={input.column} label={input.label}
                                                             mask={input.mask ?? undefined}
+                                                            decimal={input.validate ? input.validate.decimal !== undefined : undefined }
                                                             validate={input.validateHandler}
                                                             helperText={input.helperText ?? ""}
                                                             onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}

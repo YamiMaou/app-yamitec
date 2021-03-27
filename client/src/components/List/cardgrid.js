@@ -56,6 +56,48 @@ import { validaCpf } from '../../providers/commonMethods'
 const idNumbers = [
     'cpf', 'cnpj'
 ];
+
+// Decimal 
+
+const MaskedDecimalInput = (props) => {
+    const [value1, setValue] = useState(props.value ?? 0);
+    const [error, setError] = useState(false);
+    function getMoney( str )
+    {
+        return parseInt( str.replace(/[\D]+/g,'') );
+    }
+    function formatReal( int )
+    {
+        var tmp = int+'';
+        tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+        
+        if( tmp.length > 6 && !props.percent )
+            tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+        return tmp;
+    }
+    function handleChange(e) {
+        //const { value, id } = e.target;
+        let val = e.target.value.length > 0 ? e.target.value : '0';
+        if( val.length > 5 && props.percent )
+            return false;
+        props.onChange(e) ?? undefined;
+        setValue(formatReal(getMoney(val)));
+    }
+    return (
+        <TextField key={`input-${props.id}`} size="small" style={props.style}
+            required={props.required ?? false}
+            disabled={props.disabled ?? false}
+            error={error}
+            type={props.type ?? "text"}
+            value={value1 ?? ''}
+            helperText={error == true ? props.helperText ?? "conteúdo inválido" : ""}
+            id={props.id} label={props.label}
+            onChange={handleChange}
+            onBlur={handleChange}
+        />
+    );
+}
+
 // MASKED INPUTS 
 
 function TextMaskCustom(props) {
@@ -338,6 +380,8 @@ class LCardGrid extends Component {
                                                         />
                                                 </FormControl>
                                             )
+                                    } else if (input.type == "decimal" || input.type == "percent") {
+                                        return <MaskedDecimalInput percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                     } else if (input.type == "select") {
                                         return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }

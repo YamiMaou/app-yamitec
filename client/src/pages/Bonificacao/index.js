@@ -146,7 +146,7 @@ class Bonus extends Component {
         const flexBasis = '25%';
         const filter = [
             { column: 'indication_qtty', label: 'Quantidade', type: 'text', flexBasis },
-            { column: 'discount_percent', label: 'Desconto (%)', type: 'text', flexBasis },
+            { column: 'discount_percent', label: 'Desconto (%)', type: 'percent', flexBasis },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 
@@ -159,7 +159,7 @@ class Bonus extends Component {
                         </Typography>
                         {
                             this.state.session.permissions.find(x => x.module === module_id).create === 1 ?(
-                                <Link to="bonificacao/novo" style={{textDecoration: 'none'}} >
+                                <Link to="/bonificacao/novo" style={{textDecoration: 'none'}} >
                                 <Button variant="contained" size="small" fullWidth color="primary"
                                     style={{
                                     background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
@@ -181,6 +181,7 @@ class Bonus extends Component {
                             if(params.active !== undefined){
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
+                            params.discount_percent = params.discount_percent.replace(',','.');
                             this.setState({...this.state, pageRequest: params})
                             return getApiBonus(params)
                     }} />) : (
@@ -190,6 +191,7 @@ class Bonus extends Component {
                                 if(params.active !== undefined){
                                     params.active = params.active == "Ativo" ? 1: 0;
                                 }
+                                params.discount_percent = params.discount_percent.replace(',','.');
                                 this.setState({...this.state, pageRequest: params})
                                 return getApiBonus(params)
                         }}  />

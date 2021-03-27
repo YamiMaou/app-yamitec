@@ -20,6 +20,9 @@ class ProvidersController extends ControllersExtends
     {
         $this->model = new \App\Models\Provider();
         parent::__construct(Provider::class, 'home');
+        parent::setValidate([
+            "cnpj" => "required|unique:providers",
+        ]);
     }
 
 public function index(Request $request)
@@ -97,11 +100,10 @@ public function index(Request $request)
     public function store(Request $request)
     {
         try {
-
             $provider = DB::table('providers')->where('cnpj', $request->cnpj)->first();
             if ($provider):
                 if ($provider->cnpj == $request->cnpj)
-                    return response()->json(["CNPJ já cadastrado!"]);
+                    return response()->json(["success"=> false, "type" => "store", "message" => "CNPJ já cadastrado!"]);
             endif;
             $validate = $request;
             $files = new \App\Http\Controllers\FilesController();
@@ -124,7 +126,14 @@ public function index(Request $request)
             ];
             $request['anexo'] = $data['anexo'] ?? null;
             $request['logo'] = $data['logo'] ?? null;
+
             $provider = Provider::create($provider_data);
+
+            if(explode(',',$request->managers) !== null)
+                $provider->managers()->attach(explode(',',$request->managers));
+            if(explode(',',$request->providers))
+                Provider::whereIn('id', explode(',',$request->providers))->update(['matriz_id' => $provider->id]);
+                //$provider->filials()->attach(explode(',',$request->providers));
 
             if ($request->addr_clone == null):
                 $address_data = [
@@ -180,8 +189,9 @@ public function index(Request $request)
 
             if ($request->contract_clone == null):
                 $contract_data = [
-                    "rate" => $request->rate,
+                    "rate" => str_replace(",",".",$request->rate),
                     "accession_date" => $request->accession_date,
+                    "contributor_id" => $request->contributor_id,
                     "end_date" => $request->end_date,
                     "provider_id" => $provider->id,
                 ];
@@ -202,7 +212,7 @@ public function index(Request $request)
 
             parent::saveLog($provider->id, $request, 'providers');
 
-            return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
+            return response()->json(["1success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
