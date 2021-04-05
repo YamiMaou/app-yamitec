@@ -30,8 +30,8 @@ class CreateContributors extends Migration
             $table->integer('anexo')->nullable();
             $table->timestamps();
 
-            $table->unsignedBigInteger('audit_id')->nullable();
-            $table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');
+            /*$table->unsignedBigInteger('audit_id')->nullable();
+            $table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');*/
         });
     }
 

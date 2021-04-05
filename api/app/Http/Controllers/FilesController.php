@@ -71,16 +71,16 @@ class FilesController extends Controller
             foreach ($request->all() as $k => $v) {
                 $lrequest[$k] = $v;
                 if ($request->hasFile($k)) {
-                    $fileName = time() . '.' . $request->file($k)->extension();
+                    $fileName = time(). '_'.$k . '.' . $request->file($k)->extension();
 
                     $path = $request->file($k)->storeAs("uploads", $fileName);
 
                     $foreign  = isset($model) ?? strtolower($model) . '_id';
                     $model = $this->pathClass . $model;
-                        $request[$foreign] = $id;
-                        $request['path'] = $path;
-                        $request['name'] = $fileName;
-                        $create = $this->file->create($request->all());
+                        $fc[$foreign] = $id;
+                        $fc['path'] = $path;
+                        $fc['name'] = $fileName;
+                        $create = $this->file->create($fc);
                         $lrequest[$k] = $create->id;
                         unset($request[$foreign]);
                         unset($request['path']);

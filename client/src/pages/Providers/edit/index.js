@@ -28,7 +28,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AddIcon from '@material-ui/icons/Add';
 import { setSnackbar } from '../../../actions/appActions'
-import { putApiProviders, getApiManagers, deleteApiManagersProviders,getAddressByCepla, getApiProviders, getApiProviderTypes } from '../../../providers/api'
+import { putApiProviders, getApiManagers, deleteApiManagersProviders,getAddressByCepla, getApiProviders, getApiProviderTypes, getApiContributors } from '../../../providers/api'
 import { validaEmail, validaCnpj, stringToaddDate } from '../../../providers/commonMethods'
 import { InputCep, InputCnpj, InputPhone, stringCpf, stringCnpj } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
@@ -56,8 +56,9 @@ const SelectInput = (props) => {
                 setError(true)
             }
         }
+        e.target.id = e.target.name;
         props.onChange(e)
-        console.log(e.target.value)
+        console.log(e.target)
         setValue(e.target.value);
     }
     return (
@@ -91,7 +92,7 @@ const SelectInput = (props) => {
 }
 const TypeEmpresaInput = (props) => {
     const [value, setValue] = useState(props.value);
-    const [value1, setValue1] = useState(props.value);
+    const [value1, setValue1] = useState(props.value1);
     function handleChange(e) {
         const { value, id } = e.target;
         props.onChange(e) ?? undefined;
@@ -105,7 +106,7 @@ const TypeEmpresaInput = (props) => {
     return (<div style={{flexBasis: props.style.flexBasis, display: 'flex'}}>
         <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{margin: 5, marginTop: 25,flexBasis: window.innerWidth < 768 ? '100%' : '50%' }} onChange={(e) => handleChange(e)} />
         {value == 2 &&
-        <SelectInput valueLabel={props.valueLabel} json={props.json} value={value1 ?? undefined} helperText={props.helperText ?? ""} key={`input-${15001}`} id={props.column} label={props.label} name={props.column} values={props.values} style={{margin: 5, marginTop: 25,flexBasis: window.innerWidth < 768 ? '100%' : '50%' }} onChange={(e) => handleChange1(e) ?? undefined} />
+        <SelectInput valueLabel={props.valueLabel} json={props.json} value={value1} helperText={props.helperText ?? ""} key={`input-${15001}`} id={"matriz_id"} label={props.label} name={"matriz_id"} values={props.values} style={{margin: 5, marginTop: 25,flexBasis: window.innerWidth < 768 ? '100%' : '50%' }} onChange={(e) => handleChange1(e) ?? undefined} />
     }</div>)
 }
 
@@ -167,13 +168,29 @@ function BlockDialog(props) {
       </div>
     );
   }
-
+  function getMoney( str )
+  {
+      return parseInt( str.replace(/[\D]+/g,'') );
+  }
+  function formatReal( int )
+  {
+      var tmp = int+'';
+          tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+          if( tmp.length > 6)
+              tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+          if( tmp.length >= 10 )
+              tmp = tmp.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, "$1.$2,$3");
+          return tmp;
+  }
 class EditProviders extends Component {
     state = {
+        filter: ['flex'],
         data: {},
         managers: [],
+        contributors: [],
         manager: 0,
         providers: [],
+        filials: [],
         provider: 0,
         provProviders: [],
         provManagers: [],
@@ -185,18 +202,22 @@ class EditProviders extends Component {
             return;
         }
         localStorage.setItem("sessionTime", 9000)
+        const contributors = await getApiContributors({active: 1});
         const data = await getApiProviders({}, this.props.match.params.id);
-        const providers = await getApiProviders({type: 1});
-        const managers = await getApiManagers();
+        const providers = await getApiProviders({type: 1, active: 1});
+        const filials = await getApiProviders({type: 2, active: 1});
+        const managers = await getApiManagers({active: 1});
         const providertypes = await getApiProviderTypes();
-        console.log(data);
+        //console.log(providers.data.filter(x => x.id != this.props.match.params.id))
         this.setState({ ...this.state, 
             data, 
-            fields: {},
-            providers: providers.data, 
+            fields: data,
+            providers: providers.data.filter(x => x.id != this.props.match.params.id), 
+            filials: filials.data.filter(x => x.id != this.props.match.params.id),
             provManagers: data.managers, 
             provProviders: data.filials,
             managers: managers.data, 
+            contributors: contributors.data,
             providertypes: providertypes.data 
         });
 
@@ -213,6 +234,10 @@ class EditProviders extends Component {
             this.props.setSnackbar({ open: false, message: "" });
         };
         const request = async (state, data) => {
+            if(this.state.provManagers.length == 0){
+                this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 Responsável vinculado"});
+                return false;
+            }
             this.setState({ ...this.state, loading: true });
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
             data = Object.assign({}, state.addresses, data);
@@ -222,6 +247,8 @@ class EditProviders extends Component {
             delete data.addresses;
             delete data.contacts;
             delete data.contracts;
+            console.log(data.rate)
+            //data.rate = data.rate.replace(/\./g,'').replace(',', '.');
             let response = await putApiProviders(this.props.match.params.id, data);
             //console.log(response);
             if (response.data.success) {
@@ -229,15 +256,18 @@ class EditProviders extends Component {
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
-                let { errors, message } = response.data.error.response.data
+                console.log(response)
+                let errors = response.data ?? undefined;
+
+                //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
-                console.log(errors)
-                if (errors !== undefined) {
-                    Object.keys(errors).map(err => {
+                if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
+                    Object.keys(errors.error.response.data.errors).map(err => {
                         console.log(err);
-                        messages += `O campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
-                    });
-                } else {
+                        let field = err == "file" ? "Anexo" : err
+                        messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
+                    })
+                } else{
                     messages = 'Houve um problema em sua requisição!'
                 }
                 this.setState({ ...this.state, loading: false });
@@ -269,8 +299,8 @@ class EditProviders extends Component {
                             }
 
                             if(v1.validate.decimal !== undefined){
-                                if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                                //if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
+                                //    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
                             }
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
@@ -303,8 +333,6 @@ class EditProviders extends Component {
             return campo === undefined ? true : false
         }
         const flexBasis = '22%';
-        console.log('teste')
-        console.log(this.state.data)
         const forms = (this.state.data === undefined || this.state.data.id === undefined) ? [] : [
             {
                 title: 'Dados Básicos',
@@ -350,7 +378,7 @@ class EditProviders extends Component {
                 //flexFlow: 'row no-wrap',
                 //json: "address",
                 fields: [
-                    { column: 'addr_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
+                    { column: 'addr_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
                     { column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: this.state.data['addresses'].zipcode },
                     { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: this.state.data['addresses'].street },
                     { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '' },
@@ -366,7 +394,7 @@ class EditProviders extends Component {
                 title: 'Contato',
                 //json: 'contact',
                 fields: [
-                    { column: 'contact_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }},flexBasis: "100%", value: this.state.data.contact_clone },
+                    { column: 'contact_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1 ? true : false), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }},flexBasis: "100%", value: this.state.data.contact_clone },
                     { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: this.state.data['contacts'].phone1 },
                     { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: { max: 15 }, flexBasis, value: this.state.data['contacts'].phone2 },
                     { column: 'email', label: 'E-mail', type: 'email', validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: this.state.data['contacts'].email },
@@ -386,10 +414,21 @@ class EditProviders extends Component {
                 title: 'Contrato Atual',
                 //json: 'contact',
                 fields: [
-                    { column: 'contract_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%" },
+                    { column: 'contract_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1 ? true : false), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%" },
                     { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].accession_date },
                     { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: { required: true }, flexBasis: '20%', value: this.state.data['contracts'].end_date },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'number', validate: { required: true, decimal: true }, flexBasis: '20%', value: this.state.data['contracts'].rate },
+                    { 
+                        column: 'contributor_id', 
+                        label: 'Vendedor', 
+                        type: 'select',
+                        validate:{required: true}, 
+                        value: this.state.data['contracts'].contributor_id, 
+                        json: true,
+                        valueLabel: 'name',
+                        values: this.state.contributors,
+                        flexBasis: '20%'
+                    },
+                    { column: 'rate', label: 'Taxa de Adesão', type: 'decimal', validate: { required: true, decimal: true }, flexBasis: '20%', value: formatReal(getMoney(this.state.data['contracts'].rate)) },
                 ]
             }
         ];
@@ -494,14 +533,14 @@ class EditProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        if(this.state.provProviders.length > 1){
+                                        //if(this.state.provProviders.length > 1){
                                             await putApiProviders(params.row.id,{matriz_id: null,type: 1})
                                             //await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
                                             const data = await getApiProviders({}, this.props.match.params.id);
                                             this.setState({ ...this.state, provProviders: data.filials });
-                                        }else{
+                                        /*}else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
+                                        }*/
                                     } catch (err) {
                                         console.log(err)
                                     };
@@ -535,13 +574,20 @@ class EditProviders extends Component {
                         (<div>
                             <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
-                                    <Typography>
+                                    <Typography onClick={() => {
+                                            let filter = this.state.filter;
+                                            filter['responsaveis-ind'] = this.state.filter['responsaveis-ind'] == 'block' ? 'none' : 'block'
+                                            this.setState({ ...this.state, filter })
+                                        }}>
                                         <IndeterminateCheckBoxIcon /> Responsáveis
                                     </Typography>
+                                    <div style={{
+                                        display: this.state.filter['responsaveis-ind'] ?? 'block',
+                                    }}>
                                     <div  style={{
                                             alignItems: 'center',
                                             justifyContent: 'start',
-                                            display: 'flex'
+                                            display: 'flex',
                                         }}>
                                         <SelectInput valueLabel="value" 
                                             json={true} 
@@ -560,53 +606,61 @@ class EditProviders extends Component {
                                                 this.setState({...this.state, provManagers: data.managers });
                                             }}><AddIcon /></Button>
                                         </div>
-                                    <div style={{
-                                        alignItems: 'center',
-                                        justifyContent: 'start',
-                                        height: 350,
-                                    }}>
-                                        <DataGrid sx={{
-                                            '& .MuiDataGrid-root': {
-                                                '& .MuiDataGrid-viewport': {
-                                                    maxWidth: '600px',
-                                                },
-                                            }
-                                        }}
-                                            rows={rows} columns={columns}
-                                            spacing={0}
-                                            stickyHeader
-                                            disableClickEventBubbling
-                                            disableColumnMenu={true}
-                                            localeText={DEFAULT_LOCALE_TEXT}
-                                            pageSize={10} rowsPerPageOptions={[10]} pagination
-                                        />
+                                        <div style={{
+                                            alignItems: 'center',
+                                            justifyContent: 'start',
+                                            height: 350,
+                                        }}>
+                                            <DataGrid sx={{
+                                                '& .MuiDataGrid-root': {
+                                                    '& .MuiDataGrid-viewport': {
+                                                        maxWidth: '600px',
+                                                    },
+                                                }
+                                            }}
+                                                rows={rows} columns={columns}
+                                                spacing={0}
+                                                stickyHeader
+                                                disableClickEventBubbling
+                                                disableColumnMenu={true}
+                                                localeText={DEFAULT_LOCALE_TEXT}
+                                                pageSize={10} rowsPerPageOptions={[10]} pagination
+                                            />
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
                             
                             <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
-                                    <Typography>
+                                    <Typography onClick={() => {
+                                            let filter = this.state.filter;
+                                            filter['fornecedores-ind'] = this.state.filter['fornecedores-ind'] == 'block' ? 'none' : 'block'
+                                            this.setState({ ...this.state, filter })
+                                        }}>
                                         <IndeterminateCheckBoxIcon /> Fornecedores
                                     </Typography>
+                                    <div style={{
+                                        display: this.state.filter['fornecedores-ind'] ?? 'block',
+                                    }}>
                                     <div  style={{
                                             alignItems: 'center',
                                             justifyContent: 'start',
-                                            display: 'flex'
+                                            display: 'flex',
                                         }}>
                                         <SelectInput valueLabel="value" 
                                             json={true} 
                                             valueLabel={'company_name'}
                                             key={`input-${15019}`} id={"provider"} label={"Fornecedores"} name={"provider"} 
-                                            values={this.state.providers} 
+                                            values={this.state.filials} 
                                             style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                             onChange={(e) => {
                                                 this.setState({...this.state, provider: e.target.value});
                                             }} />
                                             <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
-                                                await putApiProviders(this.state.provider,{matriz_id: this.state.data.matriz_id > 0 ? this.state.data.matriz_id : this.props.match.params.id})
+                                                await putApiProviders(this.state.provider,{type: 2,matriz_id: this.state.data.matriz_id > 0 ? this.state.data.matriz_id : this.props.match.params.id})
                                                 const data = await getApiProviders({}, this.props.match.params.id);
-                                                this.setState({...this.state, provManagers: data.filials });
+                                                this.setState({...this.state, provProviders: data.filials });
                                             }}><AddIcon /></Button>
                                         </div>
                                     <div style={{
@@ -629,6 +683,7 @@ class EditProviders extends Component {
                                             localeText={DEFAULT_LOCALE_TEXT}
                                             pageSize={10} rowsPerPageOptions={[10]} pagination
                                         />
+                                    </div>
                                     </div>
                                 </CardContent>
                             </Card>

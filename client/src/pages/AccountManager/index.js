@@ -22,14 +22,16 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiAccountmanager, putApiAccountmanager } from '../../providers/api'
+import { deleteApiAccountmanager, getApiAccountmanager, putApiAccountmanager } from '../../providers/api'
 
 import {InputCpf, stringCnpj, stringCpf,} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
-import { Add, AttachMoney, MoneyOffOutlined } from '@material-ui/icons';
-import { Link } from 'react-router-dom';
+import { Add, AttachMoney, DeleteForeverOutlined, MoneyOffOutlined, TrendingUpOutlined } from '@material-ui/icons';
+import { Link, Redirect, useLocation } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 import { stringToDate } from '../../providers/commonMethods';
+
+import { withRouter } from 'react-router-dom'
 
 // MODULE ID
 const module_id = 1
@@ -45,8 +47,12 @@ function BlockDialog(props) {
     
     const send = async () => {
         setLoading(true);
-        await putApiAccountmanager( props.id, {status: props.active ?? undefined, note: justfy});
-        props.handle(props.active);
+        if(props.delete){
+            props.handle(1);
+        }else{
+            await putApiAccountmanager( props.id, {status: props.active ?? undefined, note: justfy});
+            props.handle(props.active);
+        }
         props.handleClose();
         setjustfy('');
         setLoading(false);
@@ -54,17 +60,16 @@ function BlockDialog(props) {
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Atualização de situação</DialogTitle>
+          <DialogTitle id="form-dialog-title">{props.delete ? `Deleção de Registro` : `Atualização de situação`}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-            
-                Confirma { props.active == 2 ? "Pendência" : "Pagamento" } do registro selecionado?
+                Confirma { !props.delete ? props.active == 2 ? "Pendência" : "Pagamento" : ` Exclusão ` } do registro selecionado?
             </DialogContentText>
-            { props.active == 0 &&<TextField
+            { props.delete == true &&<TextField
               autoFocus
               margin="dense"
-              id="note"
-              label="note"
+              id="Justificativa"
+              label="Justificativa"
               type="text"
               fullWidth
               value={justfy}
@@ -91,7 +96,6 @@ function BlockDialog(props) {
       </div>
     );
   }
-
 class AccountManager extends Component {
     state = {
         session: JSON.parse(localStorage.getItem("user")),
@@ -117,15 +121,11 @@ class AccountManager extends Component {
                     return stringToDate(params.value, 'DD/MM/YYYY');
                 }
             },
-            { field: 'cpf', headerName: 'CPF/Cnpj', flex: 1,
+            { field: 'cpf_cnpj', row: true, headerName: 'CPF/CNPJ', flex: 1,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    if(params.row.cpf.length > 0 && params.row.cnpj.length > 0){
-                        return stringCpf(params.row.cpf) + ' | ' + stringCnpj(params.row.cnpj);
-                    }else if(params.row.cpf.length > 0){
-                        return stringCpf(params.row.cpf);
-                    }else if(params.row.cnpj.length > 0){
-                        return stringCnpj(params.row.cnpj);
-                    }
+                    let cpfcnpj = params.row.cpf_cnpj != null ? params.row.cpf_cnpj.length > 11 
+                    ? stringCnpj(params.row.cpf_cnpj) : stringCpf(params.row.cpf_cnpj) : "";
+                    return cpfcnpj;
                 }
             },
             { field: 'name', headerName: 'Nome',flex: 0.7 },
@@ -136,7 +136,14 @@ class AccountManager extends Component {
             },
             { field: 'amount', headerName: 'Valor',flex: 0.5,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return 'R$ '+params.value.replace('.', ',');
+                    let tmp = params.value.replace(/[^\d]/g, "")+'';
+                    tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+                    if( tmp.length > 6)
+                        tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+                    if( tmp.length >= 10 )
+                        tmp = tmp.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, "$1.$2,$3");
+                    
+                    return 'R$ '+tmp;
                 }
             },
             {
@@ -169,6 +176,23 @@ class AccountManager extends Component {
                       >
                         {params.row.status === 1 ? <MoneyOffOutlined fontSize="small"/> : <AttachMoney fontSize="small" /> }
                       </Button>
+                      {params.row.detached == 1 &&
+                      <Button
+                        disabled={view.update === 0}
+                        variant="outlined" color="secondary"
+                        size="small"
+                        onClick={async (e)=> {
+                            const handle = async (justify) => {
+                                const delRow = await deleteApiAccountmanager(params.row.id, {justification: justify});
+                                this.props.setSnackbar({open: true, message: "Excluído com Êxito!"});
+                                setTimeout(()=> {this.props.history.go(0)}, 1000);
+                            }
+                            this.setState({...this.state, blockDialog: {open: true, delete: true,handle }})
+                        }}
+                        style={{ marginLeft: 16 }}
+                      >
+                        <DeleteForeverOutlined fontSize="small"/>
+                      </Button> }
                       { /* <Link to={ view.update === 0 ? '#' :  `/contas/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
                             disabled={view.update === 0}
@@ -187,9 +211,8 @@ class AccountManager extends Component {
         const filter = [
             { column: 'launch_date', label: 'De', type: 'date' },
             { column: 'launch_date_to', label: 'Até', type: 'date' },
-            { column: 'cpf', label: 'CPF', type: 'text',  mask: InputCpf,  flexBasis },
-            { column: 'cnpj', label: 'CNPJ', type: 'text',  mask: InputCpf,  flexBasis },
-            { column: 'status', label: 'Situação', type: 'select', values: ["Todos", "Efetuada", "Dependente"], value: "Todos", grow: 2  },
+            { column: 'cpf_cnpj', label: 'CPF/CNPJ', type: 'text',  mask: 'cpfcnpj',  flexBasis },
+            { column: 'status', label: 'Situação', type: 'select', values: ["Efetuada", "Dependente"], value: "Todos", grow: 2  },
             { column: 'name', label: 'Nome', type: 'text'},
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
@@ -219,6 +242,7 @@ class AccountManager extends Component {
                 </AppBar>
                 {window.innerWidth > 720 ? (
                     <LDataGrid rows={rows} columns={columns} filterInputs={filter} 
+                    autoload={true}
                     sortModel={[
                         {
                           field: 'launch_date',
@@ -248,6 +272,7 @@ class AccountManager extends Component {
                             id={this.state.blockDialog.id}
                             handle={this.state.blockDialog.handle}
                             active={this.state.blockDialog.active}
+                            delete={this.state.blockDialog.delete ?? false}
                             handleClose={() => {
                                 this.setState({...this.state, blockDialog: { open : false, id: undefined }})
                             }}
@@ -262,4 +287,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ setSnackbar}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountManager)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AccountManager))

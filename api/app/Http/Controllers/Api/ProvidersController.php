@@ -64,24 +64,26 @@ public function index(Request $request)
     public function show(Request $Request, $provider_id, $with=[])
     {
         try {
-            $provider = Provider::with(['audits','file_anexo', 'file_logo','managers','filials'])->findOrFail($provider_id);
+            $provider = Provider::with(['audits','file_anexo', 'file_logo','managers'])->findOrFail($provider_id);
+            $filials = Provider::with(['filials'])->where('id',$provider->type == 2 ? $provider->matriz_id : $provider->id)->get()[0]->filials;
+            $provider['filials'] = $filials;
             $addr_clone = $provider->where('id', $provider_id)->get('addr_clone')[0];
             $contact_clone = $provider->where('id', $provider_id)->get('contact_clone')[0];
             $contract_clone = $provider->where('id', $provider_id)->get('contract_clone')[0];
 
-            if ($addr_clone->addr_clone == true):
+            if ($provider->type == 2 && $addr_clone->addr_clone == true):
                 $address = Provider::find($provider->matriz_id)->address()->first();
             else:
                 $address = $provider->address()->first();
             endif;
             
-            if ($contact_clone->contact_clone == true):
+            if ($provider->type == 2 && $contact_clone->contact_clone == true):
                 $contact = Provider::find($provider->matriz_id)->contact()->first();
             else:
                 $contact = $provider->contact()->first();
             endif;
 
-            if ($contract_clone->contract_clone == true):
+            if ($provider->type == 2 && $contract_clone->contract_clone == true):
                 $contract = Provider::find($provider->matriz_id)->contracts()->first();
             else:
                 $contract = $provider->contracts()->first();
@@ -105,9 +107,16 @@ public function index(Request $request)
                 if ($provider->cnpj == $request->cnpj)
                     return response()->json(["success"=> false, "type" => "store", "message" => "CNPJ já cadastrado!"]);
             endif;
+            if($request->managers == ""){
+                return response()->json(["success" => false, "message" => "Ao menos um Responsável deve ser vínculado"]);
+            }
+            
+            if($request->type == 2 && $request->matriz_id == null){
+                return response()->json(["success" => false, "message" => "É obrigatório selecionar uma Matriz"]);
+            }
             $validate = $request;
             $files = new \App\Http\Controllers\FilesController();
-            $files = $files->multUpload($request, 'contributor');
+            $files = $files->multUpload($request, 'provider');
             $data = $files->request;
             // type = 1 para matriz e 0 para filial
             $provider_data = [
@@ -116,7 +125,7 @@ public function index(Request $request)
                 "cnpj" => $request->cnpj,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
-                "matriz_id" => $request->matriz_id,
+                "matriz_id" => $request->type == 2 ? $request->matriz_id : null,
                 "addr_clone" => $request->addr_clone ? true : false,
                 "contact_clone" => $request->contact_clone ? true : false,
                 "contract_clone" => $request->contract_clone ? true : false,
@@ -124,8 +133,8 @@ public function index(Request $request)
                 "anexo" =>  $data['anexo'],
                 "logo" =>  $data['logo'],
             ];
-            $request['anexo'] = $data['anexo'] ?? null;
-            $request['logo'] = $data['logo'] ?? null;
+            $provider_data['anexo'] = $data['anexo'] ?? null;
+            $provider_data['logo'] = $data['logo'] ?? null;
 
             $provider = Provider::create($provider_data);
 
@@ -135,84 +144,49 @@ public function index(Request $request)
                 Provider::whereIn('id', explode(',',$request->providers))->update(['matriz_id' => $provider->id]);
                 //$provider->filials()->attach(explode(',',$request->providers));
 
-            if ($request->addr_clone == null):
+            //if ($request->addr_clone == null):
                 $address_data = [
-                    "uf" => $request->uf,
-                    "city" => $request->city,
-                    "additional" => $request->additional,
-                    "street" => $request->street,
-                    "zipcode" => $request->zipcode,
+                    "uf" => $request->uf ?? "",
+                    "city" => $request->city ?? "",
+                    "additional" => $request->additional ?? "",
+                    "street" => $request->street ?? "",
+                    "zipcode" => $request->zipcode ?? "",
                     "provider_id" => $provider->id,
                 ];
 
                 Address::create($address_data);
-            endif;
+            //endif;
 
-            // caso addr_clone == true, cadastra dados vazios ou default onde necessário
-            if ($request->addr_clone == true):
-                $address_data = [
-                    "uf" => 'foo',
-                    "city" => 'foo',
-                    "street" => 'foo',
-                    "zipcode" => 'foo',
-                    "provider_id" => $provider->id,
-                ];
-
-                Address::create($address_data);
-            endif;
-
-            if ($request->contact_clone == null):
+            //if ($request->contact_clone == null):
                 $contact_data = [
-                    "phone1" => $request->phone1,
-                    "phone2" => $request->phone2,
-                    "email" => $request->email,
-                    "linkedin" => $request->linkedin,
-                    "facebook" => $request->facebook,
-                    "instagram" => $request->instagram,
-                    "site" => $request->site,
+                    "phone1" => $request->phone1 ?? "",
+                    "phone2" => $request->phone2 ?? "",
+                    "email" => $request->email ?? "",
+                    "linkedin" => $request->linkedin ?? "",
+                    "facebook" => $request->facebook ?? "",
+                    "instagram" => $request->instagram ?? "",
+                    "site" => $request->site ?? "",
                     "provider_id" => $provider->id,
                 ];
     
                 Contact::create($contact_data);
-            endif;
+            //endif;
 
-            // caso contact_clone == true, cadastra dados vazios ou default onde necessário
-            if ($request->contact_clone == true):
-                $contact_data = [
-                    "phone1" => 'foo',
-                    "email" => 'foo',
-                    "provider_id" => $provider->id,
-                ];
-    
-                Contact::create($contact_data);
-            endif;
 
-            if ($request->contract_clone == null):
+            //if ($request->contract_clone == null):
                 $contract_data = [
-                    "rate" => str_replace(",",".",$request->rate),
-                    "accession_date" => $request->accession_date,
-                    "contributor_id" => $request->contributor_id,
-                    "end_date" => $request->end_date,
+                    "rate" => str_replace(",",".",$request->rate) ?? "0.00",
+                    "accession_date" => $request->accession_date ?? "",
+                    "contributor_id" => $request->contributor_id ?? "",
+                    "end_date" => $request->end_date ?? "",
                     "provider_id" => $provider->id,
                 ];
     
                 Contract::create($contract_data);
-            endif;
-
-            // caso contract_clone == true, cadastra dados vazios ou default onde necessário
-            if ($request->contract_clone == true):
-                $contract_data = [
-                    "rate" => 10,
-                    "accession_date" => '2020-10-09',
-                    "provider_id" => $provider->id,
-                ];
-    
-                Contract::create($contract_data);
-            endif;
-
+            //endif;
             parent::saveLog($provider->id, $request, 'providers');
 
-            return response()->json(["1success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
+            return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
@@ -223,7 +197,7 @@ public function index(Request $request)
     {
         //$validate = $request;
         if(!isset($request->cnpj)){
-            parent::saveLog($id,$request,"providers");
+            parent::saveLog($id,$request,"provider");
             return parent::update($request, $id);
         }
         
@@ -238,17 +212,24 @@ public function index(Request $request)
             $provider_data = [
                 "active" => $request->active,
                 "cnpj" => $request->cnpj,
-                "addr_clone" => $request->addr_clone,
-                "contact_clone" => $request->contact_clone,
-                "contract_clone" => $request->contract_clone,
+                "addr_clone" => ($request->type == 2 && $request->addr_clone),
+                "contact_clone" => ($request->type == 2 && $request->contact_clone),
+                "contract_clone" => ($request->type == 2 && $request->contract_clone),
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
+                "matriz_id" => $request->type == 2 ? $request->matriz_id : null,
+                "type" => $request->type
             ];
-            $provider_data["logo"] = $data['file_logo'] == "[object Object]" ? $request['logo'] : $data['file_logo'];
+            //return response()->json($files);
+            if($request['logo'] !== null){
+                $provider_data["logo"] = $data['file_logo'] == "[object Object]" ? $request['logo'] : $data['file_logo'];
+            }
+            
             $provider_data["anexo"] = $data['file_anexo'] == "[object Object]" ? $request['anexo'] : $data['file_anexo'];
             
-            if(isset($provider_data["type"])) $provider_data["type"] = $request->type;
-            if(isset($provider_data["matriz_id"]))$provider_data["matriz_id"] = $request->matriz_id;
+            
+            //if(isset($provider_data["type"])) $provider_data["type"] = $request->type;
+            //if(isset($provider_data["matriz_id"]))$provider_data["matriz_id"] = $request->matriz_id;
 
             $provider->update($provider_data);
 
@@ -296,6 +277,7 @@ public function index(Request $request)
                 "rate" => $request->rate,
                 "accession_date" => $request->accession_date,
                 "end_date" => $request->end_date,
+                "contributors_id" => 1,//$request->contributors_id ?? 1,
                 "provider_id" => $provider->id,
             ];
             

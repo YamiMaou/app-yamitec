@@ -22,7 +22,7 @@ class AccountManagersController extends ControllersExtends
         unset($params['withId']);
         unset($params['page']);
         unset($params['pageSize']);
-        $data = $this->model->paginate($request->pageSize)->withQueryString();
+        $data = $this->model->with(['client', 'provider'])->paginate($request->pageSize)->withQueryString();
         if(count($params) > 0){
             $launch_from = $params['launch_date'] ?? '';
             $launch_to = $params['launch_date_to'] ?? '';

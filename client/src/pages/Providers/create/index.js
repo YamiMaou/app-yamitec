@@ -85,8 +85,8 @@ const SelectInput = (props) => {
                 setError(true)
             }
         }
+        e.target.id = e.target.name;
         props.onChange(e)
-        console.log(e.target.value)
         setValue(e.target.value);
     }
     return (
@@ -94,7 +94,7 @@ const SelectInput = (props) => {
             <InputLabel id={props.column}>{props.label}</InputLabel>
             <Select size="small"
                 labelId={props.id}
-                id={props.id}
+                id={props.name}
                 name={props.name}
                 value={value}
                 error={error}
@@ -119,31 +119,38 @@ const SelectInput = (props) => {
         </FormControl>)
 }
 const TypeEmpresaInput = (props) => {
-    const [value, setValue] = useState("Selecione");
-    const [empresa, setEmpresa] = useState(1);
-    const [error, setError] = useState(false);
+    const [value, setValue] = useState(props.value ?? "Selecione");
+    const [value1, setValue1] = useState(props.value ?? "Selecione");
     function handleChange(e) {
         const { value, id } = e.target;
-        props.onChange(e) ?? undefined;
-        console.log(e.target.value)
+        props.onChange(e);
         setValue(e.target.value);
     }
+    function handleChange1(e) {
+        const { value, id } = e.target;
+        console.log(e.target);
+        console.log(`${e.target.id} - ${e.target.value}`)
+        props.onChange(e);
+        setValue1(e.target.value);
+    }
     return (<div>
-        <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={(e) => handleChange(e)} />
+        <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange} />
         {value == 2 &&
-        <SelectInput valueLabel={props.valueLabel} json={props.json} value={props.value ?? undefined} helperText={props.helperText ?? ""} key={`input-${15001}`} id={props.column} label={props.label} name={props.column} values={props.values} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={(e) => props.onChange(e) ?? undefined} />
+        <SelectInput valueLabel={props.valueLabel} json={props.json} value={value1} helperText={props.helperText ?? ""} key={`input-${15001}`} id={"matriz_id"} label={props.label} name={"matriz_id"} values={props.values} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange1} />
     }</div>)
 }
 
 class CreateProviders extends Component {
     
     state = {
+        filter: ['flex'],
         data: [],
         fields: {},
         providertypes: [],
         contributors: [],
         managers: [],
         providers: [],
+        filials: [],
         provider: undefined,
         manager: 0,
         provProviders: [],
@@ -151,45 +158,51 @@ class CreateProviders extends Component {
         states: []
     }
     async componentDidMount() {
-        const data = await getApiProviders({type: "Matriz", active: 1});
+        const data = await getApiProviders({type: 1, active: 1});
         const contributors = await getApiContributors({active: 1});
         const managers = await getApiManagers();
         const providertypes = await getApiProviderTypes();
         const providers = await getApiProviders();
+        const filials = await getApiProviders({type: 1, active: 1});
         this.setState({
             ...this.state, 
             data: data.data, 
             contributors: contributors.data,
             managers: managers.data, 
             providertypes: providertypes.data,
-            providers: providers.data
+            providers: providers.data,
+            filials: filials.data
         });
         localStorage.setItem("sessionTime", 900);
 
     }
     onChange(e){
         this.setState({...this.state, fields: e});
-        console.log(this.state.fields);
-        console.log(this.state.fields['type'] == 1);
     }
     render() {
         //console.log(this.state.data)
          // to use snackbar Provider
          const setProviders = async () => {
             let provProviders = this.state.provProviders;
+            if(provProviders.find(x => x.id === this.state.provider)){
+                this.props.setSnackbar({ open: true, message: 'Filial já asossiada.' });
+                return false;
+            }
             this.setState({...this.state, provProviders: undefined});
             const prov = await getApiProviders({}, this.state.provider);
             provProviders.push(prov);
-            console.log(provProviders);
             this.setState({...this.state, provProviders});
         }
 
         const setManagers = async () => {
             let provManagers = this.state.provManagers;
+            if(provManagers.find(x => x.id === this.state.manager)){
+                this.props.setSnackbar({ open: true, message: 'Responsável já asossiado.' });
+                return false;
+            }
             this.setState({...this.state, provManagers: undefined});
             const prov = await getApiManagers({}, this.state.manager);
             provManagers.push(prov);
-            console.log(provManagers);
             this.setState({...this.state, provManagers});
         }
         
@@ -203,8 +216,13 @@ class CreateProviders extends Component {
             this.state.provProviders.map(values => {
                 providers.push(values.id);
             });
+            if(managers.length == 0){
+                this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 Responsável vinculado"});
+                return false;
+            }
             data.providers = providers;
             data.managers = managers;
+            data.rate = data.rate.replace(/\./g,'').replace(',', '.');
             this.setState({ ...this.state, loading: true });
             let response = await postApiProviders(data);
             //console.log(response);
@@ -303,7 +321,7 @@ class CreateProviders extends Component {
                         type: 'custom',
                         json: true, 
                         valueLabel: "fantasy_name",
-                        values: this.state.data,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
+                        values: this.state.providers,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
                         flexBasis,
                         component: TypeEmpresaInput
                     },
@@ -413,13 +431,13 @@ class CreateProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try{
-                                        if(this.state.provManagers.length > 1){
+                                        //if(this.state.provManagers.length > 1){
                                             await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
                                             const data = await getApiProviders({}, this.props.match.params.id);
                                             this.setState({...this.state, provManagers: data.managers});
-                                        }else{
+                                        /*}else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
+                                        }*/
                                        
                                     }catch(err){
                                         console.log(err)
@@ -519,14 +537,22 @@ class CreateProviders extends Component {
                     <div>
                     <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
-                                    <Typography>
+                                <Typography onClick={() => {
+                                            let filter = this.state.filter;
+                                            filter['responsaveis-ind'] = this.state.filter['responsaveis-ind'] == 'block' ? 'none' : 'block'
+                                            this.setState({ ...this.state, filter })
+                                        }}>
                                         <IndeterminateCheckBoxIcon /> Responsáveis
                                     </Typography>
+                                    <div style={{
+                                        display: this.state.filter['responsaveis-ind'] ?? 'block',
+                                    }}>
                                     <div  style={{
                                             alignItems: 'center',
                                             justifyContent: 'start',
-                                            display: 'flex'
+                                            display: 'flex',
                                         }}>
+                                    
                                         <SelectInput valueLabel="value" 
                                             json={true} 
                                             valueLabel={'name'}
@@ -562,24 +588,32 @@ class CreateProviders extends Component {
                                             pageSize={10} rowsPerPageOptions={[10]} pagination
                                         />
                                     </div>
+                                </div>
                                 </CardContent>
                             </Card>
 
                         <Card style={{ marginBottom: 15 }}>
                             <CardContent>
-                                <Typography>
+                                <Typography onClick={() => {
+                                            let filter = this.state.filter;
+                                            filter['fornecedores-ind'] = this.state.filter['fornecedores-ind'] == 'block' ? 'none' : 'block'
+                                            this.setState({ ...this.state, filter })
+                                        }}>
                                     <IndeterminateCheckBoxIcon /> Fornecedores
                                 </Typography>
+                                <div style={{
+                                    display: this.state.filter['fornecedores-ind'] ?? 'block',
+                                }}>
                                 <div  style={{
                                         alignItems: 'center',
                                         justifyContent: 'start',
-                                        display: 'flex'
+                                        display: 'flex',
                                  }}>
                                     <SelectInput valueLabel="value" 
                                         json={true} 
                                         valueLabel={'company_name'}
                                         key={`input-${15019}`} id={"providers"} label={"Farmácia/Grupo"} name={"providers"} 
-                                        values={this.state.providers} 
+                                        values={this.state.filials} 
                                         style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                         onChange={(e) => {
                                             this.setState({...this.state, provider: e.target.value});
@@ -611,6 +645,7 @@ class CreateProviders extends Component {
                                         pageSize={10} rowsPerPageOptions={[10]} pagination
                                     />
                                 </div>
+                            </div>
                             </CardContent>
                         </Card>
                     </div>

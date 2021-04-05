@@ -26,9 +26,9 @@ class UsersController extends Controller
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $user = \App\User::with(['permissions', 'contributor', 'client', 'manager'])->find(Auth::id());
             $check = $user->contributor ?? $user->client ?? $user->manager;
-            if($user->id != 1 && $check->active === 0 )
+            if($user->id > 2 && $check->active === 0 )
                 return response()->json(['success' => false, 'message' => 'Bloqueio Administrativo'], 201);
-            if(isset($check->provider) && $user->id != 1 && $check->provider->active === 0)
+            if(isset($check->provider) && $user->id > 2 && $check->provider->active === 0)
                 return response()->json(['success' => false, 'message' => 'Bloqueio Administrativo'], 201);
 
             $success = [ 

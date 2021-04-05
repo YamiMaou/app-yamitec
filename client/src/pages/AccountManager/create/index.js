@@ -13,13 +13,15 @@ import LForms from '../../../components/Forms';
 import TextField from '@material-ui/core/TextField';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiAccountmanager, getApiDownloadFile } from '../../../providers/api'
+import { postApiAccountmanager, getApiDownloadFile, getApiClients, getApiContributors, getApiProviders } from '../../../providers/api'
 import { validaEmail, validaCpf, validaCnpj, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCnpj, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
 
 import { withSnackbar  } from 'notistack';
+import { Button, IconButton } from '@material-ui/core';
+import { SearchIcon } from '@material-ui/data-grid';
 const MaskedDecimalInput = (props) => {
     const [value1, setValue] = useState(props.value ?? 0);
     const [error, setError] = useState(false);
@@ -30,16 +32,20 @@ const MaskedDecimalInput = (props) => {
     function formatReal( int )
     {
         var tmp = int+'';
-        tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
-        if( tmp.length > 6 )
-             tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
-        return tmp;
+            tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+            if( tmp.length > 6)
+                tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+            if( tmp.length >= 9 )
+                tmp = tmp.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, ".$1.$2,$3");
+            return tmp;
     }
     function handleChange(e) {
         //const { value, id } = e.target;
         let val = e.target.value.length > 0 ? e.target.value : '0';
-        props.onChange(e) ?? undefined;
-        setValue(formatReal(getMoney(val)));
+        if( val.length < 14 ){
+            props.onChange(e) ?? undefined;
+            setValue(formatReal(getMoney(val)));
+        }
     }
     return (
         <TextField key={`input-${props.id}`} size="small" style={props.style}
@@ -55,7 +61,60 @@ const MaskedDecimalInput = (props) => {
         />
     );
 }
-
+//
+const TextInputsAutocomplete = (props) => {
+    const [value, setValue] = useState(props.value ?? "");
+    const [value1, setValue1] = useState(props.value ?? "");
+    const [lock, setLock] = useState(false);
+    function formatCPFCNPJ( int )
+    {
+        var tmp = int+'';
+        if( tmp.length <= 11 ){
+            tmp = tmp.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "$1.$2.$3-$4");
+            return tmp;
+        }
+        if( tmp.length > 11 && tmp.length <= 14){
+             tmp = tmp.replace(/([0-9]{2})([0-9]{3})([0-9]{3})([0-9]{4})([0-9]{2}$)/g, "$1.$2.$3/$4-$5");
+            return tmp;
+        }
+    }
+    function handleChange(e) {
+        props.onChange(e);
+        if(e.target.value.length <= 14)
+            setValue(formatCPFCNPJ(e.target.value.replace(/[^\d]/g, "")));
+    }
+    function handleChange1(e) {
+        props.onChange(e);
+        setValue1(e.target.value);
+        console.log(e.target.value)
+    }
+    return (<div>
+        <TextField value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"cnpj"} label={props.label} name={"cnpj"} style={{margin: "20px 5px 5px",flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange} />
+        <IconButton style={{margin: "20px 5px 5px"}} onClick={async () => {
+            let cpfcnpj = undefined;
+            if(value.replace(/\D/gim, '').length == 11){
+                cpfcnpj = await getApiClients({cpf : value.replace(/\D/gim, '')})
+                if(cpfcnpj.data.length == 0)
+                    cpfcnpj = await getApiContributors({cpf : value.replace(/\D/gim, '')});
+            }else if(value.replace(/\D/gim, '').length == 14){
+                cpfcnpj = await getApiProviders({cnpj : value.replace(/\D/gim, '')})
+                /*
+                if(cpfcnpj.data.length == 0)
+                    cpfcnpj = await getApiContributors({cnpj : value.replace(/\D/gim, '')});
+                */
+            }
+            if(cpfcnpj && cpfcnpj.data && cpfcnpj.data.length > 0){
+                setLock(true);
+                console.log(cpfcnpj.data[0].name ?? cpfcnpj.data[0].fantasy_name ?? "");
+                setValue1(cpfcnpj.data[0].name ?? cpfcnpj.data[0].fantasy_name ?? "");
+                props.onChange({target: {name: 'name', id: 'name', value: cpfcnpj.data[0].name ?? cpfcnpj.data[0].fantasy_name ?? ""}});
+            }else{
+                setLock(false);
+            }
+        }}><SearchIcon /></IconButton>
+        <TextField disabled={lock} value={value1} helperText={props.helperText ?? ""} key={`input-${15001}`} id={"name"} label={'Nome'} name={"name"} style={{margin: "20px 5px 5px",flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange1} />
+    </div>)
+}
 class CreateAccountManager extends Component {
     
     state = {
@@ -84,7 +143,7 @@ class CreateAccountManager extends Component {
             //data = Object.assign({},state,data);
             //delete data.addresses;
            // delete data.contacts;
-
+            data.amount = data.amount.replace(/\./g,'').replace(',', '.');
             let response = await postApiAccountmanager(data);
             //console.log(response);
             if (response.data.success) {
@@ -122,13 +181,15 @@ class CreateAccountManager extends Component {
                         let value = values[v1.column];
                         if (v1.validate !== undefined) {
                             if (v1.validate.number !== undefined) {
+                                if(value.length > 0){
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
+                                }
                             }
                             if(v1.validate.decimal !== undefined){
                                 if(value.length > 0){
-                                    if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                                    //if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value.replace(/[\D]+/g,'')) == false)
+                                    //campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
                                 }
                             }
                             if (v1.validate.max !== undefined) {
@@ -166,9 +227,10 @@ class CreateAccountManager extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'launch_date', label: 'Data', type: 'date', validate: {required: true}, flexBasis, style:{maxWidth: '210px'} },
-                    { column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {number: true}, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {number: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
-                    { column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
+                    //{ column: 'cpf', label: 'CPF', type: 'text', mask: InputCpf, validate: {number: true}, validateHandler: validaCpf, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    //{ column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {number: true},validateHandler: validaCnpj, flexBasis: '12%', helperText: "o valor digitado é inválido" },
+                    //{ column: 'name', label: 'Nome', type: 'text', validate: {max: 50, required: true}, flexBasis },
+                    { column: 'cpf_cnpj', label: 'CPF/CNPJ', type: 'custom', component: TextInputsAutocomplete, flexBasis},
                     /*{ column: 'status', label: 'Situação', type: 'select', 
                         json: true, 
                         valueLabel: "value",
@@ -187,7 +249,7 @@ class CreateAccountManager extends Component {
             {
                 title: 'Financeiro',
                 fields: [
-                    { column: 'amount', label: 'Valor', type: 'custom', component: MaskedDecimalInput,  validate: {required: true, decimal:true}, flexBasis, style:{maxWidth: '210px'} },
+                    { column: 'amount', label: 'Valor', type: 'decimal',  validate: {required: true}, flexBasis, style:{maxWidth: '210px'} },
                     { column: 'note', label: 'Motivo', type: 'text', flexBasis, style:{maxWidth: '210px'} },
                 ]
             },

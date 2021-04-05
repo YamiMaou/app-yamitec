@@ -22,12 +22,12 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiBonus, putApiBonus } from '../../providers/api'
+import { deleteApiBonus, getApiBonus, putApiBonus } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { Link } from 'react-router-dom';
+import { Add, DeleteForeverOutlined } from '@material-ui/icons';
+import { Link, withRouter } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 // MODULE ID
@@ -44,8 +44,8 @@ function BlockDialog(props) {
     
     const send = async () => {
         setLoading(true);
-        await putApiBonus( props.id, {active: props.active ?? undefined, justification: justfy});
-        props.handle(props.active);
+        await deleteApiBonus( props.id, {justification: justfy});
+        props.handle(1);
         props.handleClose();
         setjustfy('');
         setLoading(false);
@@ -53,11 +53,10 @@ function BlockDialog(props) {
     return (
       <div>
         <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">{ props.active == 0 ? "B" : "Desb" }loqueio de colaborador</DialogTitle>
+          <DialogTitle id="form-dialog-title">Exclusão definitiva de registro</DialogTitle>
           <DialogContent>
             <DialogContentText>
-            
-                Confirma o { props.active == 0 ? "" : "Des" }bloqueio do registro selecionado?
+                Confirma a exclusão permanente do  registro?
             </DialogContentText>
             { props.active == 0 &&<TextField
               autoFocus
@@ -139,6 +138,21 @@ class Bonus extends Component {
                             <EditIcon fontSize="small" />
                         </Button>
                     </Link>
+                    <Button
+                        disabled={view.update === 0}
+                        variant="outlined" color="secondary"
+                        size="small"
+                        onClick={async (e)=> {
+                            const handle = async (justify) => {
+                                this.props.setSnackbar({open: true, message: "Excluído com Êxito!"});
+                                setTimeout(()=> {this.props.history.go(0)}, 1000);
+                            }
+                            this.setState({...this.state, blockDialog: {open: true, id: params.row.id,handle }})
+                        }}
+                        style={{ marginLeft: 16 }}
+                      >
+                        <DeleteForeverOutlined fontSize="small"/>
+                      </Button> 
                     </div>
                   )},
             },
@@ -181,7 +195,8 @@ class Bonus extends Component {
                             if(params.active !== undefined){
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
-                            params.discount_percent = params.discount_percent.replace(',','.');
+                            if(params.discount_percent)
+                                params.discount_percent = params.discount_percent.replace(',','.');
                             this.setState({...this.state, pageRequest: params})
                             return getApiBonus(params)
                     }} />) : (
@@ -191,7 +206,8 @@ class Bonus extends Component {
                                 if(params.active !== undefined){
                                     params.active = params.active == "Ativo" ? 1: 0;
                                 }
-                                params.discount_percent = params.discount_percent.replace(',','.');
+                                if(params.discount_percent)
+                                    params.discount_percent = params.discount_percent.replace(',','.');
                                 this.setState({...this.state, pageRequest: params})
                                 return getApiBonus(params)
                         }}  />
@@ -215,4 +231,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ setSnackbar}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Bonus)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Bonus))

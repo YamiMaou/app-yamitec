@@ -34,9 +34,12 @@ class CreateProvidersTable extends Migration
 
             $table->foreign('matriz_id')->references('id')->on('providers')->onDelete('cascade');
             $table->foreign('providertype_id')->references('id')->on('providertypes')->onDelete('cascade');
-
-            $table->unsignedBigInteger('audit_id')->nullable();
-            $table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');
+            $table->unsignedBigInteger('anexo')->nullable();
+            //$table->foreign('anexo')->references('id')->on('files')->onDelete('cascade');
+            $table->unsignedBigInteger('logo')->nullable();
+            //$table->foreign('logo')->references('id')->on('files')->onDelete('cascade');
+            /*$table->unsignedBigInteger('audit_id')->nullable();
+            $table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');*/
 
             $table->timestamps();
         });

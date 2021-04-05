@@ -68,7 +68,7 @@ class CreateContributors extends Component {
                         messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
                     })
                 } else{
-                    messages = 'Houve um problema em sua requisição!'
+                    messages = errors.message ?? 'Houve um problema em sua requisição!'
                 }
                 //response.data.error.response.data.errors
                 //this.props.enqueueSnackbar( message, { variant: 'error' });

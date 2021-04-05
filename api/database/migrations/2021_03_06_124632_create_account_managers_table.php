@@ -15,16 +15,14 @@ class CreateAccountManagersTable extends Migration
     {
         Schema::create('account_managers', function (Blueprint $table) {
             $table->id();
-
-            $table->string('cpf', 11)->unique()->nullable();
-            $table->string('cnpj', 14)->unique()->nullable();
+            $table->string('cpf_cnpj', 14)->nullable();
             $table->string('name', 100);
             $table->tinyInteger('bill_type');
             $table->decimal('amount', 8, 2);
             $table->tinyInteger('status')->nullable();
+            $table->tinyInteger('detached')->default(1)->nullable();
             $table->string('note', 200)->nullable();
             $table->date('launch_date');
-
             $table->timestamps();
         });
     }

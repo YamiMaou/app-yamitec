@@ -102,7 +102,9 @@ const MaskedDecimalInput = (props) => {
 
 function TextMaskCustom(props) {
     const { inputRef, ...other } = props;
-
+    let InCpf = [/[0-9]/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/,'-',/\d/, /\d/, /\d/]
+    let mask = props.mask == "cpfcnpj" ? props.value.length < 12 ? InCpf : InputCnpj : props.mask;
+    //console.log(props.value.length)
     return (
         <MaskedInput
             {...other}
@@ -110,7 +112,7 @@ function TextMaskCustom(props) {
                 inputRef(ref ? ref.inputElement : null);
             }}
             value={props.value}
-            mask={props.mask}
+            mask={mask}
             placeholderChar={'\u2000'}
 
         />
@@ -398,6 +400,11 @@ class LCardGrid extends Component {
 
                 {!this.state.firstLoad &&
                     <div style={{ height: 450, width: '100%' }}>
+                        {rows.length == 0 && 
+                        <Card style={{marginTop: 15}}>
+                            <CardContent> Não há registros</CardContent>
+                        </Card>
+                        }
                         {rows.map((row, key) => {
                             return (
                                 <Card style={{marginTop: 15}}>
@@ -405,9 +412,9 @@ class LCardGrid extends Component {
                                         {Object.entries(row).map(field => {
                                             let headerName = columns.find(column => column.field === field[0]);
                                             if (headerName && headerName.field !== 'id') {
-                                                //console.log(headerName)
+                                                console.log(field[1])
                                                 let value = headerName.valueFormatter ?? headerName.renderCell;
-                                                value = value == undefined? field[1] : value({value: field[1]});  
+                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row} : {value: field[1]});  
                                                 return (
                                                     <List component="nav">
                                                         <ListItem style={{paddingTop: 0, paddingBottom: 0}}>

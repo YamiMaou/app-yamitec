@@ -58,20 +58,22 @@ const MaskedDecimalInput = (props) => {
     function formatReal( int )
     {
         var tmp = int+'';
-        tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
-        if( tmp.length > 6 && !props.percent )
-            tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, "$1,$2");
-        return tmp;
+            tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+            if( tmp.length > 6)
+                tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+            if( tmp.length >= 10 )
+                tmp = tmp.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, "$1.$2,$3");
+            return tmp;
     }
     function handleChange(e) {
         //const { value, id } = e.target;
         let val = e.target.value.length > 0 ? e.target.value : '0';
         if( val.length > 5 && props.percent )
             return false;
-        if( val.length > 9 && props.decimal )
-            return false;
-        props.onChange(e) ?? undefined;
-        setValue(formatReal(getMoney(val)));
+        if( val.length < 11 ){
+            props.onChange(e) ?? undefined;
+            setValue(formatReal(getMoney(val)));
+        }
     }
     return (
         <TextField key={`input-${props.id}`} size="small" style={props.style}

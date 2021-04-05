@@ -145,7 +145,6 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     public function update(Request $request, $id)
     {
         $modelName = strtolower(str_replace('Model','',(new \ReflectionClass($this->model))->getShortName()));
-        
         if (count($this->validate) > 0) {
             foreach ($this->validate as $k => $val) {
                 $regras = "";
@@ -165,6 +164,10 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $files = new FilesController();
             $files = $files->multUpload($request, $modelName, $id);
             $data = $files->request;
+            foreach($data as $k=>$d){
+                if($d == "null")
+                    $data[$k] = null;
+            }
             //$data['user_id'] = $request->user()->id;
             unset($data["_token"]);
             unset($data["_method"]);
@@ -190,21 +193,19 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             $this->saveLog($id, $request, $modelName);
             return response()->json(["success"=> true,"type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch (Exception $error) {
-            return response()->json(["success"=> false,"type" => "error", "message" => "Problema ao Atualizar.", "error" => $error->getMessage(), "trace" => $error->getTraceAsString()], 500);
+            return response()->json(["success"=> false,"type" => "error", "message" => "Problema ao Atualizar.", "error" => $error->getMessage(), "trace" => $error->getTraceAsString()], 200);
         }
     }
 
     public function destroy(Request $request, $id)
     {
-        $this->saveLog($id, $request);
+        $modelName = strtolower(str_replace('Model','',(new \ReflectionClass($this->model))->getShortName()));
+        $this->saveLog($id, $request, $modelName);
         try {
             $this->model->destroy($id);
-            $break = isset($_COOKIE['url']) ? $_COOKIE['url'] : "/home";
-            $break = str_replace(['https', 'http', '://'], '', $break);
-            $break = explode("/", $break);
-            return response()->json(["type" => "delete", "message" => "Deletado com Sucesso!", "url" => "/".$break[1]]);
+            return response()->json(["type" => "delete", "message" => "Deletado com Sucesso!"]);
         } catch (Exception $error) {
-            return response()->json(["type" => "error", "message" => "Problema ao Deletar. "], 500);
+            return response()->json(["type" => "error", "message" => "Problema ao Deletar. ", "trace" => $error->getMessage()], 200);
         }
     }
 

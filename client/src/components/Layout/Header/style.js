@@ -62,7 +62,7 @@ export const themeStyle = {
       //mainGradient: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
     },
     secondary:{
-      main: "#0086e8",
+      main: "#f44336",
       mainGradient: clientStyles[0].primary
       //mainGradient: 'linear-gradient(45deg, #025a71 30%, #0010e8 90%)',
     },

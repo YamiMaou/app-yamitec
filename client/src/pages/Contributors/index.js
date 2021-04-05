@@ -188,7 +188,6 @@ class Contributors extends Component {
             {
                 column: 'function', label: 'Função', type: 'select',
                 values: [
-                    "Todos",
                     "Administração",
                     "Coordenador de usuários",
                     "Coordenador de parceiros",
@@ -199,7 +198,7 @@ class Contributors extends Component {
                 value: "Todos",
                 flexBasis
             },
-            { column: 'active', label: 'Situação', type: 'select', values: ["Todos", "Ativo", "Inativo"], value: "Todos", flexBasis },
+            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 

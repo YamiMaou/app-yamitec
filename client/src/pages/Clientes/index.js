@@ -167,7 +167,7 @@ class Clients extends Component {
             mask: InputCpf, 
             flexBasis },
             { column: 'name', label: 'Nome', type: 'text', flexBasis },
-            { column: 'active', label: 'Situação', type: 'select', values: ["Todos", "Ativo", "Inativo"], value: "Todos", flexBasis },
+            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 

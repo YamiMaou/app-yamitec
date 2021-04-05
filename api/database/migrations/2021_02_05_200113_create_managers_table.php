@@ -28,8 +28,8 @@ class CreateManagersTable extends Migration
             $table->unsignedBigInteger('user_id'); // ID do usuário que executou o cadastro do responsável
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->unsignedBigInteger('audit_id')->nullable();
-            $table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');
+            //$table->unsignedBigInteger('audit_id')->nullable();
+            //$table->foreign('audit_id')->references('id')->on('audits')->onDelete('cascade');
 
             $table->timestamps();
         });

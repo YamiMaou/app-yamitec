@@ -16,6 +16,10 @@ class ClientsController extends ControllersExtends
     public function __construct()
     {
          parent::__construct(Client::class, 'home');
+         parent::setValidate([
+            "name" => "required|max:50",
+            "cpf" => "required|unique:contributors|max:11",
+        ]);
     }
 
     // TESTE
@@ -30,53 +34,58 @@ class ClientsController extends ControllersExtends
        return  parent::show($request, $id, ['user', 'addresses', 'contacts', 'audits']);
     }
 
-    public function store(Request $resquest)
+    public function store(Request $request)
     {
+        $client = \App\Models\Client::where('cpf', $request->cpf)->first();
+        if ($client):
+            if ($client->cpf == $request->cpf)
+                return response()->json(["success"=> false, "type" => "store", "message" => "CPF já cadastrado!"]);
+        endif;
         try {
             $data_user = [
-                'name' => $resquest->name,
-                'email' => $resquest->email,
+                'name' => $request->name,
+                'email' => $request->email,
                 'profile_id' => 1, 
-                'password' => Hash::make($resquest->cpf),
+                'password' => Hash::make($request->cpf),
             ];
     
             $user = User::create($data_user);
     
             $data_client = [
-                'name' => $resquest->name,
-                'cpf' => $resquest->cpf,
-                'birth_date' => $resquest->birth_date,
-                'active' => $resquest->active,
-                'note' => $resquest->note,
+                'name' => $request->name,
+                'cpf' => $request->cpf,
+                'birth_date' => $request->birth_date,
+                'active' => $request->active,
+                'note' => $request->note,
                 'user_id' => $user->id,
             ];
     
             $client = Client::create($data_client);
     
             $data_address = [
-                'zipcode' => $resquest->zipcode,
-                'street' => $resquest->street,
-                'city' => $resquest->city,
-                'additional' => $resquest->additional,
-                'uf' => $resquest->uf,
+                'zipcode' => $request->zipcode,
+                'street' => $request->street,
+                'city' => $request->city,
+                'additional' => $request->additional,
+                'uf' => $request->uf,
                 'client_id' => $client->id,
             ];
             
             Address::create($data_address);
     
             $data_address = [
-                'phone1' => $resquest->phone1,
-                'phone2' => $resquest->phone2,
-                'email' => $resquest->email,
-                'linkedin' => $resquest->linkedin,
-                'facebook' => $resquest->facebook,
-                'instagram' => $resquest->instagram,
+                'phone1' => $request->phone1,
+                'phone2' => $request->phone2,
+                'email' => $request->email,
+                'linkedin' => $request->linkedin,
+                'facebook' => $request->facebook,
+                'instagram' => $request->instagram,
                 'client_id' => $client->id,
             ];
     
             Contact::create($data_address);
 
-            parent::saveLog($client->id, $resquest, 'client');
+            parent::saveLog($client->id, $request, 'client');
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);

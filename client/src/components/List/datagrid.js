@@ -45,6 +45,7 @@ import MaskedInput from 'react-text-mask';
 // VALIDATORS
 
 import { validaCpf } from '../../providers/commonMethods'
+import { InputCnpj, InputCpf } from '../../providers/masks';
 //
 
 //const [valus, setValues] = useState(new Date('2021-02-13'));
@@ -96,7 +97,9 @@ const MaskedDecimalInput = (props) => {
 
 function TextMaskCustom(props) {
     const { inputRef, ...other } = props;
-
+    let InCpf = [/[0-9]/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/,'-',/\d/, /\d/, /\d/]
+    let mask = props.mask == "cpfcnpj" ? props.value.length < 12 ? InCpf : InputCnpj : props.mask;
+    //console.log(props.value.length)
     return (
         <MaskedInput
             {...other}
@@ -104,7 +107,7 @@ function TextMaskCustom(props) {
                 inputRef(ref ? ref.inputElement : null);
             }}
             value={props.value}
-            mask={props.mask}
+            mask={mask}
             placeholderChar={'\u2000'}
 
         />
@@ -277,6 +280,7 @@ class LDataGrid extends Component {
                 value = value.replace(/[^\d]+/g, '');
             }
             if (value.length == 0) {
+                filters[e.target.id ?? e.target.name] = "";
                 delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {

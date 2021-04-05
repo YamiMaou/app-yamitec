@@ -12,19 +12,86 @@ import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { putApiBonus, getAddressByCepla, getApiClients, getApiBonus } from '../../../providers/api'
+import { putApiBonus, getAddressByCepla, getApiClients, getApiBonus, deleteApiBonus } from '../../../providers/api'
 import { validaEmail, validaCpf, stringToaddDate } from '../../../providers/commonMethods'
-
+//
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+//
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
-import { withSnackbar  } from 'notistack';
+import { withSnackbar } from 'notistack';
+import { DeleteForever } from '@material-ui/icons';
+import { Button, CircularProgress, Toolbar } from '@material-ui/core';
+function BlockDialog(props) {
+    const [open, setOpen] = React.useState(props.open);
+    const [loading, setLoading] = React.useState(false);
+    const [justfy, setjustfy] = React.useState('');
+
+    const handleClose = () => {
+        setOpen(false);
+        setLoading(false);
+    };
+
+    const send = async () => {
+        setLoading(true);
+        await deleteApiBonus(props.id, { justification: justfy });
+        props.handle(1);
+        props.handleClose();
+        setjustfy('');
+        setLoading(false);
+    }
+    return (
+        <div>
+            <Dialog open={props.open} onClose={props.handleClose} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Exclusão definitiva de registro</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Confirma a exclusão permanente do  registro?
+            </DialogContentText>
+                    {props.active == 0 && <TextField
+                        autoFocus
+                        margin="dense"
+                        id="justification"
+                        label="Justificativa"
+                        type="text"
+                        fullWidth
+                        value={justfy}
+                        onChange={(e) => {
+                            setjustfy(e.target.value)
+                        }}
+                    />}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={props.handleClose} color="primary">
+                        NÃO
+            </Button>
+                    {!loading ? (
+                        <Button onClick={send} color="primary">
+                            SIM
+                        </Button>) : (
+                        <Button color="primary">
+                            <CircularProgress style={{ display: 'flex' }} />
+                        </Button>
+
+                    )}
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
+}
 class EditBonus extends Component {
     state = {
         data: {},
-        loading: false
+        loading: false,
+        blockDialog: { open: false, id: undefined, active: 0, handle: undefined },
     }
     async componentDidMount() {
-        if(JSON.parse(localStorage.getItem("user")) == null){
+        if (JSON.parse(localStorage.getItem("user")) == null) {
             window.location.href = '/login';
             return;
         }
@@ -44,9 +111,9 @@ class EditBonus extends Component {
         const request = async (state, data) => {
             this.setState({ ...this.state, loading: true });
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
-            data = Object.assign({},state.addresses,data);
-            data = Object.assign({},state.contacts,data);
-            data = Object.assign({},state,data);
+            data = Object.assign({}, state.addresses, data);
+            data = Object.assign({}, state.contacts, data);
+            data = Object.assign({}, state, data);
             delete data.addresses;
             delete data.contacts;
             let response = await putApiBonus(this.props.match.params.id, data);
@@ -56,20 +123,20 @@ class EditBonus extends Component {
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
-                let {errors, message} = response.data.error.response.data
+                let { errors, message } = response.data.error.response.data
                 let messages = '';
                 console.log(errors)
-                if(errors !== undefined ){
+                if (errors !== undefined) {
                     Object.keys(errors).map(err => {
                         console.log(err);
                         messages += `O campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
                     });
-                } else{
+                } else {
                     messages = 'Houve um problema em sua requisição!'
                 }
                 this.setState({ ...this.state, loading: false });
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, messages});
+                this.props.setSnackbar({ open: true, messages });
             }
 
         }
@@ -84,9 +151,9 @@ class EditBonus extends Component {
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
-                            if(v1.validate.decimal !== undefined){
+                            if (v1.validate.decimal !== undefined) {
                                 if (/^\s*-?(\d+(\.\d{1,2})?|\.\d{1,2})\s*$/.test(value) == false)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
+                                    campo = { id: v1.column, message: `O Campo ${v1.label} é somente números e ponto ` }
                             }
                             if (v1.validate.max !== undefined) {
                                 if (value.length > v1.validate.max)
@@ -99,8 +166,8 @@ class EditBonus extends Component {
                             }
 
                             if (v1.validate.required !== undefined) {
-                                if(value == "Selecione"){
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
+                                if (value == "Selecione") {
+                                    campo = { id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                                 }
                                 if (value.length == 0)
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
@@ -114,7 +181,7 @@ class EditBonus extends Component {
                 })
             })
             //console.log(campo)
-            campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message}) : '';
+            campo !== undefined ? this.props.setSnackbar({ open: true, message: campo.message }) : '';
 
             return campo === undefined ? true : false
         }
@@ -123,8 +190,8 @@ class EditBonus extends Component {
             {
                 title: 'Dados Básicos',
                 fields: [
-                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: {min: 1, number: true, required: true},  value: 1, flexBasis : "45%", value: this.state.data.indication_qtty },
-                    { column: 'discount_percent', label: 'Desconto (%)', type: 'text', validate: {min: 1, decimal: true, required: true},flexBasis: '45%' , value: this.state.data.discount_percent },
+                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: { min: 1, number: true, required: true }, value: 1, flexBasis: "45%", value: this.state.data.indication_qtty },
+                    { column: 'discount_percent', label: 'Desconto (%)', type: 'text', validate: { min: 1, decimal: true, required: true }, flexBasis: '45%', value: this.state.data.discount_percent },
                 ]
             },
         ]
@@ -132,18 +199,32 @@ class EditBonus extends Component {
         return (
             <Fragment>
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
-                    <Typography variant="h6">
-                        <HomeIcon />  <span>Editar / Colaboradores</span>
-                    </Typography>
+                    <Toolbar>
+                        <Typography variant="h6"  style={{flexGrow: 1}}>
+                            <HomeIcon />  <span>Editar / Colaboradores</span>
+                        </Typography>
+                        { /*<Button variant="contained" size="small" color="primary"
+                            style={{
+                                background: 'linear-gradient(45deg, #c50000 30%, rgb(234 16 0) 90%)',
+                            }}
+                            onClick={(e)=> {
+                                const handle = async (status) => {
+                                    this.props.history.goBack();
+                                }
+                                this.setState({...this.state, blockDialog: {open: true, id: this.props.match.params.id, handle }})
+                            }}>
+                            Deletar <DeleteForever style={{ color: 'white' }} fontSize="small" />
+                        </Button> */} 
+                    </Toolbar>
                 </AppBar>
                 {
                     <LForms forms={forms}
-                        request={(data) => {request(this.state.data,data)}}
+                        request={(data) => { request(this.state.data, data) }}
                         validate={(values) => { return validateFields(forms, values) }}
                         loading={this.state.loading}
                     />
                 }
-                { this.state.data.audits  &&
+                { this.state.data.audits &&
                     <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 720 ? 210 : 90 }}>
                         <div style={{ float: 'left', maxWidth: 350 }}>
                             <Typography variant="subtitle1" style={{ padding: 10 }}>
@@ -163,6 +244,15 @@ class EditBonus extends Component {
                         </div>
                     </Paper>
                 }
+                <BlockDialog
+                    open={this.state.blockDialog.open}
+                    id={this.state.blockDialog.id}
+                    handle={this.state.blockDialog.handle}
+                    active={this.state.blockDialog.active}
+                    handleClose={() => {
+                        this.setState({ ...this.state, blockDialog: { open: false, id: undefined } })
+                    }}
+                />
             </Fragment>
         )
     }

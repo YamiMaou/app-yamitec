@@ -511,6 +511,7 @@ export const getApiBonus = async (params = '',id = undefined) => {
     return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
   });
 }
+
 /// create bonus
 export const postApiBonus = async (params = {}) => {
   localStorage.setItem("sessionTime", 900)
@@ -568,7 +569,35 @@ export const putApiBonus = async (id,params = {}) => {
   }
 }
 
-
+/// update bonus
+export const deleteApiBonus = async (id,params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  params.justification = params.justification  ?? " ";
+  const data = new FormData();
+  data.append("_method", "delete");
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, (typeof string == "string") ? `${val}` : val);
+    });
+    
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost +  `/bonus/${id}`,
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
+  }
+}
 /// list accountmanager
 export const getApiAccountmanager = async (params = '',id = undefined) => {
   localStorage.setItem("sessionTime", 900)
@@ -623,6 +652,36 @@ export const putApiAccountmanager = async (id,params = {}) => {
   params.justification = params.justification  ?? " ";
   const data = new FormData();
   data.append("_method", "put");
+  Object.entries(params)
+    .map(([key, val]) => {
+      data.append(key, (typeof string == "string") ? `${val}` : val);
+    });
+    
+  const options = {
+    method: 'POST',
+    //mode: 'cors', // pode ser cors ou basic(default)
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer ' + token
+    },
+    data,
+    url: apiHost +  `/accountmanager/${id}`,
+  };
+  try{
+    const response = await axios(options);  // wrap in async function
+    return response;
+  } catch (error) {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
+  }
+}
+
+/// update accountmanagers
+export const deleteApiAccountmanager = async (id,params = {}) => {
+  localStorage.setItem("sessionTime", 900)
+  params.justification = params.justification  ?? " ";
+  const data = new FormData();
+  data.append("_method", "delete");
   Object.entries(params)
     .map(([key, val]) => {
       data.append(key, (typeof string == "string") ? `${val}` : val);

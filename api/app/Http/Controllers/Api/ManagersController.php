@@ -77,6 +77,16 @@ class ManagersController extends ControllersExtends
     }
     public function store(Request $resquest)
     {
+        if($resquest->providers == ""){
+            //return response()->json(["success" => false, "message" => "Ao menos um Fornecedor deve ser vínculado"]);
+        }
+        if(User::where('email', $resquest->email)->count() > 0){
+            return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
+        }
+        if(Manager::where('cpf', str_replace([".","-","_"],"",$resquest->cpf))->count() > 0){
+            return response()->json(["success" => false, "message" => "O CPF informado já está cadastrado."]);
+        }
+        
         try {
             $data_user = [
                 'name' => $resquest->name,
@@ -96,7 +106,7 @@ class ManagersController extends ControllersExtends
             ];
     
             $manager = Manager::create($data_manager);
-            if(explode(',',$resquest->providers) !== null)
+            if($resquest->providers != "")
                 $manager->providers()->attach(explode(',',$resquest->providers));
 
             /*$data_address = [
