@@ -188,7 +188,7 @@ const FileInput = (props) => {
     return (
         <FormControl style={props.style}>
             { file === undefined || replace ?
-                (<div style={{ display: 'flex' }}>
+                (<div>
                     { value === undefined ?
                         <Button style={props.style} variant="outlined" component="label" endIcon={<Icon name="arrow-circle-up" size={18} color="#025ea2" />}>
                             {props.label}
@@ -199,7 +199,7 @@ const FileInput = (props) => {
                                 id={props.id}
                             />
                         </Button> :
-                         <div style={{ display: 'flex' }}>
+                         <div style={{ display: 'flex', marginRight: 10 }}>
                             <Button style={props.style} variant="outlined" component="label">
                                 {value.split(/(\\|\/)/g).pop().substring(0, 7) + '...'}
                             </Button>

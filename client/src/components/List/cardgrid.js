@@ -50,6 +50,7 @@ import MaskedInput from 'react-text-mask';
 // VALIDATORS
 
 import { validaCpf } from '../../providers/commonMethods'
+import { InputCnpj } from '../../providers/masks';
 //
 
 //const [valus, setValues] = useState(new Date('2021-02-13'));
@@ -103,7 +104,7 @@ const MaskedDecimalInput = (props) => {
 function TextMaskCustom(props) {
     const { inputRef, ...other } = props;
     let InCpf = [/[0-9]/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/,'-',/\d/, /\d/, /\d/]
-    let mask = props.mask == "cpfcnpj" ? props.value.length < 12 ? InCpf : InputCnpj : props.mask;
+    let mask = props.mask == "cpfcnpj" ? props.value.replace(/[^\d]/g, "").length < 12 ? InCpf : InputCnpj : props.mask;
     //console.log(props.value.length)
     return (
         <MaskedInput

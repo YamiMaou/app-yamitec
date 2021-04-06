@@ -9,14 +9,14 @@ class AccountManager extends Model
     protected $table = "account_managers";
 
     protected $fillable = [
-        'cpf',
-        'cnpj',
+        'cpf_cnpj',
         'name',
         'bill_type',
         'amount',
         'status',
         'note',
-        'launch_date'
+        'launch_date',
+        'detached'
     ];
 
     public function audits()

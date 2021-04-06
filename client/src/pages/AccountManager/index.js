@@ -251,6 +251,10 @@ class AccountManager extends Component {
                     ]}
                     pageRequest={
                         (params) => {
+                            if(params.status)
+                                params.status = "Efetuada" ? 1 : 0
+                            if(params.cpf_cnpj)
+                                params.cpf_cnpj = params.cpf_cnpj.replace(/\D/gim, '')
                             if(params.active !== undefined){
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
@@ -260,6 +264,11 @@ class AccountManager extends Component {
                         <LCardGrid rows={rows} columns={columns} filterInputs={filter}
                         pageRequest={
                             (params) => {
+                                if(params.status)
+                                    params.status = "Efetuada" ? 1 : 0
+                                if(params.cpf_cnpj)
+                                    params.cpf_cnpj = params.cpf_cnpj.replace(/\D/gim, '')
+
                                 if(params.active !== undefined){
                                     params.active = params.active == "Ativo" ? 1: 0;
                                 }

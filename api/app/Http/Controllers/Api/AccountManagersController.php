@@ -57,4 +57,12 @@ class AccountManagersController extends ControllersExtends
     {
        return  parent::show($request, $id, ['audits']);
     }
+
+    public function store(Request $request)
+    {
+        if(!isset($request->name)){
+            return response()->json(["success" => false, "message" => "O campo Nome é Obrigatório"]);
+        }
+        return parent::store($request);
+    }
 }

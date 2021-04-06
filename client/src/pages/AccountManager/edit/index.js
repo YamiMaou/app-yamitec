@@ -37,7 +37,7 @@ const TextInputsAutocomplete = (props) => {
     }
     function handleChange(e) {
         props.onChange(e);
-        if(e.target.value.length <= 14)
+        if(e.target.value.replace(/[^\d]/g, "").length <= 14)
             setValue(formatCPFCNPJ(e.target.value.replace(/[^\d]/g, "")));
     }
     function handleChange1(e) {
@@ -166,6 +166,12 @@ class EditAccountManager extends Component {
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
                             }
                         }
+
+                        if (v1.column == "name") {
+                            //if (value.length == 0)
+                                // campo = {id: v1.column, message: `O Campo Nome é obrigatório` };
+                        }
+
                         if(value == "Selecione"){
                             campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                         }
@@ -192,7 +198,7 @@ class EditAccountManager extends Component {
                         column: 'cpf_cnpj', 
                         label: 'CPF/CNPJ', 
                         type: 'custom', component: TextInputsAutocomplete, 
-                        value: this.state.data['cnpj'],
+                        value: this.state.data['cpf_cnpj'],
                         value1: this.state.data['name'],
                         flexBasis
                     },

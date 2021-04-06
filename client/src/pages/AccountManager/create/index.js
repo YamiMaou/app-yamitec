@@ -79,8 +79,9 @@ const TextInputsAutocomplete = (props) => {
         }
     }
     function handleChange(e) {
+        //console.log(e.target)
         props.onChange(e);
-        if(e.target.value.length <= 14)
+        if(e.target.value.replace(/[^\d]/g, "").length <= 14)
             setValue(formatCPFCNPJ(e.target.value.replace(/[^\d]/g, "")));
     }
     function handleChange1(e) {
@@ -92,12 +93,12 @@ const TextInputsAutocomplete = (props) => {
         <TextField value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"cnpj"} label={props.label} name={"cnpj"} style={{margin: "20px 5px 5px",flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange} />
         <IconButton style={{margin: "20px 5px 5px"}} onClick={async () => {
             let cpfcnpj = undefined;
-            if(value.replace(/\D/gim, '').length == 11){
-                cpfcnpj = await getApiClients({cpf : value.replace(/\D/gim, '')})
+            if(value.replace(/[^\d]/g, '').length == 11){
+                cpfcnpj = await getApiClients({cpf : value.replace(/[^\d]/g, '')})
                 if(cpfcnpj.data.length == 0)
-                    cpfcnpj = await getApiContributors({cpf : value.replace(/\D/gim, '')});
-            }else if(value.replace(/\D/gim, '').length == 14){
-                cpfcnpj = await getApiProviders({cnpj : value.replace(/\D/gim, '')})
+                    cpfcnpj = await getApiContributors({cpf : value.replace(/[^\d]/g, '')});
+            }else if(value.replace(/[^\d]/g, '').length == 14){
+                cpfcnpj = await getApiProviders({cnpj : value.replace(/[^\d]/g, '')})
                 /*
                 if(cpfcnpj.data.length == 0)
                     cpfcnpj = await getApiContributors({cnpj : value.replace(/\D/gim, '')});
@@ -164,7 +165,7 @@ class CreateAccountManager extends Component {
                         messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
                     })
                 } else{
-                    messages = 'Houve um problema em sua requisição!'
+                    messages = errors.message ?? 'Houve um problema em sua requisição!'
                 }
                 //response.data.error.response.data.errors
                 //this.props.enqueueSnackbar( message, { variant: 'error' });
@@ -201,15 +202,12 @@ class CreateAccountManager extends Component {
                                 if (value.length < v1.validate.min)
                                     campo = {id: v1.column, message: `O Campo ${v1.label}, tamanho minimo de ${v1.validate.min} caracteres.` };
                             }
-
-                            if (v1.validate.required !== undefined) {
-                                if (value.length == 0)
-                                    campo = {id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
-                            }
+                           
                         }
                         if(value == "Selecione"){
                             campo = {id: v1.column, message: `O Campo ${v1.label} é inválido ` }
                         }
+                        
                         if(v1.validateHandler !== undefined){
                             //if (v1.validateHandler(value) == false)
                                     //campo = {id: v1.column, message: `O Campo ${v1.label}  é inválido ` }
