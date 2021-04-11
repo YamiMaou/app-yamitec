@@ -18,7 +18,7 @@ class ClientsController extends ControllersExtends
          parent::__construct(Client::class, 'home');
          parent::setValidate([
             "name" => "required|max:50",
-            "cpf" => "required|unique:contributors|max:11",
+            "cpf" => "required|unique:clients|max:11",
         ]);
     }
 
@@ -37,6 +37,11 @@ class ClientsController extends ControllersExtends
     public function store(Request $request)
     {
         $client = \App\Models\Client::where('cpf', $request->cpf)->first();
+        $user = \App\User::where('email', $request->email)->first();
+        if ($user):
+            if ($user->email == $request->email)
+                return response()->json(["success"=> false, "type" => "store", "message" => "E-mail já cadastrado!"]);
+        endif;
         if ($client):
             if ($client->cpf == $request->cpf)
                 return response()->json(["success"=> false, "type" => "store", "message" => "CPF já cadastrado!"]);

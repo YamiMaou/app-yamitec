@@ -94,8 +94,14 @@ class UsersController extends Controller
 
         $tokenData = DB::table('password_resets')->where('email', $request->email)->first();
         //$tokenData->token
-        $message = "Foi solicitado a recuperação de senha do seu perfil \n". 
-        "Acesse : <a href='https://farmaciafacil.yamitec.com/reset/{$tokenData->token}'>este link</a> para continuar";
+        $message = "<p>Caro(a), <nome>.</p>
+        <p></p>
+        <p>Para recuperar a sua senha no Portal Farmácia Fácil, use o link de  abaixo:</p>
+        <p></p>
+        <p><a href='https://farmaciafacil.yamitec.com/reset/{$tokenData->token}'>Redefinir senha</a></p>
+        <p></p>
+        <p>Atenciosamente,</p>
+        <p>Equipe administrativo do Portal Farmácia Fácil</p>";
 
         if ($this->SendMail("no-reply@yamitec.com",$getUser->email,"Recuperação de Senha", $message)):
             return response()->json(["success" => true, "type" => "email", "message" => "Um e-mail foi com as instruções de recuperação foi enviado!"]);

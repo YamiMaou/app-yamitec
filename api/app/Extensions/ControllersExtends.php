@@ -44,7 +44,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 "message" => "parametros incorretos", 
                 "error" => "é necessário informar o Model e o Diretório de template do módulo para continuar."], 500);
         }
-        $data = $this->model->paginate($request->pageSize)->withQueryString();
+        $data = $this->model->paginate($request->pageSize ?? 10)->withQueryString();
         if(count($params) > 0){
             $createdAt = $params['created_at'] ?? '';
             unset($params['created_at']);
@@ -55,16 +55,33 @@ abstract class ControllersExtends extends Controller implements ControllersInter
             })->where(function($query) use($params, $request){
                 foreach($params as $k=>$v){
                     if($request->queryType == "like"){
-                        $query->where($k,'like', '%'.$v.'%');
-                        if($k == $request->withId){
-                            $query->orWhere('id','like', '%'.$v.'%');
+                        if(isset($params['active']) && $k == "active"){
+                            $query->where($k, $v);
+                        }else{
+                            $query->where($k,'like', '%'.$v.'%');
                         }
                     }else{
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate(10);
-            //echo $data->toSql();
+            })->orWhere(function($query) use($params, $request){
+                foreach($params as $k=>$v){
+                    if($request->queryType == "like"){
+                        if($k == $request->withId){
+                            $query->where('id','like', '%'.$v.'%');
+                            continue;
+                        }
+                        if(isset($params['active']) && $k == "active"){
+                            $query->where($k, $v);
+                        }else{
+                            $query->where($k,'like', '%'.$v.'%');
+                        }
+                    }else{
+                        $query->where($k,'=', $v);
+                    }
+                }
+            })->paginate($request->pageSize ?? 10)->withQueryString();
+           //dd($data->toSql());
         }
 
         

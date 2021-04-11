@@ -100,10 +100,13 @@ class CreateManagers extends Component {
     render() {
         const setProviders = async () => {
             let provManagers = this.state.provManagers;
+            if(provManagers.find(x => x.id === this.state.provider)){
+                this.props.setSnackbar({ open: true, message: 'Fornecedor já associado.' });
+                return false;
+            }
             this.setState({...this.state, provManagers: undefined});
             const prov = await getApiProviders({}, this.state.provider);
             provManagers.push(prov);
-            console.log(provManagers);
             this.setState({...this.state, provManagers});
         }
          // to use snackbar Provider
@@ -263,17 +266,17 @@ class CreateManagers extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        if(this.state.provManagers.length > 1){
+                                        //if(this.state.provManagers.length > 1){
                                             let provManagers = this.state.provManagers;
-                                            await getApiManagers({}, 1);
+                                            await getApiProviders({}, 1);
                                             let index = provManagers.findIndex(x => x.id == params.row.id)
                                             this.setState({...this.state, provManagers: undefined});
                                             provManagers.splice(index,1)
                                             this.setState({...this.state, provManagers });
                                             console.log(this.state.provManagers)
-                                        }else{
+                                        /*}else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
+                                        }*/
 
                                         
                                     } catch (err) {

@@ -194,6 +194,7 @@ class EditProviders extends Component {
         provider: 0,
         provProviders: [],
         provManagers: [],
+        provManagersDeleted: [],
         loading: false
     }
     async componentDidMount() {
@@ -248,6 +249,18 @@ class EditProviders extends Component {
             delete data.contacts;
             delete data.contracts;
             console.log(data.rate)
+            this.state.provManagersDeleted.map(async (v,k) => {
+                let del = await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: v.id });
+                if(del.success == false){
+                    this.props.setSnackbar({ open: true, message: del.message });
+                }
+            });
+            this.state.provManagers.map(async (v,k) => {
+                let add = await putApiProviders(`manager/${this.props.match.params.id}/${v.id }`)
+                if(add.success == false){
+                    this.props.setSnackbar({ open: true, message:del.message });
+                }
+            });
             //data.rate = data.rate.replace(/\./g,'').replace(',', '.');
             let response = await putApiProviders(this.props.match.params.id, data);
             //console.log(response);
@@ -364,9 +377,9 @@ class EditProviders extends Component {
                         flexBasis: '66%',
                         component: TypeEmpresaInput
                     },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: { min: 11, number: true, required: true }, validateHandler: validaCnpj, flexBasis: '33%', helperText: "o valor digitado é inválido" },
-                    { column: 'company_name', label: 'Razão Social', type: 'text', value: this.state.data['company_name'], validate: { max: 50, required: true }, flexBasis },
-                    { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', value: this.state.data['fantasy_name'], validate: { max: 50, required: true }, flexBasis: '33%' },
+                    { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: { min: 11, number: true, required: true }, validateHandler: validaCnpj, flexBasis: '22%', helperText: "o valor digitado é inválido" },
+                    { column: 'company_name', label: 'Razão Social', type: 'text', value: this.state.data['company_name'], validate: { max: 50, required: true }, flexBasis: '25%' },
+                    { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', value: this.state.data['fantasy_name'], validate: { max: 50, required: true }, flexBasis: '25%' },
                     { column: 'file_anexo', label: 'Documento', type: 'file', file: this.state.data['file_anexo'] ? this.state.data['file_anexo'].name : '', flexBasis },
                     { column: 'file_logo', label: 'Logo marca', type: 'file', file: this.state.data['file_logo'] ? this.state.data['file_logo'].name : '', validate: { required: true }, flexBasis },
 
@@ -437,7 +450,7 @@ class EditProviders extends Component {
             {
                 field: 'cpf', headerName: 'CPF', flex: 0.7,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return stringCpf(params.value);
+                    return params.value ? stringCpf(params.value) : '';
                 }
             },
             { field: 'name', headerName: 'Nome', flex: 2 },
@@ -463,13 +476,23 @@ class EditProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try{
-                                        if(this.state.provManagers.length > 1){
-                                            await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
+                                        let provManagers = this.state.provManagers;
+                                        let actualDel = provManagers.find(x => x.id == params.row.id)
+                                        let index = provManagers.findIndex(x => x.id == params.row.id)
+                                        await getApiProviders({}, this.props.match.params.id);
+                                        this.setState({...this.state, provManagers: undefined});
+                                        provManagers.splice(index,1)
+                                        let provManagersDeleted = this.state.provManagersDeleted;
+                                        provManagersDeleted.push(actualDel)
+                                        this.setState({...this.state, provManagers, provManagersDeleted });
+                                        
+                                        //if(this.state.provManagers.length > 1){
+                                            /*await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
                                             const data = await getApiProviders({}, this.props.match.params.id);
-                                            this.setState({...this.state, provManagers: data.managers});
-                                        }else{
-                                            this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
+                                            this.setState({...this.state, provManagers: data.managers});*/
+                                        //}else{
+                                        //    this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
+                                        //}
                                        
                                     }catch(err){
                                         console.log(err)
@@ -599,11 +622,23 @@ class EditProviders extends Component {
                                                 this.setState({...this.state, manager: e.target.value});
                                             }} />
                                             <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
+                                                let provManagers = this.state.provManagers;
+                                                const allmanagers = provManagers.find(x => x.id == this.state.manager)
+                                                if(allmanagers){
+                                                    this.props.setSnackbar({open: true, message: `O Responsável ${allmanagers.name} já está vinculado.`})
+                                                    return false;
+                                                }
+                                                const data = await getApiManagers({}, this.state.manager);
+                                                this.setState({...this.state, provManagers: undefined});
+                                                provManagers.push(data)
+                                                this.setState({...this.state, provManagers });
+                                                console.log(this.state.provManagers);
+                                                /*
                                                 await putApiProviders(`manager/${this.props.match.params.id}/${this.state.manager}`)
                                                 const data = await getApiProviders({}, this.props.match.params.id);
-                                                /*let data = {...this.state.data};
-                                                data = managers.managers*/
-                                                this.setState({...this.state, provManagers: data.managers });
+                                                // let data = {...this.state.data};
+                                                // data = managers.managers
+                                                this.setState({...this.state, provManagers: data.managers });*/
                                             }}><AddIcon /></Button>
                                         </div>
                                         <div style={{

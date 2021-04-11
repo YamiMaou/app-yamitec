@@ -108,6 +108,7 @@ class EditContributors extends Component {
     state = {
         data: {},
         provManagers: [],
+        provManagersDeleted: [],
         providers: [],
         provider: 0,
         loading: false
@@ -145,6 +146,18 @@ class EditContributors extends Component {
             data = Object.assign({}, state, data);
             delete data.addresses;
             delete data.contacts;
+            this.state.provManagersDeleted.map(async (v,k) => {
+                let del = await deleteApiManagersProviders({provider_id:v.id , manager_id: this.props.match.params.id });
+                if(del.success == false){
+                    this.props.setSnackbar({ open: true, message: del.message });
+                }
+            });
+            this.state.provManagers.map(async (v,k) => {
+                let add = await putApiProviders(`manager/${v.id }/${this.props.match.params.id}`)
+                if(add.success == false){
+                    this.props.setSnackbar({ open: true, message:del.message });
+                }
+            });
             let response = await putApiManagers(this.props.match.params.id, data);
             //console.log(response);
             if (response.data.success) {
@@ -289,15 +302,15 @@ class EditContributors extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        if(this.state.provManagers.length > 1){
-                                            await deleteApiManagersProviders({provider_id: params.row.id,manager_id: this.props.match.params.id})
-                                            const data = await getApiManagers({}, this.props.match.params.id);
-                                            this.setState({ ...this.state, provManagers: data.providers });
-                                        }else{
-                                            this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
-
-                                        
+                                        let provManagers = this.state.provManagers;
+                                        let actualDel = provManagers.find(x => x.id == params.row.id)
+                                        let index = provManagers.findIndex(x => x.id == params.row.id)
+                                        await getApiProviders({}, this.props.match.params.id);
+                                        this.setState({...this.state, provManagers: []});
+                                        provManagers.splice(index,1)
+                                        let provManagersDeleted = this.state.provManagersDeleted;
+                                        provManagersDeleted.push(actualDel)
+                                        this.setState({...this.state, provManagers, provManagersDeleted });
                                     } catch (err) {
                                         console.log(err)
                                     };
@@ -348,9 +361,19 @@ class EditContributors extends Component {
                                                 this.setState({...this.state, provider: e.target.value});
                                             }} />
                                             <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
-                                                await putApiProviders(`manager/${this.state.provider}/${this.props.match.params.id}`)
+                                                /*await putApiProviders(`manager/${this.state.provider}/${this.props.match.params.id}`)
                                                 const data = await getApiManagers({}, this.props.match.params.id);
-                                                this.setState({...this.state, provManagers: data.providers });
+                                                this.setState({...this.state, provManagers: data.providers });*/
+                                                let provManagers = this.state.provManagers;
+                                                const allmanagers = provManagers.find(x => x.id == this.state.provider)
+                                                if(allmanagers){
+                                                    this.props.setSnackbar({open: true, message: `O Fornecedor ${allmanagers.fantasy_name} já está vinculado.`})
+                                                    return false;
+                                                }
+                                                const data = await getApiProviders({}, this.state.provider);
+                                                this.setState({...this.state, provManagers: []});
+                                                provManagers.push(data)
+                                                this.setState({...this.state, provManagers });
                                             }}><AddIcon /></Button>
                                         </div>
                                     <div style={{

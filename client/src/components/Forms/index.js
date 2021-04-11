@@ -68,11 +68,21 @@ const MaskedDecimalInput = (props) => {
     function handleChange(e) {
         //const { value, id } = e.target;
         let val = e.target.value.length > 0 ? e.target.value : '0';
-        if( val.length > 5 && props.percent )
-            return false;
-        if( val.length < 11 ){
-            props.onChange(e) ?? undefined;
-            setValue(formatReal(getMoney(val)));
+        console.log(val);
+        console.log(props.percent)
+        if(/^[\d,.?!]+$/.test(val)){
+            if( val.length > 6 && props.percent )
+                return false;
+            if( val.length < 7 && props.percent ){
+                console.log(val)
+                props.onChange(e) ?? undefined;
+                setValue(formatReal(getMoney(val)));
+            }
+
+            if( val.length < 11 && !props.percent){
+                props.onChange(e) ?? undefined;
+                setValue(formatReal(getMoney(val)));
+            }
         }
     }
     return (

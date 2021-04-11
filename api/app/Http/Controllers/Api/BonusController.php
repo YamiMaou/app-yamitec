@@ -11,6 +11,9 @@ class BonusController extends ControllersExtends
     public function __construct()
     {
         parent::__construct(\App\Models\Bonus::class, 'home');
+        parent::setValidate([
+            "indication_qtty" => "unique:bonuses",
+        ]);
     }
 
     public function store(Request $request){

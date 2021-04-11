@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { putResetPassword,postAuth, JWT_Decode } from '../../providers/api'
 import {setDialog as authDialog, setAuth} from '../../actions/authAction'
-import {setLoading } from '../../actions/appActions'
+import {setLoading, setSnackbar } from '../../actions/appActions'
 
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -13,6 +13,8 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Slide from '@material-ui/core/Slide';
+
+import { withRouter } from 'react-router-dom'
 
 import logo from '../../../assets/logo.png'
 
@@ -63,7 +65,10 @@ function ResetPassword(props) {
       if(data.data.success){
         setLoginerror(false);
         setloading(false);
-        window.location.href="/";
+        props.setSnackbar({open: true, message: "Senha atualizada, faça já o seu login"})
+        setTimeout(() => {props.history.push('/login')}, 1000)
+        
+        //window.location.href="/";
       }else{
         setLoginerror(true)
         setloading(false);
@@ -135,6 +140,6 @@ const mapStateToProps = store => ({
   loading: store.appReducer.loading
 });
 const mapDispatchToProps = dispatch =>
-bindActionCreators({ setLoading, authDialog, setAuth,JWT_Decode }, dispatch);
+bindActionCreators({ setSnackbar, setLoading, authDialog, setAuth,JWT_Decode }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ResetPassword)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResetPassword))

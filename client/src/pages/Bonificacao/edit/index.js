@@ -111,8 +111,7 @@ class EditBonus extends Component {
         const request = async (state, data) => {
             this.setState({ ...this.state, loading: true });
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
-            data = Object.assign({}, state.addresses, data);
-            data = Object.assign({}, state.contacts, data);
+            data.discount_percent = data.discount_percent.replace('.',',')
             data = Object.assign({}, state, data);
             delete data.addresses;
             delete data.contacts;
@@ -123,20 +122,20 @@ class EditBonus extends Component {
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
-                let { errors, message } = response.data.error.response.data
+                let errors = response.data ?? undefined;
                 let messages = '';
-                console.log(errors)
-                if (errors !== undefined) {
-                    Object.keys(errors).map(err => {
+                if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
+                    Object.keys(errors.error.response.data.errors).map(err => {
                         console.log(err);
-                        messages += `O campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
-                    });
-                } else {
-                    messages = 'Houve um problema em sua requisição!'
+                        let field = err == "file" ? "Anexo" : err
+                        messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
+                    })
+                } else{
+                    messages = errors.message ?? 'Houve um problema em sua requisição!'
                 }
+                
                 this.setState({ ...this.state, loading: false });
-                //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, messages });
+                this.props.setSnackbar({ open: true, message: messages});
             }
 
         }
@@ -191,7 +190,7 @@ class EditBonus extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: { min: 1, number: true, required: true }, value: 1, flexBasis: "45%", value: this.state.data.indication_qtty },
-                    { column: 'discount_percent', label: 'Desconto (%)', type: 'text', validate: { min: 1, decimal: true, required: true }, flexBasis: '45%', value: this.state.data.discount_percent },
+                    { column: 'discount_percent', label: 'Desconto (%)', type: 'percent', validate: {min: 1, percent: true, required: true}, flexBasis: '45%', value: this.state.data.discount_percent.replace('.',',') },
                 ]
             },
         ]

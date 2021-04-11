@@ -90,7 +90,7 @@ const SelectInput = (props) => {
         setValue(e.target.value);
     }
     return (
-        <FormControl id={props.column} style={{ ...props.style, marginTop: '25px' }}>
+        <FormControl id={props.column} style={{ ...props.style, marginTop: '25px'}}>
             <InputLabel id={props.column}>{props.label}</InputLabel>
             <Select size="small"
                 labelId={props.id}
@@ -133,10 +133,10 @@ const TypeEmpresaInput = (props) => {
         props.onChange(e);
         setValue1(e.target.value);
     }
-    return (<div>
-        <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange} />
+    return (<div style={{flexBasis: props.style.flexBasis, marginRight: 5}}>
+        <SelectInput valueLabel="value" json={true} value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"type"} label={"Empresa"} name={"type"} values={[{id:1, value: 'Matriz'},{id:2, value: 'Filial'} ]} style={{flexBasis: window.innerWidth < 768 ? '100%' : '50%', minWidth: value == 2 ? '45%' : '90%'}} onChange={handleChange} />
         {value == 2 &&
-        <SelectInput valueLabel={props.valueLabel} json={props.json} value={value1} helperText={props.helperText ?? ""} key={`input-${15001}`} id={"matriz_id"} label={props.label} name={"matriz_id"} values={props.values} style={{flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange1} />
+        <SelectInput valueLabel={props.valueLabel} json={props.json} value={value1} helperText={props.helperText ?? ""} key={`input-${15001}`} id={"matriz_id"} label={props.label} name={"matriz_id"} values={props.values} style={{flexBasis: window.innerWidth < 768 ? '100%' : '50%', minWidth: '45%', marginLeft: 10 }} onChange={handleChange1} />
     }</div>)
 }
 
@@ -185,7 +185,7 @@ class CreateProviders extends Component {
          const setProviders = async () => {
             let provProviders = this.state.provProviders;
             if(provProviders.find(x => x.id === this.state.provider)){
-                this.props.setSnackbar({ open: true, message: 'Filial já asossiada.' });
+                this.props.setSnackbar({ open: true, message: 'Filial já associado.' });
                 return false;
             }
             this.setState({...this.state, provProviders: undefined});
@@ -197,7 +197,7 @@ class CreateProviders extends Component {
         const setManagers = async () => {
             let provManagers = this.state.provManagers;
             if(provManagers.find(x => x.id === this.state.manager)){
-                this.props.setSnackbar({ open: true, message: 'Responsável já asossiado.' });
+                this.props.setSnackbar({ open: true, message: 'Responsável já associado.' });
                 return false;
             }
             this.setState({...this.state, provManagers: undefined});
@@ -325,9 +325,9 @@ class CreateProviders extends Component {
                         flexBasis,
                         component: TypeEmpresaInput
                     },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '33%', helperText: "o valor digitado é inválido" },
-                    { column: 'company_name', label: 'Razão Social', type: 'text', validate: {max: 50, required: true}, flexBasis },
-                    { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', validate: {max: 50, required: true}, flexBasis:'33%' },
+                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '20%', helperText: "o valor digitado é inválido" },
+                    { column: 'company_name', label: 'Razão Social', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
+                    { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
                     { column: 'anexo', label: 'Documento', type: 'file', flexBasis },
                     { column: 'logo', label: 'Logo marca', type: 'file', validate: {required: true}, flexBasis },
                     //
@@ -431,10 +431,17 @@ class CreateProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try{
+                                            let provManagers = this.state.provManagers;
+                                            await getApiProviders({}, 1);
+                                            let index = provManagers.findIndex(x => x.id == params.row.id)
+                                            this.setState({...this.state, provManagers: undefined});
+                                            provManagers.splice(index,1)
+                                            this.setState({...this.state, provManagers });
+                                            // console.log(this.state.provManagers)
                                         //if(this.state.provManagers.length > 1){
-                                            await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
-                                            const data = await getApiProviders({}, this.props.match.params.id);
-                                            this.setState({...this.state, provManagers: data.managers});
+                                            //await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: params.row.id });
+                                            //const data = await getApiProviders({}, this.props.match.params.id);
+                                            //this.setState({...this.state, provManagers: data.managers});
                                         /*}else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
                                         }*/
@@ -493,23 +500,22 @@ class CreateProviders extends Component {
                                 size="small"
                                 onClick={async (e) => {
                                     try {
-                                        if(this.state.provManagers.length > 1){
-                                            let provManagers = this.state.provManagers;
+                                        //if(this.state.provManagers.length > 1){
+                                            let provProviders = this.state.provProviders;
                                             await getApiProviders({}, 1);
-                                            let index = provManagers.findIndex(x => x.id == params.row.id)
-                                            this.setState({...this.state, provManagers: undefined});
-                                            provManagers.splice(index,1)
-                                            this.setState({...this.state, provManagers });
-                                            console.log(this.state.provManagers)
-                                        }else{
+                                            let index = provProviders.findIndex(x => x.id == params.row.id)
+                                            this.setState({...this.state, provProviders: undefined});
+                                            provProviders.splice(index,1)
+                                            this.setState({...this.state, provProviders });
+                                            console.log(this.state.provProviders)
+                                        /*}else{
                                             this.props.setSnackbar({ open: true, message: "Você deve manter pelo menos 1 registro" })
-                                        }
+                                        }*/
 
                                         
                                     } catch (err) {
                                         console.log(err)
                                     };
-
                                 }}
                                 style={{ marginLeft: 16 }}
                             >

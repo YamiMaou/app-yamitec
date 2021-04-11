@@ -32,7 +32,7 @@ public function index(Request $request)
         unset($params['withId']);
         unset($params['page']);
         unset($params['pageSize']);
-        $data = $this->model->paginate($request->pageSize)->withQueryString();
+        $data = $this->model->paginate($request->pageSize ?? 10)->withQueryString();
         if(count($params) > 0){
             $launch_from = $params['created_at'] ?? '';
             $launch_to = $params['created_at_to'] ?? '';
@@ -56,7 +56,7 @@ public function index(Request $request)
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate(10);
+            })->paginate($request->pageSize ?? 10)->withQueryString();
             //echo $data->toSql();
         }
         return $data;
@@ -122,7 +122,7 @@ public function index(Request $request)
             $provider_data = [
                 "type" => $request->type,
                 "active" => $request->active,
-                "cnpj" => $request->cnpj,
+                "cpf_cnpj" => $request->cpf_cnpj,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
                 "matriz_id" => $request->type == 2 ? $request->matriz_id : null,
@@ -140,6 +140,7 @@ public function index(Request $request)
 
             if(explode(',',$request->managers) !== null)
                 $provider->managers()->attach(explode(',',$request->managers));
+                
             if(explode(',',$request->providers))
                 Provider::whereIn('id', explode(',',$request->providers))->update(['matriz_id' => $provider->id]);
                 //$provider->filials()->attach(explode(',',$request->providers));
@@ -184,7 +185,7 @@ public function index(Request $request)
     
                 Contract::create($contract_data);
             //endif;
-            parent::saveLog($provider->id, $request, 'providers');
+            parent::saveLog($provider->id, $request, 'provider');
 
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception $error) {
@@ -211,7 +212,7 @@ public function index(Request $request)
             //exit();
             $provider_data = [
                 "active" => $request->active,
-                "cnpj" => $request->cnpj,
+                "cpf_cnpj" => $request->cpf_cnpj,
                 "addr_clone" => ($request->type == 2 && $request->addr_clone),
                 "contact_clone" => ($request->type == 2 && $request->contact_clone),
                 "contract_clone" => ($request->type == 2 && $request->contract_clone),
@@ -287,7 +288,7 @@ public function index(Request $request)
 
             $this->addSellerToProvider($provider->id, $request->contributor_id);
 
-            parent::saveLog($id,$request,"providers");
+            parent::saveLog($id,$request,"provider");
             return response()->json(["success"=> true, "type" => "store", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);

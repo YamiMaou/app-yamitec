@@ -10,5 +10,8 @@ class BonusesController extends ControllersExtends
     public function __construct()
     {
         parent::__construct(Bonus::class, 'home');
+        parent::setValidate([
+            "indication_qtty" => "unique|bonuses",
+        ]);
     }
 }

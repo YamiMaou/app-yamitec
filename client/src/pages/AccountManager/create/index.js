@@ -13,7 +13,7 @@ import LForms from '../../../components/Forms';
 import TextField from '@material-ui/core/TextField';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiAccountmanager, getApiDownloadFile, getApiClients, getApiContributors, getApiProviders } from '../../../providers/api'
+import { postApiAccountmanager, getApiDownloadFile, getApiClients, getApiContributors, getApiProviders, getApiManagers } from '../../../providers/api'
 import { validaEmail, validaCpf, validaCnpj, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCnpj, InputCpf, InputPhone } from '../../../providers/masks'
@@ -97,6 +97,8 @@ const TextInputsAutocomplete = (props) => {
                 cpfcnpj = await getApiClients({cpf : value.replace(/[^\d]/g, '')})
                 if(cpfcnpj.data.length == 0)
                     cpfcnpj = await getApiContributors({cpf : value.replace(/[^\d]/g, '')});
+                if(cpfcnpj.data.length == 0)
+                    cpfcnpj = await getApiManagers({cpf : value.replace(/[^\d]/g, '')});
             }else if(value.replace(/[^\d]/g, '').length == 14){
                 cpfcnpj = await getApiProviders({cnpj : value.replace(/[^\d]/g, '')})
                 /*

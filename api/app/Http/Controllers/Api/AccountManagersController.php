@@ -22,7 +22,7 @@ class AccountManagersController extends ControllersExtends
         unset($params['withId']);
         unset($params['page']);
         unset($params['pageSize']);
-        $data = $this->model->with(['client', 'provider'])->paginate($request->pageSize)->withQueryString();
+        $data = $this->model->paginate($request->pageSize ?? 10)->withQueryString();
         if(count($params) > 0){
             $launch_from = $params['launch_date'] ?? '';
             $launch_to = $params['launch_date_to'] ?? '';
@@ -47,7 +47,7 @@ class AccountManagersController extends ControllersExtends
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate(10);
+            })->paginate(10)->withQueryString();
             //echo $data->toSql();
         }
         return $data;
@@ -62,6 +62,13 @@ class AccountManagersController extends ControllersExtends
     {
         if(!isset($request->name)){
             return response()->json(["success" => false, "message" => "O campo Nome é Obrigatório"]);
+        }
+        if(!isset($request->launch_date)){
+            return response()->json(["success" => false, "message" => "O campo Data é Obrigatório"]);
+        }
+
+        if(!isset($request->bill_type)){
+            return response()->json(["success" => false, "message" => "O campo Tipo é Obrigatório"]);
         }
         return parent::store($request);
     }

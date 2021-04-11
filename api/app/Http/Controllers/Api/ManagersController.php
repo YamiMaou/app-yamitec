@@ -35,7 +35,7 @@ class ManagersController extends ControllersExtends
         unset($params['withId']);
         unset($params['page']);
         unset($params['pageSize']);
-        $data = $this->model->paginate($request->pageSize)->withQueryString();
+        $data = $this->model->paginate($request->pageSize ?? 10)->withQueryString();
         if(count($params) > 0){
             $launch_from = $params['launch_date'] ?? '';
             $launch_to = $params['launch_date_to'] ?? '';
@@ -65,7 +65,7 @@ class ManagersController extends ControllersExtends
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate(10);
+            })->paginate($request->pageSize ?? 10)->withQueryString();
             //echo $data->toSql();
         }
         return $data;
@@ -75,65 +75,64 @@ class ManagersController extends ControllersExtends
     {
        return  parent::show($request, $id, ['user', 'providers','addresses', 'contacts', 'audits']);
     }
-    public function store(Request $resquest)
+    public function store(Request $request)
     {
-        if($resquest->providers == ""){
+        if($request->providers == ""){
             //return response()->json(["success" => false, "message" => "Ao menos um Fornecedor deve ser vínculado"]);
         }
-        if(User::where('email', $resquest->email)->count() > 0){
+        if(User::where('email', $request->email)->count() > 0){
             return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
         }
-        if(Manager::where('cpf', str_replace([".","-","_"],"",$resquest->cpf))->count() > 0){
+        if(Manager::where('cpf', str_replace([".","-","_"],"",$request->cpf))->count() > 0){
             return response()->json(["success" => false, "message" => "O CPF informado já está cadastrado."]);
         }
         
         try {
             $data_user = [
-                'name' => $resquest->name,
-                'email' => $resquest->email,
+                'name' => $request->name,
+                'email' => $request->email,
                 'profile_id' => 1, 
-                'password' => Hash::make($resquest->cpf),
+                'password' => Hash::make($request->cpf),
             ];
     
             $user = User::create($data_user);
     
             $data_manager = [
-                'name' => $resquest->name,
-                'cpf' => $resquest->cpf,
-                'function' => $resquest->function,
-                'active' => $resquest->active,
+                'name' => $request->name,
+                'cpf' => $request->cpf,
+                'function' => $request->function,
+                'active' => $request->active,
                 'user_id' => $user->id,
             ];
     
             $manager = Manager::create($data_manager);
-            if($resquest->providers != "")
-                $manager->providers()->attach(explode(',',$resquest->providers));
-
+            if(explode(',',$request->providers) !== null)
+                $manager->providers()->attach(explode(',',$request->providers));
             /*$data_address = [
-                'zipcode' => $resquest->zipcode,
-                'street' => $resquest->street,
-                'additional' => $resquest->additional,
-                'city' => $resquest->city,
-                'uf' => $resquest->uf,
-                'city' => $resquest->city,
+                'zipcode' => $request->zipcode,
+                'street' => $request->street,
+                'additional' => $request->additional,
+                'city' => $request->city,
+                'uf' => $request->uf,
+                'city' => $request->city,
                 'manager_id' => $manager->id,
             ];
     
             Address::create($data_address);*/
     
             $data_contact = [
-                'phone1' => $resquest->phone1,
-                'phone2' => $resquest->phone2,
-                'email' => $resquest->email,
-                'linkedin' => $resquest->linkedin,
-                'facebook' => $resquest->facebook,
-                'instagram' => $resquest->instagram,
+                'phone1' => $request->phone1,
+                'phone2' => $request->phone2,
+                'email' => $request->email,
+                'linkedin' => $request->linkedin,
+                'facebook' => $request->facebook,
+                'instagram' => $request->instagram,
                 'manager_id' => $manager->id,
             ];
     
             Contact::create($data_contact);
 
-            parent::saveLog($manager->id, $resquest, 'manager');
+            parent::saveLog($manager->id, $request, 'manager');
 
             return response()->json(["success"=> true, "type" => "show", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
@@ -142,10 +141,10 @@ class ManagersController extends ControllersExtends
 
     }
 
-    public function update(Request $resquest, $id)
+    public function update(Request $request, $id)
     {
-        if(!isset($resquest->cpf)){
-            return parent::update($resquest, $id);
+        if(!isset($request->cpf)){
+            return parent::update($request, $id);
         }
         try {
             $manager = Manager::findOrFail($id);
@@ -153,37 +152,37 @@ class ManagersController extends ControllersExtends
             $user = User::findOrFail($manager->user_id);
 
             $data_user = [
-                'name' => $resquest->name,
-                //'email' => $resquest->email,
-                //'password' => Hash::make($resquest->cpf),
+                'name' => $request->name,
+                //'email' => $request->email,
+                //'password' => Hash::make($request->cpf),
             ];
     
             $user->update($data_user);
 
             $data_manager = [
-                'name' => $resquest->name,
-                'cpf' => $resquest->cpf,
-                'function' => $resquest->function,
-                'active' => $resquest->active,
+                'name' => $request->name,
+                'cpf' => $request->cpf,
+                'function' => $request->function,
+                'active' => $request->active,
                 'user_id' => $user->id,
             ];
     
             $manager->update($data_manager);
     
             $data_contact = [
-                'phone1' => $resquest->phone1,
-                'phone2' => $resquest->phone2,
-                'email' => $resquest->email,
-                'linkedin' => $resquest->linkedin,
-                'facebook' => $resquest->facebook,
-                'instagram' => $resquest->instagram,
+                'phone1' => $request->phone1,
+                'phone2' => $request->phone2,
+                'email' => $request->email,
+                'linkedin' => $request->linkedin,
+                'facebook' => $request->facebook,
+                'instagram' => $request->instagram,
                 'manager_id' => $manager->id,
             ];
 
             $contact = Contact::where('manager_id', $manager->id);
     
             $contact->update($data_contact);
-            parent::saveLog($id, $resquest, 'manager');
+            parent::saveLog($id, $request, 'manager');
             return response()->json(["success"=> true, "type" => "update", "message" => "Atualizado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Atualizar. ", "error" => $error->getMessage()], 201);
