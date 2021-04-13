@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 //
 import AppBar from '@material-ui/core/AppBar';
+import Chip from '@material-ui/core/Chip';
 
 import Button from '@material-ui/core/Button';
 import HomeIcon from '@material-ui/icons/Home';
@@ -25,8 +26,8 @@ import { setSnackbar } from '../../actions/appActions'
 import { getApiManagers,getApiProviders, putApiManagers } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
-import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
+import { CircularProgress, IconButton, Toolbar, Tooltip } from '@material-ui/core';
+import { Add, FiberManualRecord } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
@@ -114,12 +115,29 @@ class Managers extends Component {
     render() {
         const rows : RowsProp = this.state.managers.data ?? [];
         const columns: ColDef[] = [
-            { field: 'cpf', headerName: 'CPF', flex: 0.7,
-                valueFormatter: (params: ValueFormatterParams) => {
-                    return stringCpf(params.value);
+            { field: 'cpf', headerName: 'CPF', flex:1.2,
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
+                    try{
+                        if(params.row.client == undefined && params.row.contributor == undefined){
+                            return <span>{stringCpf(params.value)}</span>
+                        }
+                        let haveIn = [];
+                        //console.log(params.row)
+                        if(params.row.client != undefined){
+                            haveIn.push("Clientes");
+                        }
+                            
+                        if(params.row.contributor != undefined){
+                            haveIn.push("Colaboradores");
+                        }
+                        return <div style={{display:'flex', alignItems: 'center'}}>{stringCpf(params.value)}<Tooltip placement="right" title={`Existente em ${haveIn.join(',')}`} arrow><FiberManualRecord color="secondary" /></Tooltip></div>;
+                    }catch(e){
+                        console.error(e);
+                        return  <span>{stringCpf(params.value)}</span>
+                    }
                 }
             },
-            { field: 'name', headerName: 'Nome',flex: 2 },
+            { field: 'name', headerName: 'Nome',flex: 1.5 },
             { field: 'function', headerName: 'Função', flex: 1 },
             {
                 field: 'active',

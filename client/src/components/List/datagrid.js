@@ -434,7 +434,7 @@ class LDataGrid extends Component {
                                     disableClickEventBubbling
                                     disableColumnMenu={true}
                                     loading={this.state.loading}
-                                    localeText={DEFAULT_LOCALE_TEXT}
+                                    localetext={DEFAULT_LOCALE_TEXT}
                                     paginationMode="server"
                                     rowCount={this.state.data.total ?? 0}
                                     pageSize={10} rowsPerPageOptions={[10]} pagination

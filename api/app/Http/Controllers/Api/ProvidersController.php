@@ -122,7 +122,7 @@ public function index(Request $request)
             $provider_data = [
                 "type" => $request->type,
                 "active" => $request->active,
-                "cpf_cnpj" => $request->cpf_cnpj,
+                "cnpj" => $request->cnpj,
                 "company_name" => $request->company_name,
                 "fantasy_name" => $request->fantasy_name,
                 "matriz_id" => $request->type == 2 ? $request->matriz_id : null,
@@ -196,14 +196,10 @@ public function index(Request $request)
 
     public function update(Request $request, $id)
     {
-        //$validate = $request;
         if(!isset($request->cnpj)){
             parent::saveLog($id,$request,"provider");
             return parent::update($request, $id);
         }
-        
-        //var_dump($request->hasFile('file_logo'));
-        
         $files = new \App\Http\Controllers\FilesController();
         $files = $files->multUpload($request, 'provider', $id);
         $data = $files->request;
@@ -212,7 +208,7 @@ public function index(Request $request)
             //exit();
             $provider_data = [
                 "active" => $request->active,
-                "cpf_cnpj" => $request->cpf_cnpj,
+                "cnpj" => $request->cnpj,
                 "addr_clone" => ($request->type == 2 && $request->addr_clone),
                 "contact_clone" => ($request->type == 2 && $request->contact_clone),
                 "contract_clone" => ($request->type == 2 && $request->contract_clone),

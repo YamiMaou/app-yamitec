@@ -120,7 +120,7 @@ class CreateBonus extends Component {
             {
                 title: 'Bonificação',
                 fields: [
-                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: {min: 1, number: true, required: true},  value: 1, flexBasis : "45%" },
+                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: { max: 11, min: 1, number: true, required: true},  value: 1, flexBasis : "45%" },
                     { column: 'discount_percent', label: 'Desconto (%)', type: 'percent', validate: {min: 1, percent: true, required: true}, flexBasis: '45%' },
                 ]
             },

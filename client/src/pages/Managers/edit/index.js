@@ -135,12 +135,6 @@ class EditContributors extends Component {
         const request = async (state, data) => {
             this.setState({ ...this.state, loading: true });
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
-            //this.props.enqueueSnackbar("Validando Dados, Aguarde ...", {variant: 'info'});
-            //let address = JSON.stringify(Object.assign({},JSON.parse(state.address),data.address));
-            //let contact = JSON.stringify(Object.assign({},JSON.parse(state.contact),data.contact));
-            //if (data.address) data.address = address;
-            //if (data.contact) data.contact = contact
-            //if (data.active) data.active = data.active == 'Ativo' ? 1 : 0;
             data = Object.assign({}, state.addresses, data);
             data = Object.assign({}, state.contacts, data);
             data = Object.assign({}, state, data);
@@ -272,7 +266,7 @@ class EditContributors extends Component {
                 }
             },
            { 
-            field: 'phone1', headerName: 'Telefone', flex: 0.7,
+            field: 'phone1', headerName: 'Telefone', flex: 0.5,
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
                     //console.log(provider)
@@ -287,7 +281,7 @@ class EditContributors extends Component {
                     return params.row.contact ? params.row.contact.email : '';
                 }
             },
-            { field: 'function', headerName: 'Função', flex: 0.7 }, 
+            { field: 'function', headerName: 'Função', flex: 0.5 }, 
             {
                 field: 'id',
                 headerName: 'Ações',
@@ -361,13 +355,11 @@ class EditContributors extends Component {
                                                 this.setState({...this.state, provider: e.target.value});
                                             }} />
                                             <Button variant="contained" color="primary" size="small" disableElevation onClick={async () => {
-                                                /*await putApiProviders(`manager/${this.state.provider}/${this.props.match.params.id}`)
-                                                const data = await getApiManagers({}, this.props.match.params.id);
-                                                this.setState({...this.state, provManagers: data.providers });*/
+                                               
                                                 let provManagers = this.state.provManagers;
                                                 const allmanagers = provManagers.find(x => x.id == this.state.provider)
                                                 if(allmanagers){
-                                                    this.props.setSnackbar({open: true, message: `O Fornecedor ${allmanagers.fantasy_name} já está vinculado.`})
+                                                    this.props.setSnackbar({open: true, message: `O Fornecedor ${allmanagers.company_name} já está vinculado.`})
                                                     return false;
                                                 }
                                                 const data = await getApiProviders({}, this.state.provider);

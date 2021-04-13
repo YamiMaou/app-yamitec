@@ -294,7 +294,7 @@ class LCardGrid extends Component {
         const columns: ColDef[] = this.props.columns;
         return (
             <div>
-                <Card className={classes.root} style={{ marginBottom: 15 }}>
+                <Card style={{ marginBottom: 15 }}>
                     <CardContent>
                         <Typography onClick={() => {
                             this.setState({ ...this.state, filter: this.state.filter == 'none' ? 'flex' : 'none' })
@@ -312,10 +312,10 @@ class LCardGrid extends Component {
                                 this.props.filterInputs.map(input => {
                                     if (input.type == "text") {
                                         if (input.mask === undefined)
-                                            return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            return <TextField key={`field_${input.column}`} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         else
                                             return (
-                                                <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                <FormControl key={`field_${input.column}`} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
                                                     <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                     <Input
                                                         value={this.state.filters[input.column] ?? ""}
@@ -346,7 +346,7 @@ class LCardGrid extends Component {
                                             }
 
                                             return (
-                                                <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                <FormControl key={`field_${input.column}`} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
                                                     <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                     <Input
                                                         value={this.state.filters[input.column] ?? ""}
@@ -384,9 +384,9 @@ class LCardGrid extends Component {
                                                 </FormControl>
                                             )
                                     } else if (input.type == "decimal" || input.type == "percent") {
-                                        return <MaskedDecimalInput percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                        return <MaskedDecimalInput key={`field_${input.column}`} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
+                                        return (<SelectInput key={`field_${input.column}`} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1 }} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }
@@ -407,23 +407,37 @@ class LCardGrid extends Component {
                         </Card>
                         }
                         {rows.map((row, key) => {
+                            //console.log(row);
                             return (
-                                <Card style={{marginTop: 15}}>
+                                <Card key={`card-container${key}`} style={{marginTop: 15}}>
                                     <CardContent>
+                                    <List key={`list_field_${key}`} component="nav">
                                         {Object.entries(row).map(field => {
+                                            
                                             let headerName = columns.find(column => column.field === field[0]);
                                             if (headerName && headerName.field !== 'id') {
-                                                console.log(field[1])
+                                                //console.log(field[1])
                                                 let value = headerName.valueFormatter ?? headerName.renderCell;
-                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row} : {value: field[1]});  
-                                                return (
-                                                    <List component="nav">
+                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row} : {value: field[1]}); 
+                                                if(headerName.renderCell !== undefined)
+                                                {
+                                                    console.log(row);
+                                                    value = headerName.renderCell({value: field[1], row: row }, row);
+                                                    console.log(value);
+                                                    return (
+                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                            <ListItemText primary={`${headerName.headerName}`} secondary={value} />
+                                                        </ListItem>
+                                                    )
+                                                }else{
+                                                    return (
                                                         <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
                                                             <ListItemText primary={`${headerName.headerName}`} secondary={`${value}`} />
                                                         </ListItem>
-                                                    </List>
-                                                )}
+                                                    )}
+                                                }
                                         })}
+                                        </List>
                                     </CardContent>
                                     <CardActions style={{justifyContent: 'center'}}>
                                     {Object.entries(row).map(field => {
@@ -440,7 +454,7 @@ class LCardGrid extends Component {
                         <Card style={{marginTop: 15}}>
                         <TablePagination
                             component="div"
-                            localeText={DEFAULT_LOCALE_TEXT}
+                            localetext={DEFAULT_LOCALE_TEXT}
                             count={this.state.data.total}
                             page={this.state.data.current_page-1}
                             onChangePage={(e,params) => {

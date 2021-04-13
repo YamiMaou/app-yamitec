@@ -44,6 +44,7 @@ const MaskedDecimalInput = (props) => {
     {
         return parseInt( str.replace(/[\D]+/g,'') );
     }
+
     function formatReal( int )
     {
         var tmp = int+'';
@@ -52,6 +53,7 @@ const MaskedDecimalInput = (props) => {
              tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
         return tmp;
     }
+
     function handleChange(e) {
         //const { value, id } = e.target;
         let val = e.target.value;
@@ -347,7 +349,7 @@ class CreateProviders extends Component {
                         //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
+                    { column: 'additional', label: 'Complemento', validate: {max: 20}, type: 'text', flexBasis },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
                         validate: {required: true },
@@ -610,7 +612,7 @@ class CreateProviders extends Component {
                                 <div style={{
                                     display: this.state.filter['fornecedores-ind'] ?? 'block',
                                 }}>
-                                <div  style={{
+                                <div style={{
                                         alignItems: 'center',
                                         justifyContent: 'start',
                                         display: 'flex',

@@ -394,7 +394,7 @@ class EditProviders extends Component {
                     { column: 'addr_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
                     { column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: this.state.data['addresses'].zipcode },
                     { column: 'street', label: 'Endereço', validate: { max: 100, required: true }, type: 'text', flexBasis, value: this.state.data['addresses'].street },
-                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis, value: this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '' },
+                    { column: 'additional', label: 'Complemento', validate: {max: 20}, type: 'text', flexBasis, value: this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '' },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],

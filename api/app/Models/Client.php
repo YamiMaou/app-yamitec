@@ -53,5 +53,12 @@ class Client extends Model
     {
         return $this->belongsTo(Audit::class)->latest();
     }
+    public function manager(){
+        return $this->hasOne(\App\Models\Manager::class,'cpf', 'cpf');
+    }
+
+    public function contributor() {
+        return $this->hasOne(\App\Models\Contributor::class,'cpf', 'cpf');
+    }
 
 }

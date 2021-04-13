@@ -16,6 +16,7 @@ class ClientsController extends ControllersExtends
     public function __construct()
     {
          parent::__construct(Client::class, 'home');
+         parent::setRelations(['manager', 'contributor']);
          parent::setValidate([
             "name" => "required|max:50",
             "cpf" => "required|unique:clients|max:11",

@@ -111,8 +111,9 @@ class EditBonus extends Component {
         const request = async (state, data) => {
             this.setState({ ...this.state, loading: true });
             this.props.setSnackbar({ open: true, message: "Validando Dados, Aguarde ...", });
-            data.discount_percent = data.discount_percent.replace('.',',')
+            
             data = Object.assign({}, state, data);
+            data.discount_percent = data.discount_percent.replace(',','.')
             delete data.addresses;
             delete data.contacts;
             let response = await putApiBonus(this.props.match.params.id, data);
@@ -189,7 +190,7 @@ class EditBonus extends Component {
             {
                 title: 'Dados Básicos',
                 fields: [
-                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: { min: 1, number: true, required: true }, value: 1, flexBasis: "45%", value: this.state.data.indication_qtty },
+                    { column: 'indication_qtty', label: 'Quantidade', type: 'text', validate: { max: 11, min: 1, number: true, required: true }, value: 1, flexBasis: "45%", value: this.state.data.indication_qtty },
                     { column: 'discount_percent', label: 'Desconto (%)', type: 'percent', validate: {min: 1, percent: true, required: true}, flexBasis: '45%', value: this.state.data.discount_percent.replace('.',',') },
                 ]
             },

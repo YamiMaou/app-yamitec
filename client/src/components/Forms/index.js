@@ -74,6 +74,9 @@ const MaskedDecimalInput = (props) => {
             if( val.length > 6 && props.percent )
                 return false;
             if( val.length < 7 && props.percent ){
+                if(val.length == 6){
+                    val = '100,00'
+                }
                 console.log(val)
                 props.onChange(e) ?? undefined;
                 setValue(formatReal(getMoney(val)));
@@ -288,6 +291,7 @@ function TextInputCustom(props) {
                 id={props.id} label={props.label}
                 onChange={handleChange}
                 onBlur={handleChange}
+                inputProps={{ maxLength: props.maxLength }}
             />
         )
     else
@@ -589,11 +593,13 @@ class LForms extends Component {
                                                             />
                                                         )
                                                     } else {
+                                                        let maxLength= input.validate != undefined ? input.validate.max != undefined ? input.validate.max : 1000 : 1000
                                                         return <TextInputCustom key={`input-${ind1}`}
                                                             id={input.column}
                                                             disabled={input.disabled ?? false}
                                                             type={input.type}
                                                             value={input.value}
+                                                            maxLength={maxLength}
                                                             style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }}
                                                             id={input.column} label={input.label}
                                                             mask={input.mask ?? undefined}

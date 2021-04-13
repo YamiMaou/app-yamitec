@@ -215,8 +215,8 @@ function Header(props) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                { window.innerWidth < 720 && <MenuItem disable={true}><TimerOutlined /> {minute} : {second}</MenuItem>}
-                { window.innerWidth < 720 && <MenuItem disable={true}><PersonOutlined />{authData.name}</MenuItem>}
+                { window.innerWidth < 720 && <MenuItem disabled><TimerOutlined /> {minute} : {second}</MenuItem>}
+                { window.innerWidth < 720 && <MenuItem disabled><PersonOutlined />{authData.name}</MenuItem>}
                 <MenuItem onClick={logoutClick}>
                   <PowerSettingsNewIcon style={{ color: red[500] }}/>
                   Sair 

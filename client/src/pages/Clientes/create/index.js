@@ -140,7 +140,7 @@ class CreateContributors extends Component {
                         //handle: getAddress 
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
+                    { column: 'additional', label: 'Complemento', validate: {max: 20}, type: 'text', flexBasis },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
                         validate: {required: true },

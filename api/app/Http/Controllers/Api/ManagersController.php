@@ -22,6 +22,8 @@ class ManagersController extends ControllersExtends
     }
     public function index(Request $request)
     {
+
+        
         if(isset($request->provider_id)){
             $provider = Provider::findOrFail($request->provider_id);
             $managers = $provider->managers()->where('managers.id' ,'>' ,0)->pluck('managers.id');
@@ -35,7 +37,7 @@ class ManagersController extends ControllersExtends
         unset($params['withId']);
         unset($params['page']);
         unset($params['pageSize']);
-        $data = $this->model->paginate($request->pageSize ?? 10)->withQueryString();
+        $data = $this->model->with(['client', 'contributor'])->paginate($request->pageSize ?? 10)->withQueryString();
         if(count($params) > 0){
             $launch_from = $params['launch_date'] ?? '';
             $launch_to = $params['launch_date_to'] ?? '';
@@ -65,7 +67,7 @@ class ManagersController extends ControllersExtends
                         $query->where($k,'=', $v);
                     }
                 }
-            })->paginate($request->pageSize ?? 10)->withQueryString();
+            })->with(['client', 'contributor'])->paginate($request->pageSize ?? 10)->withQueryString();
             //echo $data->toSql();
         }
         return $data;
@@ -106,20 +108,10 @@ class ManagersController extends ControllersExtends
             ];
     
             $manager = Manager::create($data_manager);
-            if(explode(',',$request->providers) !== null)
-                $manager->providers()->attach(explode(',',$request->providers));
-            /*$data_address = [
-                'zipcode' => $request->zipcode,
-                'street' => $request->street,
-                'additional' => $request->additional,
-                'city' => $request->city,
-                'uf' => $request->uf,
-                'city' => $request->city,
-                'manager_id' => $manager->id,
-            ];
-    
-            Address::create($data_address);*/
-    
+            if(!$manager){
+                $user->delete();
+                return response()->json(["success" => "false", "message" => "Problema ao cadastrar Responsável"]);
+            }
             $data_contact = [
                 'phone1' => $request->phone1,
                 'phone2' => $request->phone2,
@@ -130,10 +122,16 @@ class ManagersController extends ControllersExtends
                 'manager_id' => $manager->id,
             ];
     
-            Contact::create($data_contact);
-
-            parent::saveLog($manager->id, $request, 'manager');
-
+            $contact = Contact::create($data_contact);
+            if(!$contact){
+                $user->delete();
+                $manager->delete();
+                return response()->json(["success" => "false", "message" => "Problema ao cadastrar Contato"]);
+            }else{
+                if($request->providers != "")
+                $manager->providers()->attach(explode(',',$request->providers));
+                parent::saveLog($manager->id, $request, 'manager');
+            }
             return response()->json(["success"=> true, "type" => "show", "message" => "Cadastrado com Sucesso!"]);
         } catch(\Exception  $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);

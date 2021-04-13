@@ -52,4 +52,12 @@ class Manager extends Model
     {
         return $this->belongsTo(Audit::class)->latest();
     }
+
+    public function client(){
+        return $this->hasOne(\App\Models\Client::class,'cpf', 'cpf');
+    }
+
+    public function contributor() {
+        return $this->hasOne(\App\Models\Contributor::class,'cpf', 'cpf');
+    }
 }

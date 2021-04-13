@@ -179,7 +179,7 @@ class AccountManager extends Component {
                       {params.row.detached == 1 &&
                       <Button
                         disabled={view.update === 0}
-                        variant="outlined" color="secondary"
+                        variant="outlined" color="primary"
                         size="small"
                         onClick={async (e)=> {
                             const handle = async (justify) => {

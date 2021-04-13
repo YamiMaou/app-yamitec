@@ -46,7 +46,7 @@ const TextInputsAutocomplete = (props) => {
         console.log(e.target.value)
     }
     return (<div>
-        <TextField value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"cnpj"} label={props.label} name={"cnpj"} style={{margin: "20px 5px 5px",flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange} />
+        <TextField value={value} helperText={props.helperText ?? ""} key={`input-${15000}`} id={"cpf_cnpj"} label={props.label} name={"cpf_cnpjnpj"} style={{margin: "20px 5px 5px",flexBasis: window.innerWidth < 768 ? '100%' : props.flexBasis }} onChange={handleChange} />
         <IconButton style={{margin: "20px 5px 5px"}} onClick={async () => {
             let cpfcnpj = undefined;
             if(value.replace(/\D/gim, '').length == 11){

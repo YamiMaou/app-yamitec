@@ -61,4 +61,12 @@ class Contributor extends Model
         );
     }
 
+    public function manager(){
+        return $this->hasOne(\App\Models\Manager::class,'cpf', 'cpf');
+    }
+
+    public function client(){
+        return $this->hasOne(\App\Models\Client::class,'cpf', 'cpf');
+    }
+
 }

@@ -22,6 +22,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     private $template = null;
     private $isApi = true;
     private $with = [];
+    private $relation = [];
     private $validate = [];
     private $storeId = 0;
 
@@ -44,7 +45,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 "message" => "parametros incorretos", 
                 "error" => "é necessário informar o Model e o Diretório de template do módulo para continuar."], 500);
         }
-        $data = $this->model->paginate($request->pageSize ?? 10)->withQueryString();
+        $data = $this->model->with($this->relation)->paginate($request->pageSize ?? 10)->withQueryString();
         if(count($params) > 0){
             $createdAt = $params['created_at'] ?? '';
             unset($params['created_at']);
@@ -229,6 +230,10 @@ abstract class ControllersExtends extends Controller implements ControllersInter
     public function withAndChange($modules = [], $changes = ["permiss" => false, "key" => ""])
     {
         $this->with = ["data" => $modules, "changes" => (object) $changes];
+    }
+    public function setRelations(array $relations)
+    {
+        $this->relation = $relations;
     }
     public function setValidate(array $validate)
     {

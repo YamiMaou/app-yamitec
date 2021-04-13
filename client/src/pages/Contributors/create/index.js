@@ -48,9 +48,7 @@ class CreateContributors extends Component {
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
-                console.log(response)
                 let errors = response.data ?? undefined;
-
                 let messages = '';
                 if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
                     Object.keys(errors.error.response.data.errors).map(err => {
@@ -59,7 +57,7 @@ class CreateContributors extends Component {
                         messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
                     })
                 } else{
-                    messages = 'Houve um problema em sua requisição!'
+                    messages = errors.message ?? 'Houve um problema em sua requisição!'
                 }
                 this.setState({ ...this.state, loading: false });
                 this.props.setSnackbar({ open: true, message: messages});
@@ -140,7 +138,7 @@ class CreateContributors extends Component {
                         column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
                     },
                     { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'additional', label: 'Complemento', type: 'text', flexBasis },
+                    { column: 'additional', label: 'Complemento', validate: {max: 20}, type: 'text', flexBasis },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
                         validate: {required: true },

@@ -15,6 +15,7 @@ class ContributorsController extends ControllersExtends
     public function __construct()
     {
         parent::__construct(Contributor::class, 'home');
+        parent::setRelations(['manager', 'client']);
         parent::setValidate([
             "name" => "required|max:50",
             "cpf" => "required|unique:contributors|max:11",
