@@ -107,6 +107,7 @@ class EditAccountManager extends Component {
             data = Object.assign({},state.addresses,data);
             data = Object.assign({},state.contacts,data);
             data = Object.assign({},state,data);
+            data.cpf_cnpj = data.cpf_cnpj.replace(/[^\d]/g, '')
             data.amount = data.amount.replace(/\./g,'').replace(',', '.');
             delete data.addresses;
             delete data.contacts;

@@ -79,7 +79,10 @@ const MaskedDecimalInput = (props) => {
     function handleChange(e) {
         //const { value, id } = e.target;
         let val = e.target.value.length > 0 ? e.target.value : '0';
-        if( val.length > 5 && props.percent )
+        if(val.length == 6){
+            val = '100,00'
+        }
+        if( val.length > 6 && props.percent )
             return false;
         props.onChange(e) ?? undefined;
         setValue(formatReal(getMoney(val)));
@@ -155,7 +158,7 @@ const DateInput = (props) => {
 //
 
 const SelectInput = (props) => {
-    const [value, setValue] = useState(props.values[0]);
+    const [value, setValue] = useState(props.value ?? props.values[0]);
     function handleChange(e) {
         props.onBlur(e)
         setValue(e.target.value);
@@ -167,7 +170,7 @@ const SelectInput = (props) => {
                 labelId={props.id}
                 id={props.id}
                 name={props.name}
-                value={props.value}
+                value={props.value ?? props.values[0]}
                 onChange={handleChange}
                 onBlur={handleChange}
             >
@@ -401,10 +404,10 @@ class LCardGrid extends Component {
 
                 {!this.state.firstLoad &&
                     <div style={{ height: 450, width: '100%' }}>
-                        {rows.length == 0 && 
-                        <Card style={{marginTop: 15}}>
-                            <CardContent> Não há registros</CardContent>
-                        </Card>
+                        {rows.length == 0 ? (
+                            <Card style={{marginTop: 15}}>
+                                <CardContent> Não há registros</CardContent>
+                            </Card>) : ('')
                         }
                         {rows.map((row, key) => {
                             //console.log(row);

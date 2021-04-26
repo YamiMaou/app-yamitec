@@ -25,7 +25,7 @@ class Manager extends Model
             'manager_providers',
             'manager_id',
             'provider_id'
-        )->with('address', 'contact');
+        )->with('addresses', 'contacts');
     }
 
     public function addresses()

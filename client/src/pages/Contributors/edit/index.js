@@ -56,7 +56,6 @@ class EditContributors extends Component {
             delete data.addresses;
             delete data.contacts;
             let response = await putApiContributors(this.props.match.params.id, data);
-            console.log(response);
             if (response.data.success) {
                 this.props.setSnackbar({ open: true, message: response.data.message });
                 this.setState({ ...this.state, loading: false });
@@ -75,7 +74,7 @@ class EditContributors extends Component {
                 }
                 this.setState({ ...this.state, loading: false });
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, messages});
+                this.props.setSnackbar({ open: true, message: messages});
             }
 
         }

@@ -28,7 +28,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
-
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
 
 import ptBR from "date-fns/locale/pt-BR";
@@ -45,6 +45,48 @@ import MaskedInput from 'react-text-mask';
 const idNumbers = [
     'cpf', 'cnpj', 'zipcode'
 ];
+// Autocomplete
+
+const options = ['Option 1', 'Option 2'];
+
+const CustomAutocomplete = (props) => {
+  
+  const [value, setValue] = React.useState(props.value ? props.values.find((item) => item.id = props.value) : undefined);
+  const [inputValue, setInputValue] = React.useState('');
+
+  function handleChange(e, newValue) {
+    const { value, id } = e.target;
+    let vl = {target: { id: props.id, value: newValue.id}}
+    if (props.validate !== undefined) {
+        if (props.validate(value)) {
+            setError(false);
+        } else {
+            setError(true)
+        }
+    }
+    props.onChange(vl)
+    setValue(newValue);
+}
+  return <Autocomplete
+        key={`autocomplete-${props.id}`}
+        id={props.id}
+        disabled={props.disabled ?? false}
+        name={props.name}
+        value={value}
+        onChange={handleChange}
+        getOptionSelected={(option, value) => option.id === props.value}
+        getOptionLabel={(option) => option[props.valueLabel]}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        options={props.values}
+        style={props.style}
+        renderInput={(params) => <TextField {...params} 
+        label={props.label} 
+         />}
+      />;
+}
+
 
 // Decimal 
 
@@ -300,6 +342,7 @@ function TextInputCustom(props) {
                 <InputLabel htmlFor={props.id}>{props.label}</InputLabel>
                 <Input
                     required={props.required ?? false}
+                    disabled={props.disabled ?? false}
                     size="small"
                     key={`input-${props.id}`}
                     error={error}
@@ -349,6 +392,7 @@ const DateInput = (props) => {
             <TextField
                 style={{ width: '100%' }}
                 id={props.id}
+                disabled={props.disabled ?? false}
                 label={props.label ?? 'Data'}
                 type="date"
                 defaultValue={value}
@@ -410,6 +454,7 @@ const SelectInput = (props) => {
             <Select size="small"
                 labelId={props.id}
                 id={props.id}
+                disabled={props.disabled ?? false}
                 name={props.name}
                 value={value}
                 error={error}
@@ -548,7 +593,7 @@ class LForms extends Component {
                                                     if (input.type == "custom") {
                                                         let CustomComponent = input.component;
                                                         //console.log(input.value + '  ' + input.value1);
-                                                        return (<CustomComponent valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />) ?? ('Não existe');
+                                                        return (<CustomComponent disabled={input.disabled ?? false} valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />) ?? ('Não existe');
                                                     } else if (input.type == "decimal" || input.type == "percent") {
                                                         return <MaskedDecimalInput key={`input-${ind1}`}
                                                             id={input.column}
@@ -564,14 +609,17 @@ class LForms extends Component {
                                                             onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                             onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "date") {
-                                                        return <DateInput value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                        return <DateInput disabled={input.disabled ?? false} value={input.value ?? ""} validate={input.validateHandler} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} style={{ ...classes.m5, width: window.innerWidth < 720 ? '100%' : '20%' }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "select") {
-                                                        return (<SelectInput valueLabel={input.valueLabel} json={input.json} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />)
+                                                        return <SelectInput disabled={input.disabled ?? false} valueLabel={input.valueLabel} json={input.json} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
+                                                    } else if (input.type == "autocomplete"){
+                                                        return <CustomAutocomplete disabled={input.disabled ?? false} valueLabel={input.valueLabel} json={input.json} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />
                                                     } else if (input.type == "file") {
                                                         return (
                                                             <FileInput key={`input-${ind1}`}
                                                                 style={{ ...classes.m5, width: window.innerWidth > 720 ? '190px' : '100%' }}
                                                                 file={input.file}
+                                                                disabled={input.disabled ?? false}
                                                                 onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 onBlur={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
                                                                 label={input.label}

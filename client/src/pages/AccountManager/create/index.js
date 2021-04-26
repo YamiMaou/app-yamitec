@@ -147,6 +147,7 @@ class CreateAccountManager extends Component {
             //delete data.addresses;
            // delete data.contacts;
             data.amount = data.amount.replace(/\./g,'').replace(',', '.');
+            data.cpf_cnpj = data.cpf_cnpj.replace(/[^\d]/g, '')
             let response = await postApiAccountmanager(data);
             //console.log(response);
             if (response.data.success) {

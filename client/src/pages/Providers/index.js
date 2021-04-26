@@ -106,7 +106,6 @@ class Providers extends Component {
     }
 
     render() {
-        
         const rows : RowsProp = this.state.providers.data ?? [];
         const columns: ColDef[] = [
             { field: 'cnpj', headerName: 'CNPJ', flex: 1,
@@ -221,6 +220,9 @@ class Providers extends Component {
                             if(params.active !== undefined){
                                 params.active = params.active == "Ativo" ? 1: 0;
                             }
+                            if(params.type !== undefined){
+                                params.type = params.type == "Matriz" ? 1: 2;
+                            }
                             this.setState({...this.state, pageRequest: params})
                             return getApiProviders(params)
                     }} />) : (
@@ -229,6 +231,9 @@ class Providers extends Component {
                             (params) => {
                                 if(params.active !== undefined){
                                     params.active = params.active == "Ativo" ? 1: 0;
+                                }
+                                if(params.type !== undefined){
+                                    params.type = params.type == "Matriz" ? 1: 2;
                                 }
                                 this.setState({...this.state, pageRequest: params})
                                 return getApiProviders(params)

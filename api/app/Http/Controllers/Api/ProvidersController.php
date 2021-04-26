@@ -72,15 +72,15 @@ public function index(Request $request)
             $contract_clone = $provider->where('id', $provider_id)->get('contract_clone')[0];
 
             if ($provider->type == 2 && $addr_clone->addr_clone == true):
-                $address = Provider::find($provider->matriz_id)->address()->first();
+                $address = Provider::find($provider->matriz_id)->addresses()->first();
             else:
-                $address = $provider->address()->first();
+                $address = $provider->addresses()->first();
             endif;
             
             if ($provider->type == 2 && $contact_clone->contact_clone == true):
-                $contact = Provider::find($provider->matriz_id)->contact()->first();
+                $contact = Provider::find($provider->matriz_id)->contacts()->first();
             else:
-                $contact = $provider->contact()->first();
+                $contact = $provider->contacts()->first();
             endif;
 
             if ($provider->type == 2 && $contract_clone->contract_clone == true):
@@ -110,6 +110,10 @@ public function index(Request $request)
             if($request->managers == ""){
                 return response()->json(["success" => false, "message" => "Ao menos um Responsável deve ser vínculado"]);
             }
+
+            if($request->logo == null){
+                return response()->json(["success" => false, "message" => "O Campo Logo é Obrigatório"]);
+            }
             
             if($request->type == 2 && $request->matriz_id == null){
                 return response()->json(["success" => false, "message" => "É obrigatório selecionar uma Matriz"]);
@@ -130,14 +134,12 @@ public function index(Request $request)
                 "contact_clone" => $request->contact_clone ? true : false,
                 "contract_clone" => $request->contract_clone ? true : false,
                 "providertype_id" => $request->providertype_id,
-                "anexo" =>  $data['anexo'],
-                "logo" =>  $data['logo'],
             ];
             $provider_data['anexo'] = $data['anexo'] ?? null;
             $provider_data['logo'] = $data['logo'] ?? null;
 
             $provider = Provider::create($provider_data);
-
+            if($provider){
             if(explode(',',$request->managers) !== null)
                 $provider->managers()->attach(explode(',',$request->managers));
                 
@@ -155,7 +157,10 @@ public function index(Request $request)
                     "provider_id" => $provider->id,
                 ];
 
-                Address::create($address_data);
+                $address = Address::create($address_data);
+                if(!$address){
+                    $provider->delete();
+                }
             //endif;
 
             //if ($request->contact_clone == null):
@@ -170,7 +175,11 @@ public function index(Request $request)
                     "provider_id" => $provider->id,
                 ];
     
-                Contact::create($contact_data);
+                $contact = Contact::create($contact_data);
+                if(!$contact){
+                    $address->delete();
+                    $provider->delete();
+                }
             //endif;
 
 
@@ -183,11 +192,17 @@ public function index(Request $request)
                     "provider_id" => $provider->id,
                 ];
     
-                Contract::create($contract_data);
+                $contract = Contract::create($contract_data);
+                if(!$contract){
+                    $address->delete();
+                    $provider->delete();
+                    $contact->delete();
+                }
             //endif;
             parent::saveLog($provider->id, $request, 'provider');
-
             return response()->json(["success"=> true, "type" => "store", "message" => "Cadastrado com Sucesso!"]);
+            }
+            return response()->json(["success"=> false, "type" => "store", "message" => "Erro ao cadastrar!"]);
         } catch(\Exception $error) {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
@@ -221,8 +236,8 @@ public function index(Request $request)
             if($request['logo'] !== null){
                 $provider_data["logo"] = $data['file_logo'] == "[object Object]" ? $request['logo'] : $data['file_logo'];
             }
-            
-            $provider_data["anexo"] = $data['file_anexo'] == "[object Object]" ? $request['anexo'] : $data['file_anexo'];
+            if($request['anexo'] !== null &&  $request['anexo'] != 'null')
+                $provider_data["anexo"] = $data['file_anexo'] == "[object Object]" ? $request['anexo'] : $data['file_anexo'];
             
             
             //if(isset($provider_data["type"])) $provider_data["type"] = $request->type;

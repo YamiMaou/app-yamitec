@@ -25,7 +25,7 @@ import { setSnackbar } from '../../actions/appActions'
 import { getApiClients, putApiClients } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
-import { CircularProgress, IconButton, Toolbar, Tooltip } from '@material-ui/core';
+import { CircularProgress, IconButton, Toolbar, Tooltip, ListItemText } from '@material-ui/core';
 import { Add, FiberManualRecord } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
@@ -111,7 +111,7 @@ class Clients extends Component {
     render() {
         const rows : RowsProp = this.state.clients.data ?? [];
         const columns: ColDef[] = [
-            { field: 'cpf', headerName: 'CPF', flex: 1.2,
+            { field: 'cpf', headerName: 'CPF', flex: 1.2, row: true,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
                     try{
                         if(params.row.manager == undefined && params.row.contributor == undefined){
@@ -126,10 +126,22 @@ class Clients extends Component {
                         if(params.row.contributor != undefined){
                             haveIn.push("Colaboradores");
                         }
-                        return <div style={{display:'flex', alignItems: 'center'}}>{stringCpf(params.value)}<Tooltip placement="right" title={`Existente em ${haveIn.join(',')}`} arrow><FiberManualRecord color="secondary" /></Tooltip></div>;
+                        return window.innerWidth > 720 ?
+                            (
+                            <div style={{display:'flex', alignItems: 'center'}}>
+                                {stringCpf(params.value)}
+                                <Tooltip placement="right" title={`Existente em ${haveIn.join(',')}`} arrow>
+                                    <FiberManualRecord color="secondary" />
+                                </Tooltip>
+                            </div>) : (
+                                <div>
+                                    {stringCpf(params.row.cpf)}
+                                    <ListItemText secondary={`Existente em ${haveIn.join(',')}`} />
+                                </div>
+                            )
                     }catch(e){
-                        console.error(e);
-                        return  <span>{stringCpf(params.value)}</span>
+                        console.log(e);
+                        return  <span>{stringCpf(params.row.cpf)}</span>
                     }
                 }
             },
@@ -183,7 +195,7 @@ class Clients extends Component {
             { column: 'cpf', label: 'CPF', type: 'text', 
             mask: InputCpf, 
             flexBasis },
-            { column: 'name', label: 'Nome', type: 'text', flexBasis },
+            { column: 'name', label: 'Nome', type: 'text', flexBasis: '45%' },
             { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]

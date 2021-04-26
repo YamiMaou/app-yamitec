@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Contact;
 use App\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ClientsController extends ControllersExtends
@@ -104,6 +105,11 @@ class ClientsController extends ControllersExtends
         if(!isset($resquest->cpf)){
             return parent::update($resquest, $id);
         }
+        $user = User::where('email', $resquest->email)->first();
+        $is = \App\Models\Client::findOrFail($id);
+        if($is && $user && $user->id != $is->user_id){
+            return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
+        }
         try {
             $client = Client::findOrFail($id);
 
@@ -111,7 +117,7 @@ class ClientsController extends ControllersExtends
 
             $data_user = [
                 'name' => $resquest->name,
-                //'email' => $resquest->email,
+                'email' => $resquest->email,
                 //'password' => Hash::make($resquest->cpf),
             ];
     

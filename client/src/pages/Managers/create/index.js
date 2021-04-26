@@ -14,6 +14,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { DataGrid, RowsProp, ColDef} from '@material-ui/data-grid';
 import { DEFAULT_LOCALE_TEXT } from '../../../providers/langs/datagrid';
 import LForms from '../../../components/Forms';
+import LCardGrid from '../../../components/List/cardgrid';
 //
 
 import MenuItem from '@material-ui/core/MenuItem';
@@ -34,7 +35,7 @@ import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonM
 
 import { InputCep, InputCpf, InputPhone, stringCnpj } from '../../../providers/masks'
 import { Redirect } from 'react-router-dom';
-
+import { CardActions, List, ListItem, ListItemText } from '@material-ui/core';
 import { withSnackbar  } from 'notistack';
 const SelectInput = (props) => {
     const [value, setValue] = useState(props.value ?? "Selecione");
@@ -85,6 +86,7 @@ const SelectInput = (props) => {
 class CreateManagers extends Component {
     
     state = {
+        filter: ['flex'],
         managers: [],
         providers: [],
         provider: undefined,
@@ -227,12 +229,12 @@ class CreateManagers extends Component {
         ];
 
         // Providers Grid
-        const rows: RowsProp = this.state.provManagers;
+        const rows: RowsProp = (this.state.provManagers !== undefined) ? this.state.provManagers : [];
         const columns: ColDef[] = [
             {
-                field: 'company_name', headerName: 'Farmácia', flex: 1.2,
+                field: 'company_name', headerName: 'Farmácia', flex: 1.2, row:true,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return params.value +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
+                    return params.row.company_name +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
                 }
             },
            { 
@@ -251,7 +253,12 @@ class CreateManagers extends Component {
                     return params.row.contacts ? params.row.contacts.email : '';
                 }
             },
-            { field: 'function', headerName: 'Função', flex: 0.7 }, 
+            { 
+                field: 'type', headerName: 'Tipo', flex: 0.7,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return params.value === 1 ? "Matriz" : "Filial"
+                } 
+            },
             {
                 field: 'id',
                 headerName: 'Ações',
@@ -308,9 +315,16 @@ class CreateManagers extends Component {
                         <div>
                             <Card style={{ marginBottom: 15 }}>
                                 <CardContent>
-                                    <Typography>
-                                        <IndeterminateCheckBoxIcon /> Fornecedores
-                                    </Typography>
+                                <Typography onClick={() => {
+                                            let filter = this.state.filter;
+                                            filter['fornecedores-ind'] = this.state.filter['fornecedores-ind'] == 'block' ? 'none' : 'block'
+                                            this.setState({ ...this.state, filter })
+                                        }}>
+                                    <IndeterminateCheckBoxIcon /> Fornecedores
+                                </Typography>
+                                <div style={{
+                                    display: this.state.filter['fornecedores-ind'] ?? 'block',
+                                }}>
                                     <div  style={{
                                             alignItems: 'center',
                                             justifyContent: 'start',
@@ -319,7 +333,7 @@ class CreateManagers extends Component {
                                         <SelectInput valueLabel="value" 
                                             json={true} 
                                             valueLabel={'company_name'}
-                                            key={`input-${15019}`} id={"manager"} label={"Farmácia/Grupo"} name={"manager"} 
+                                            key={`input-${15019}`} id={"manager"} label={"Filial"} name={"manager"} 
                                             values={this.state.providers} 
                                             style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                             onChange={(e) => {
@@ -333,10 +347,13 @@ class CreateManagers extends Component {
                                     <div style={{
                                         alignItems: 'center',
                                         justifyContent: 'start',
+                                        overflow: 'auto',
                                         height: 350,
+                                        minHeight: 350,
                                     }}>
-                                        { rows == undefined || rows.length == 0 ? ('') :  
-                                        <DataGrid sx={{
+                                         
+                                         {window.innerWidth > 720 ? (
+                                              <DataGrid sx={{
                                             '& .MuiDataGrid-root': {
                                                 '& .MuiDataGrid-viewport': {
                                                     maxWidth: '600px',
@@ -350,7 +367,53 @@ class CreateManagers extends Component {
                                             disableColumnMenu={true}
                                             localeText={DEFAULT_LOCALE_TEXT}
                                             pageSize={10} rowsPerPageOptions={[10]} pagination
-                                        /> }
+                                        /> ) : rows.map((row, key) => {
+                                            //console.log(row);
+                                            return (
+                                                <Card key={`card-container${key}`} style={{marginTop: 15}}>
+                                                    <CardContent>
+                                                    <List key={`list_field_${key}`} component="nav">
+                                                        {Object.entries(row).map(field => {
+                                                            
+                                                            let headerName = columns.find(column => column.field === field[0]);
+                                                            if (headerName && headerName.field !== 'id') {
+                                                                console.log(field[1])
+                                                                let value = headerName.valueFormatter ?? headerName.renderCell;
+                                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row} : {value: field[1]}); 
+                                                                if(headerName.renderCell !== undefined)
+                                                                {
+                                                                    console.log(row);
+                                                                    value = headerName.renderCell({value: field[1], row: row }, row);
+                                                                    console.log(value);
+                                                                    return (
+                                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                                            <ListItemText primary={`${headerName.headerName}`} secondary={value} />
+                                                                        </ListItem>
+                                                                    )
+                                                                }else{
+                                                                    return (
+                                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                                            <ListItemText primary={`${headerName.headerName}`} secondary={`${value}`} />
+                                                                        </ListItem>
+                                                                    )}
+                                                                }
+                                                            }
+                                                        )
+                                                        }
+                                                        </List>
+                                                    </CardContent>
+                                                    <CardActions style={{justifyContent: 'center'}}>
+                                                    {Object.entries(row).map(field => {
+                                                        let headerName = columns.find(column => column.field === field[0]);
+                                                        if(headerName && headerName.field == 'id') {
+                                                            return headerName.renderCell({value: field[1], row }, row);
+                                                        }
+                                                    })}
+                                                    </CardActions>
+                                                </Card>
+                                            )
+                                        })}
+                                    </div>
                                     </div>
                                 </CardContent>
                             </Card>

@@ -11,6 +11,7 @@ use App\Models\Manager;
 use App\Models\Provider;
 use Illuminate\Support\Facades\Hash;
 use \App\User;
+use Illuminate\Support\Facades\Auth;
 
 class ManagersController extends ControllersExtends
 {
@@ -82,7 +83,8 @@ class ManagersController extends ControllersExtends
         if($request->providers == ""){
             //return response()->json(["success" => false, "message" => "Ao menos um Fornecedor deve ser vínculado"]);
         }
-        if(User::where('email', $request->email)->count() > 0){
+        $user = \App\User::where('email', $request->email)->first();
+        if($user){
             return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
         }
         if(Manager::where('cpf', str_replace([".","-","_"],"",$request->cpf))->count() > 0){
@@ -144,6 +146,11 @@ class ManagersController extends ControllersExtends
         if(!isset($request->cpf)){
             return parent::update($request, $id);
         }
+        $user = User::where('email', $request->email)->first();
+        $is = \App\Models\Manager::findOrFail($id);
+        if($is && $user && $user->id != $is->user_id){
+            return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
+        }
         try {
             $manager = Manager::findOrFail($id);
 
@@ -151,7 +158,7 @@ class ManagersController extends ControllersExtends
 
             $data_user = [
                 'name' => $request->name,
-                //'email' => $request->email,
+                'email' => $request->email,
                 //'password' => Hash::make($request->cpf),
             ];
     

@@ -73,7 +73,10 @@ const MaskedDecimalInput = (props) => {
     function handleChange(e) {
         //const { value, id } = e.target;
         let val = e.target.value.length > 0 ? e.target.value : '0';
-        if( val.length > 5 && props.percent )
+        if(val.length == 6){
+            val = '100,00'
+        }
+        if( val.length > 6 && props.percent )
             return false;
         props.onChange(e) ?? undefined;
         setValue(formatReal(getMoney(val)));
@@ -180,7 +183,7 @@ const SelectInput = (props) => {
                 labelId={props.id}
                 id={props.id}
                 name={props.name}
-                value={value}
+                value={props.value ?? props.values[0]}
                 onChange={handleChange}
                 onBlur={handleChange}
             >
@@ -300,7 +303,7 @@ class LDataGrid extends Component {
         const onClearFilter = () => {
             let filters = {};
             this.props.filterInputs.map(input => {
-                filters[input.column] = input.value ?? "";
+                filters[input.column] = undefined;
             });
 
             this.setState({ ...this.state, filters });

@@ -36,6 +36,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import { CardActions, List, ListItem, ListItemText } from '@material-ui/core';
 
 const MaskedDecimalInput = (props) => {
     const [value1, setValue] = useState(props.value ?? undefined);
@@ -165,7 +166,7 @@ class CreateProviders extends Component {
         const managers = await getApiManagers();
         const providertypes = await getApiProviderTypes();
         const providers = await getApiProviders();
-        const filials = await getApiProviders({type: 1, active: 1});
+        const filials = await getApiProviders({type: 2, active: 1});
         this.setState({
             ...this.state, 
             data: data.data, 
@@ -315,16 +316,16 @@ class CreateProviders extends Component {
                         values: this.state.providertypes,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
                         validate: {required: true },
                         value: "Selecione",
-                        flexBasis
+                        flexBasis:'13%'
                     },
                     {
                         column: 'matriz_id', 
                         label: 'Matriz', 
                         type: 'custom',
                         json: true, 
-                        valueLabel: "fantasy_name",
+                        valueLabel: "conpany_name",
                         values: this.state.providers,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
-                        flexBasis,
+                        flexBasis:'30%',
                         component: TypeEmpresaInput
                     },
                     { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '20%', helperText: "o valor digitado é inválido" },
@@ -345,18 +346,18 @@ class CreateProviders extends Component {
                     { column: 'addr_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
                     
                     {
-                        column: 'zipcode', label: 'CEP', type: 'text', mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
+                        column: 'zipcode', label: 'CEP', type: 'text',disabled: (this.state.fields['addr_clone'] == 1), mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
                         //handle: getAddress 
                     },
-                    { column: 'street', label: 'Endereço', validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'additional', label: 'Complemento', validate: {max: 20}, type: 'text', flexBasis },
+                    { column: 'street', label: 'Endereço',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 100, required: true}, type: 'text', flexBasis },
+                    { column: 'additional', label: 'Complemento',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 20}, type: 'text', flexBasis },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
-                        validate: {required: true },
+                        validate: {required: true },disabled: (this.state.fields['addr_clone'] == 1),
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
                         flexBasis, style:{minWidth: "192px"}
                     },
-                    { column: 'city', label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
+                    { column: 'city',disabled: (this.state.fields['addr_clone'] == 1), label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
                 ]
             },
             {
@@ -364,19 +365,19 @@ class CreateProviders extends Component {
                 //json: 'contact',
                 fields: [
                     { column: 'contact_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
-                    { column: 'phone1', label: 'Contato', type: 'text', mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
-                    { column: 'phone2', label: 'Contato alternativo', type: 'text', mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
-                    { column: 'email', label: 'E-mail', type: 'email', validate: {max: 100}, validateHandler: validaEmail, flexBasis: '20%' },
-                    { column: 'site', label: 'Site', type: 'text', validate: {max: 100}, flexBasis: '20%' },
+                    { column: 'phone1', label: 'Contato', type: 'text', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
+                    { column: 'phone2', label: 'Contato alternativo', type: 'text', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
+                    { column: 'email', label: 'E-mail', type: 'email', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), validate: {max: 100}, validateHandler: validaEmail, flexBasis: '20%' },
+                    { column: 'site', label: 'Site', type: 'text', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), validate: {max: 100}, flexBasis: '20%' },
                 ]
             },
             {
                 title: 'Redes Sociais',
                 //json: 'contact',
                 fields: [
-                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
-                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
-                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
+                    { column: 'linkedin', label: 'Usuário do LinkedIn', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
+                    { column: 'facebook', label: 'Usuário do Facebook', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
+                    { column: 'instagram', label: 'Usuário do Instagram', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
                 ]
             },
             {
@@ -384,19 +385,19 @@ class CreateProviders extends Component {
                 //json: 'contact',
                 fields: [
                     { column: 'contract_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
-                    { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', validate: {required: true}, flexBasis: '20%' },
-                    { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', validate: {required: true}, flexBasis: '20%' },
+                    { column: 'accession_date', label: 'Data de Adesão - Início', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
+                    { column: 'end_date', label: 'Data de Adesão - Fim', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
                     { 
                         column: 'contributor_id', 
                         label: 'Vendedor', 
-                        type: 'select',
+                        type: 'autocomplete',
                         validate:{required: true}, 
                         json: true,
                         valueLabel: 'name',
                         values: this.state.contributors,
-                        flexBasis: '20%'
+                        flexBasis: '20%', disabled: (this.state.fields['contract_clone'] == 1)
                     },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'decimal', validate: {decimal: true, required: true}, flexBasis: '20%' },
+                    { column: 'rate', label: 'Taxa de Adesão', type: 'decimal', disabled: (this.state.fields['contract_clone'] == 1), validate: {decimal: true, required: true}, flexBasis: '20%' },
                 ]
             }
         ]
@@ -466,13 +467,13 @@ class CreateProviders extends Component {
         const rowsProv: RowsProp = (this.state.provProviders !== undefined) ? this.state.provProviders : [];
         const columnsProv: ColDef[] = [
             {
-                field: 'company_name', headerName: 'Farmácia', flex: 1.2,
+                field: 'company_name', headerName: 'Farmácia', flex: 1.2, row:true,
                 valueFormatter: (params: ValueFormatterParams) => {
-                    return params.value +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
+                    return params.row.company_name +" - "+ stringCnpj(params.row.cnpj ?? '00000000000000');
                 }
             },
            { 
-            field: 'phone1', headerName: 'Telefone', flex: 0.7,
+            field: 'phone1', headerName: 'Telefone', flex: 0.7, row: true,
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
                     //console.log(params.row)
@@ -480,14 +481,19 @@ class CreateProviders extends Component {
                 }
             },
             { 
-                field: 'email', headerName: 'E-mail',flex: 0.7,
+                field: 'email', headerName: 'E-mail',flex: 0.7, row: true,
                 valueFormatter: (params: ValueFormatterParams) => {
                     //let provider = this.state.providers.filter(prov => prov.id === params.row.id); 
                     //console.log(provider)
                     return params.row.contacts ? params.row.contacts.email : '';
                 }
             },
-            { field: 'function', headerName: 'Função', flex: 0.7 }, 
+            { 
+                field: 'type', headerName: 'Tipo', flex: 0.7, row: true,
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return params.row.type === 1 ? "Matriz" : "Filial"
+                } 
+            }, 
             {
                 field: 'id',
                 headerName: 'Ações',
@@ -578,8 +584,11 @@ class CreateProviders extends Component {
                                     <div style={{
                                         alignItems: 'center',
                                         justifyContent: 'start',
+                                        overflow: 'auto',
                                         height: 350,
+                                        minHeight: 350,
                                     }}>
+                                        { window.innerWidth > 720 ? (
                                         <DataGrid sx={{
                                             '& .MuiDataGrid-root': {
                                                 '& .MuiDataGrid-viewport': {
@@ -594,7 +603,52 @@ class CreateProviders extends Component {
                                             disableColumnMenu={true}
                                             localeText={DEFAULT_LOCALE_TEXT}
                                             pageSize={10} rowsPerPageOptions={[10]} pagination
-                                        />
+                                        />) : rows.map((row, key) => {
+                                            //console.log(row);
+                                            return (
+                                                <Card key={`card-container${key}`} style={{marginTop: 15}}>
+                                                    <CardContent>
+                                                    <List key={`list_field_${key}`} component="nav">
+                                                        {Object.entries(row).map(field => {
+                                                            
+                                                            let headerName = columns.find(column => column.field === field[0]);
+                                                            if (headerName && headerName.field !== 'id') {
+                                                                console.log(field[1])
+                                                                let value = headerName.valueFormatter ?? headerName.renderCell;
+                                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row} : {value: field[1]}); 
+                                                                if(headerName.renderCell !== undefined)
+                                                                {
+                                                                    console.log(row);
+                                                                    value = headerName.renderCell({value: field[1], row: row }, row);
+                                                                    console.log(value);
+                                                                    return (
+                                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                                            <ListItemText primary={`${headerName.headerName}`} secondary={value} />
+                                                                        </ListItem>
+                                                                    )
+                                                                }else{
+                                                                    return (
+                                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                                            <ListItemText primary={`${headerName.headerName}`} secondary={`${value}`} />
+                                                                        </ListItem>
+                                                                    )}
+                                                                }
+                                                            }
+                                                        )
+                                                        }
+                                                        </List>
+                                                    </CardContent>
+                                                    <CardActions style={{justifyContent: 'center'}}>
+                                                    {Object.entries(row).map(field => {
+                                                        let headerName = columns.find(column => column.field === field[0]);
+                                                        if(headerName && headerName.field == 'id') {
+                                                            return headerName.renderCell({value: field[1], row }, row);
+                                                        }
+                                                    })}
+                                                    </CardActions>
+                                                </Card>
+                                            )
+                                        })}
                                     </div>
                                 </div>
                                 </CardContent>
@@ -620,7 +674,7 @@ class CreateProviders extends Component {
                                     <SelectInput valueLabel="value" 
                                         json={true} 
                                         valueLabel={'company_name'}
-                                        key={`input-${15019}`} id={"providers"} label={"Farmácia/Grupo"} name={"providers"} 
+                                        key={`input-${15019}`} id={"providers"} label={"Filial"} name={"providers"} 
                                         values={this.state.filials} 
                                         style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                         onChange={(e) => {
@@ -634,9 +688,11 @@ class CreateProviders extends Component {
                                 <div style={{
                                     alignItems: 'center',
                                     justifyContent: 'start',
+                                    overflow: 'auto',
                                     height: 350,
+                                    minHeight: 350,
                                 }}>
-                                     
+                                     { window.innerWidth > 720 ? (
                                     <DataGrid sx={{
                                         '& .MuiDataGrid-root': {
                                             '& .MuiDataGrid-viewport': {
@@ -651,7 +707,50 @@ class CreateProviders extends Component {
                                         disableColumnMenu={true}
                                         localeText={DEFAULT_LOCALE_TEXT}
                                         pageSize={10} rowsPerPageOptions={[10]} pagination
-                                    />
+                                    />) : rowsProv.map((row, key) => {
+                                            //console.log(row);
+                                            return (
+                                                <Card key={`card-container${key}`} style={{marginTop: 15}}>
+                                                    <CardContent>
+                                                    <List key={`list_field_${key}`} component="nav">
+                                                        {Object.entries(row).map(field => {
+                                                            
+                                                            let headerName = columnsProv.find(column => (column.field === field[0] || field[0] == 'contacts' && column.field == 'phone1' || field[0] == 'contact_clone' && column.field == 'email' ));
+                                                            if (headerName && headerName.field !== 'id') {
+                                                                console.log(field[1])
+                                                                let value = headerName.valueFormatter ?? headerName.renderCell;
+                                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row, value: field[1]} : {value: field[1]}); 
+                                                                if(headerName.renderCell !== undefined)
+                                                                {
+                                                                    console.log(row);
+                                                                    value = headerName.renderCell({value: field[1], row: row }, row);
+                                                                    console.log(value);
+                                                                    return (
+                                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                                            <ListItemText primary={`${headerName.headerName}`} secondary={value} />
+                                                                        </ListItem>
+                                                                    )
+                                                                }else{
+                                                                    return (
+                                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                                            <ListItemText primary={`${headerName.headerName}`} secondary={`${value}`} />
+                                                                        </ListItem>
+                                                                    )}
+                                                                }
+                                                        })}
+                                                        </List>
+                                                    </CardContent>
+                                                    <CardActions style={{justifyContent: 'center'}}>
+                                                    {Object.entries(row).map(field => {
+                                                        let headerName = columnsProv.find(column => column.field === field[0]);
+                                                        if(headerName && headerName.field == 'id') {
+                                                            return headerName.renderCell({value: field[1], row }, row);
+                                                        }
+                                                    })}
+                                                    </CardActions>
+                                                </Card>
+                                            )
+                                        })}
                                 </div>
                             </div>
                             </CardContent>

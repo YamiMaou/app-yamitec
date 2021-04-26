@@ -26,7 +26,7 @@ import { setSnackbar } from '../../actions/appActions'
 import { getApiManagers,getApiProviders, putApiManagers } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
-import { CircularProgress, IconButton, Toolbar, Tooltip } from '@material-ui/core';
+import { CircularProgress, IconButton, ListItemText, Toolbar, Tooltip } from '@material-ui/core';
 import { Add, FiberManualRecord } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
@@ -115,7 +115,7 @@ class Managers extends Component {
     render() {
         const rows : RowsProp = this.state.managers.data ?? [];
         const columns: ColDef[] = [
-            { field: 'cpf', headerName: 'CPF', flex:1.2,
+            { field: 'cpf', headerName: 'CPF', flex:1.2, row:true,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
                     try{
                         if(params.row.client == undefined && params.row.contributor == undefined){
@@ -130,10 +130,22 @@ class Managers extends Component {
                         if(params.row.contributor != undefined){
                             haveIn.push("Colaboradores");
                         }
-                        return <div style={{display:'flex', alignItems: 'center'}}>{stringCpf(params.value)}<Tooltip placement="right" title={`Existente em ${haveIn.join(',')}`} arrow><FiberManualRecord color="secondary" /></Tooltip></div>;
+                        return window.innerWidth > 720 ?
+                            (
+                            <div style={{display:'flex', alignItems: 'center'}}>
+                                {stringCpf(params.value)}
+                                <Tooltip placement="right" title={`Existente em ${haveIn.join(',')}`} arrow>
+                                    <FiberManualRecord color="secondary" />
+                                </Tooltip>
+                            </div>) : (
+                                <div>
+                                    {stringCpf(params.row.cpf)}
+                                    <ListItemText secondary={`Existente em ${haveIn.join(',')}`} />
+                                </div>
+                            )
                     }catch(e){
                         console.error(e);
-                        return  <span>{stringCpf(params.value)}</span>
+                        return  <span>{stringCpf(params.row.cpf)}</span>
                     }
                 }
             },

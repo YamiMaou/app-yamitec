@@ -123,7 +123,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 $files = new FilesController();
                 $files = $files->multUpload($request, $modelName);
                 $data = $files->request;
-                $data['user_id'] = $request->user()->id;
+                //$data['user_id'] = $request->user()->id;
                 $data['username'] = $request->user()->email;
                 unset($data["file"]);
                 unset($data["_token"]);
@@ -144,7 +144,7 @@ abstract class ControllersExtends extends Controller implements ControllersInter
                 }
             } else {
                 $data = $request->all();
-                $data['user_id'] = $request->user()->id;
+                //$data['user_id'] = $request->user()->id;
                 $data['username'] = $request->user()->email;
                 unset($data["file"]);
                 unset($data["_token"]);

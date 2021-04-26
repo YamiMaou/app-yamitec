@@ -92,12 +92,21 @@ class Provider extends Model
         return $this->hasOne(File::class,'id', 'anexo')->latest();
     }
 
-    public function address()
+    public function addresses()
     {
         return $this->hasOne(Address::class);
     }
 
+    public function address(){
+        return $this->hasOne(Address::class);
+    }
+
     public function contact()
+    {
+        return $this->hasOne(Contact::class);
+    }
+
+    public function contacts()
     {
         return $this->hasOne(Contact::class);
     }

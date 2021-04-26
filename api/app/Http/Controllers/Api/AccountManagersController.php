@@ -70,6 +70,14 @@ class AccountManagersController extends ControllersExtends
         if(!isset($request->bill_type)){
             return response()->json(["success" => false, "message" => "O campo Tipo é Obrigatório"]);
         }
+        if(count(explode('.',$request->amount)) == 1)
+        {
+            $start = substr($request->amount,0, strlen($request->amount)-2);
+            $end = substr($request->amount,strlen($request->amount)-2, strlen($request->amount));
+            $request->merge([
+                'amount' => "{$start}.{$end}"
+            ]);
+        }
         return parent::store($request);
     }
 }

@@ -17,7 +17,7 @@ class CreateBonusesTable extends Migration
             $table->id();
 
             $table->integer('indication_qtty')->nullable();
-            $table->decimal('discount_percent', 4, 2)->nullable();
+            $table->decimal('discount_percent', 8, 2)->nullable();
 
             $table->timestamps();
         });
