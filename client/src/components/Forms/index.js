@@ -51,14 +51,24 @@ const options = ['Option 1', 'Option 2'];
 
 const CustomAutocomplete = (props) => {
   
-  const [value, setValue] = React.useState(props.value ? props.values.find((item) => item.id = props.value) : undefined);
+  const [value, setValue] = React.useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
   const [inputValue, setInputValue] = React.useState('');
+  const [defaultVal, setDefault] = useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
+    useEffect(() => {
+        if(props.value !== defaultVal){
+            const vl = props.value ? props.values.find((item) => item.id == props.value) : undefined;
+            setValue(vl)
+            setInputValue(vl !== undefined ? vl[props.valueLabel] : "")
+        }
+    })
+    //console.log("Vendedor"+props.value)
+    //console.log(props.value ? props.values.find((item) => item.id == props.value) :  "aa");
 
   function handleChange(e, newValue) {
-    const { value, id } = e.target;
+    const { val, id } = e.target;
     let vl = {target: { id: props.id, value: newValue.id}}
     if (props.validate !== undefined) {
-        if (props.validate(value)) {
+        if (props.validate(val)) {
             setError(false);
         } else {
             setError(true)
@@ -73,8 +83,12 @@ const CustomAutocomplete = (props) => {
         disabled={props.disabled ?? false}
         name={props.name}
         value={value}
+        inputValue={inputValue}
         onChange={handleChange}
-        getOptionSelected={(option, value) => option.id === props.value}
+        /*getOptionSelected={(option, value) => {
+            //console.log(value);
+            return option.id == value.id
+        }}*/
         getOptionLabel={(option) => option[props.valueLabel]}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
@@ -93,6 +107,12 @@ const CustomAutocomplete = (props) => {
 const MaskedDecimalInput = (props) => {
     const [value1, setValue] = useState(props.value ?? 0);
     const [error, setError] = useState(false);
+    const [defaultVal, setDefault] = useState(props.value);
+    useEffect(() => {
+        if(props.value !== defaultVal){
+            setValue(props.value ?? 0)
+        }
+    })
     function getMoney( str )
     {
         return parseInt( str.replace(/[\D]+/g,'') );
@@ -106,6 +126,23 @@ const MaskedDecimalInput = (props) => {
             if( tmp.length >= 10 )
                 tmp = tmp.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, "$1.$2,$3");
             return tmp;
+    }
+    function value(val){
+        if(/^[\d,.?!]+$/.test(val)){
+            if( val.length > 6 && props.percent )
+                return false;
+            if( val.length < 7 && props.percent ){
+                if(val.length == 6){
+                    val = '100,00'
+                }
+                
+                return (formatReal(getMoney(val)));
+            }
+
+            if( val.length < 11 && !props.percent){
+                return (formatReal(getMoney(val)));
+            }
+        }
     }
     function handleChange(e) {
         //const { value, id } = e.target;
@@ -136,7 +173,10 @@ const MaskedDecimalInput = (props) => {
             disabled={props.disabled ?? false}
             error={error}
             type={props.type ?? "text"}
-            value={value1 ?? ''}
+            InputLabelProps={{
+                shrink: props.value != (""|undefined) || value1 != (""|undefined)  ? true : false,
+              }}
+            value={value(value1 ?? 0)}
             helperText={error == true ? props.helperText ?? "conteúdo inválido" : ""}
             id={props.id} label={props.label}
             onChange={handleChange}
@@ -156,6 +196,7 @@ function TextMaskCustom(props) {
             ref={(ref) => {
                 inputRef(ref ? ref.inputElement : null);
             }}
+            
             value={props.value}
             onChange={props.onChange}
             onBlur={props.onChange}
@@ -296,9 +337,15 @@ const FileInput = (props) => {
 function TextInputCustom(props) {
     const { inputRef, ...other } = props;
 
-    const [value, setValue] = useState(props.value ?? "");
+    
+    const [value, setValue] = useState(props.value);
     const [error, setError] = useState(false);
-
+    const [defaultVal, setDefault] = useState(props.value);
+    useEffect(() => {
+        if(props.value !== defaultVal)
+            setValue(props.value)
+    })
+    
     function handleChange(e) {
         const { id } = e.target;
         let e1 = {target: {id: e.target.id, name: e.target.name, type: e.target.type, value: e.target.value.replace(',', '.')}}
@@ -326,6 +373,9 @@ function TextInputCustom(props) {
             <TextField key={`input-${props.id}`} size="small" style={props.style}
                 required={props.required ?? false}
                 disabled={props.disabled ?? false}
+                InputLabelProps={{
+                    shrink: props.value != (""|undefined) || value != (""|undefined) ? true : false,
+                  }}
                 error={error}
                 type={props.type ?? "text"}
                 value={value}
@@ -339,7 +389,7 @@ function TextInputCustom(props) {
     else
         return (
             <FormControl key={`input-${props.id}`} style={props.style} >
-                <InputLabel htmlFor={props.id}>{props.label}</InputLabel>
+                <InputLabel shrink={props.value != (""|undefined) || value != (""|undefined)  ? true : false} htmlFor={props.id}>{props.label}</InputLabel>
                 <Input
                     required={props.required ?? false}
                     disabled={props.disabled ?? false}
@@ -367,6 +417,11 @@ const DateInput = (props) => {
     let valueDate = new Date(props.value)
     const [value, setValue] = useState(props.value);
     const [error, setError] = useState(false);
+    const [defaultVal, setDefault] = useState(props.value);
+    useEffect(() => {
+        if(props.value !== defaultVal)
+            setValue(props.value)
+    })
     function handleChange(e) {
         setValue(e.target.value);
         console.log(e)
@@ -395,6 +450,7 @@ const DateInput = (props) => {
                 disabled={props.disabled ?? false}
                 label={props.label ?? 'Data'}
                 type="date"
+                value={value}
                 defaultValue={value}
                 onChange={handleChange}
                 onBlur={handleChange}
@@ -435,6 +491,13 @@ const DateInput = (props) => {
 const SelectInput = (props) => {
     const [value, setValue] = useState(props.value ?? "Selecione");
     const [error, setError] = useState(false);
+    const [defaultVal, setDefault] = useState(props.value ?? "Selecione");
+    useEffect(() => {
+        if(props.value !== defaultVal){
+            setValue(props.value ?? "Selecione")
+        }
+    })
+
     function handleChange(e) {
         const { value, id } = e.target;
         if (props.validate !== undefined) {
@@ -593,7 +656,7 @@ class LForms extends Component {
                                                     if (input.type == "custom") {
                                                         let CustomComponent = input.component;
                                                         //console.log(input.value + '  ' + input.value1);
-                                                        return (<CustomComponent disabled={input.disabled ?? false} valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />) ?? ('Não existe');
+                                                        return (<CustomComponent handler={input.handler ?? undefined} disabled={input.disabled ?? false} valueLabel={input.valueLabel} json={input.json} value1={input.value1 ?? undefined} value={input.value ?? undefined} helperText={input.helperText ?? ""} key={`input-${ind1}`} id={input.column} label={input.label} name={input.column} values={input.values} style={{ ...classes.m5, flexBasis: window.innerWidth < 768 ? '100%' : input.flexBasis }} onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })} />) ?? ('Não existe');
                                                     } else if (input.type == "decimal" || input.type == "percent") {
                                                         return <MaskedDecimalInput key={`input-${ind1}`}
                                                             id={input.column}

@@ -135,8 +135,8 @@ public function index(Request $request)
                 "contract_clone" => $request->contract_clone ? true : false,
                 "providertype_id" => $request->providertype_id,
             ];
-            $provider_data['anexo'] = $data['anexo'] ?? null;
-            $provider_data['logo'] = $data['logo'] ?? null;
+            $provider_data['anexo'] == "[object Object]" ? $data['anexo'] : $data['file_anexo'];
+            $provider_data['logo'] == "[object Object]" ? $data['logo'] : $data['file_logo'];
 
             $provider = Provider::create($provider_data);
             if($provider){
@@ -233,10 +233,10 @@ public function index(Request $request)
                 "type" => $request->type
             ];
             //return response()->json($files);
-            if($request['logo'] !== null){
+            if($request['file_logo'] !== null){
                 $provider_data["logo"] = $data['file_logo'] == "[object Object]" ? $request['logo'] : $data['file_logo'];
             }
-            if($request['anexo'] !== null &&  $request['anexo'] != 'null')
+            if($request['file_anexo'] !== null &&  $request['file_anexo'] != 'null')
                 $provider_data["anexo"] = $data['file_anexo'] == "[object Object]" ? $request['anexo'] : $data['file_anexo'];
             
             
@@ -289,7 +289,7 @@ public function index(Request $request)
                 "rate" => $request->rate,
                 "accession_date" => $request->accession_date,
                 "end_date" => $request->end_date,
-                "contributors_id" => 1,//$request->contributors_id ?? 1,
+                "contributors_id" => $request->contributor_id ?? 1,
                 "provider_id" => $provider->id,
             ];
             

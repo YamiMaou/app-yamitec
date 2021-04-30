@@ -2,7 +2,7 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 
 const cliente = JSON.parse(localStorage.getItem("cliente"));
-console.log(cliente)
+//console.log(cliente)
 const clientStyles = cliente === null ? [
   {
     primary: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)' , 

@@ -123,15 +123,14 @@ class AccountManager extends Component {
                     return window.innerWidth > 720 ?
                      (<div>
                         {stringToDate(params.value, 'DD/MM/YYYY')}
-                        <Tooltip placement="right" title={`Motivo: ${params.row.note}`} arrow>
-                            <FiberManualRecord color="secondary" />
+                        <Tooltip placement="right" title={`Motivo: ${params.row.note != ('null'| undefined) ? params.row.note : "Sem Motivo"}`} arrow>
+                            <FiberManualRecord color="primary" />
                         </Tooltip>
                         </div>
-                    )
-                    :(
+                    ) : (
                         <div>
                             {stringToDate(params.row.launch_date, 'DD/MM/YYYY')}
-                            <ListItemText primary={<span style={{color:'black'}}>Motivo</span>} secondary={params.row.note} />
+                            <ListItemText primary={<span style={{color:'black'}}>Motivo</span>} secondary={params.row.note != ('null'| undefined) ? params.row.note : "Sem Motivo"} />
                         </div>
                     )
                     

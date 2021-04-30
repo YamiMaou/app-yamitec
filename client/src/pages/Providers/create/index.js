@@ -36,7 +36,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
-import { CardActions, List, ListItem, ListItemText } from '@material-ui/core';
+import { CardActions, CircularProgress, List, ListItem, ListItemText } from '@material-ui/core';
 
 const MaskedDecimalInput = (props) => {
     const [value1, setValue] = useState(props.value ?? undefined);
@@ -129,8 +129,13 @@ const TypeEmpresaInput = (props) => {
         props.onChange(e);
         setValue(e.target.value);
     }
-    function handleChange1(e) {
+    async function handleChange1(e) {
         const { value, id } = e.target;
+        try{
+            await props.handler(value);
+        }catch(e){
+            console.error(e);
+        }
         console.log(e.target);
         console.log(`${e.target.id} - ${e.target.value}`)
         props.onChange(e);
@@ -158,6 +163,8 @@ class CreateProviders extends Component {
         manager: 0,
         provProviders: [],
         provManagers: [],
+        provProvidersLoading: false,
+        provManagerLoading: false,
         states: []
     }
     async componentDidMount() {
@@ -169,6 +176,7 @@ class CreateProviders extends Component {
         const filials = await getApiProviders({type: 2, active: 1});
         this.setState({
             ...this.state, 
+            matrizData: undefined,
             data: data.data, 
             contributors: contributors.data,
             managers: managers.data, 
@@ -186,27 +194,41 @@ class CreateProviders extends Component {
         //console.log(this.state.data)
          // to use snackbar Provider
          const setProviders = async () => {
-            let provProviders = this.state.provProviders;
-            if(provProviders.find(x => x.id === this.state.provider)){
-                this.props.setSnackbar({ open: true, message: 'Filial já associado.' });
-                return false;
+             try{
+                let provProviders = this.state.provProviders;
+                
+                console.log(this.state.provider)
+                if(this.state.provider != 'Selecione' && provProviders !== undefined ){
+                    this.setState({...this.state, provProvidersLoading: false});
+                    if(provProviders.find(x => x.id === this.state.provider)){
+                        this.props.setSnackbar({ open: true, message: 'Filial já associado.' });
+                        return false;
+                    }
+                    this.setState({...this.state, provProviders: undefined});
+                    const prov = await getApiProviders({}, this.state.provider);
+                    provProviders.push(prov);
+                    this.setState({...this.state, provProviders, provProvidersLoading: false});
+                }
+            }catch(err){
+                console.log(err);
             }
-            this.setState({...this.state, provProviders: undefined});
-            const prov = await getApiProviders({}, this.state.provider);
-            provProviders.push(prov);
-            this.setState({...this.state, provProviders});
         }
 
         const setManagers = async () => {
             let provManagers = this.state.provManagers;
-            if(provManagers.find(x => x.id === this.state.manager)){
-                this.props.setSnackbar({ open: true, message: 'Responsável já associado.' });
-                return false;
+            
+            console.log(this.state.provider)
+            if(this.state.manager != 'Selecione' && provManagers !== undefined ){
+                this.setState({...this.state, provProvManagersLoading: false});
+                if(provManagers.find(x => x.id === this.state.manager)){
+                    this.props.setSnackbar({ open: true, message: 'Responsável já associado.' });
+                    return false;
+                }
+                this.setState({...this.state, provManagers: undefined});
+                const prov = await getApiManagers({}, this.state.manager);
+                provManagers.push(prov);
+                this.setState({...this.state, provManagers, provProvManagersLoading: false});
             }
-            this.setState({...this.state, provManagers: undefined});
-            const prov = await getApiManagers({}, this.state.manager);
-            provManagers.push(prov);
-            this.setState({...this.state, provManagers});
         }
         
         const request = async (data) => {
@@ -237,7 +259,6 @@ class CreateProviders extends Component {
             } else {
                 console.log(response)
                 let errors = response.data ?? undefined;
-
                 //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
                 if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
@@ -323,10 +344,29 @@ class CreateProviders extends Component {
                         label: 'Matriz', 
                         type: 'custom',
                         json: true, 
-                        valueLabel: "conpany_name",
-                        values: this.state.providers,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
+                        valueLabel: "company_name",
+                        values: this.state.providers,
                         flexBasis:'30%',
-                        component: TypeEmpresaInput
+                        component: TypeEmpresaInput,
+                        handler: async (id) => {
+                            let matrizData = await getApiProviders({},id);
+                            let fields = this.state.fields;
+                            Object.entries(matrizData.addresses)
+                                .map(([key, val]) => {
+                                    fields[key] = val
+                            });
+                            Object.entries(matrizData.contacts)
+                                .map(([key, val]) => {
+                                    fields[key] = val
+                            });
+                            Object.entries(matrizData.contracts)
+                                .map(([key, val]) => {
+                                    fields[key] = val
+                            });
+                            
+                            this.setState({...this.state, fields, matrizData});
+                            console.log(this.state.fields);
+                        }
                     },
                     { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     { column: 'company_name', label: 'Razão Social', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
@@ -346,18 +386,24 @@ class CreateProviders extends Component {
                     { column: 'addr_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
                     
                     {
-                        column: 'zipcode', label: 'CEP', type: 'text',disabled: (this.state.fields['addr_clone'] == 1), mask: InputCep, validate: {max: 9, required: true}, flexBasis: '9%',
+                        column: 'zipcode', 
+                        label: 'CEP', type: 'text',
+                        disabled: (this.state.fields['addr_clone'] == 1), 
+                        value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['zipcode'] : "",
+                        mask: InputCep, validate: {max: 9, required: true}, 
+                        flexBasis: '9%',
                         //handle: getAddress 
                     },
-                    { column: 'street', label: 'Endereço',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 100, required: true}, type: 'text', flexBasis },
-                    { column: 'additional', label: 'Complemento',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 20}, type: 'text', flexBasis },
+                    { column: 'street', value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['street'] : "", label: 'Endereço',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 100, required: true}, type: 'text', flexBasis },
+                    { column: 'additional',value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['additional'] : "", label: 'Complemento',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 20}, type: 'text', flexBasis },
                     {
                         column: 'uf', label: 'Estado', type: 'select',
                         validate: {required: true },disabled: (this.state.fields['addr_clone'] == 1),
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        flexBasis, style:{minWidth: "192px"}
+                        flexBasis, style:{minWidth: "192px"},
+                        value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['uf'] : "",
                     },
-                    { column: 'city',disabled: (this.state.fields['addr_clone'] == 1), label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
+                    { column: 'city', value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['city'] : "",disabled: (this.state.fields['addr_clone'] == 1), label: 'Cidade', type: 'text', validate: {max: 100, required: true}, flexBasis },
                 ]
             },
             {
@@ -365,19 +411,19 @@ class CreateProviders extends Component {
                 //json: 'contact',
                 fields: [
                     { column: 'contact_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
-                    { column: 'phone1', label: 'Contato', type: 'text', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
-                    { column: 'phone2', label: 'Contato alternativo', type: 'text', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
-                    { column: 'email', label: 'E-mail', type: 'email', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), validate: {max: 100}, validateHandler: validaEmail, flexBasis: '20%' },
-                    { column: 'site', label: 'Site', type: 'text', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), validate: {max: 100}, flexBasis: '20%' },
+                    { column: 'phone1', label: 'Contato', type: 'text', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['phone1'] : "", disabled: (this.state.fields['contact_clone'] == 1 ? true : false), mask: InputPhone, validate: {max: 15, required: true}, flexBasis: '20%' },
+                    { column: 'phone2', label: 'Contato alternativo', type: 'text',  value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['phone2'] : "",disabled: (this.state.fields['contact_clone'] == 1 ? true : false), mask: InputPhone, validate: {max: 15}, flexBasis: '20%' },
+                    { column: 'email', label: 'E-mail', type: 'email', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['email'] : "", disabled: (this.state.fields['contact_clone'] == 1 ? true : false), validate: {max: 100}, validateHandler: validaEmail, flexBasis: '20%' },
+                    { column: 'site', label: 'Site', type: 'text', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['site'] : "", disabled: (this.state.fields['contact_clone'] == 1 ? true : false), validate: {max: 100}, flexBasis: '20%' },
                 ]
             },
             {
                 title: 'Redes Sociais',
                 //json: 'contact',
                 fields: [
-                    { column: 'linkedin', label: 'Usuário do LinkedIn', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
-                    { column: 'facebook', label: 'Usuário do Facebook', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
-                    { column: 'instagram', label: 'Usuário do Instagram', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', validate: {max: 100, required: true}, flexBasis: '20%' },
+                    { column: 'linkedin', label: 'Usuário do LinkedIn', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['linkedin'] : "", validate: {max: 100, required: true}, flexBasis: '20%' },
+                    { column: 'facebook', label: 'Usuário do Facebook', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['facebook'] : "", validate: {max: 100, required: true}, flexBasis: '20%' },
+                    { column: 'instagram', label: 'Usuário do Instagram', disabled: (this.state.fields['contact_clone'] == 1 ? true : false), type: 'text', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['instagram'] : "", validate: {max: 100, required: true}, flexBasis: '20%' },
                 ]
             },
             {
@@ -385,8 +431,8 @@ class CreateProviders extends Component {
                 //json: 'contact',
                 fields: [
                     { column: 'contract_clone', label: 'Clonar Matriz', disabled: this.state.fields['type'] == 1, type: 'checkbox', flexBasis : "100%" },
-                    { column: 'accession_date', label: 'Data de Adesão - Início', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
-                    { column: 'end_date', label: 'Data de Adesão - Fim', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
+                    { column: 'accession_date', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['accession_date'] : "",label: 'Data de Adesão - Início', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
+                    { column: 'end_date', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['end_date'] : "", label: 'Data de Adesão - Fim', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
                     { 
                         column: 'contributor_id', 
                         label: 'Vendedor', 
@@ -395,9 +441,10 @@ class CreateProviders extends Component {
                         json: true,
                         valueLabel: 'name',
                         values: this.state.contributors,
+                        value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['contributors_id'] : "",
                         flexBasis: '20%', disabled: (this.state.fields['contract_clone'] == 1)
                     },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'decimal', disabled: (this.state.fields['contract_clone'] == 1), validate: {decimal: true, required: true}, flexBasis: '20%' },
+                    { column: 'rate', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['rate'] : "", label: 'Taxa de Adesão', type: 'decimal', disabled: (this.state.fields['contract_clone'] == 1), validate: {decimal: true, required: true}, flexBasis: '20%' },
                 ]
             }
         ]
@@ -542,6 +589,8 @@ class CreateProviders extends Component {
                         <HomeIcon />  <span>Cadastro / Fornecedores</span>
                     </Typography>
                 </AppBar>
+                {this.state.fields == undefined ? ("Carregando ..."):
+                (
                 <LForms forms={forms}
                     onChange={(e) => {this.onChange(e)}}
                     request={request} 
@@ -576,10 +625,14 @@ class CreateProviders extends Component {
                                             onChange={(e) => {
                                                 this.setState({...this.state, manager: e.target.value});
                                             }} />
+                                            {!this.state.provManagerLoading ? (
                                             <Button variant="contained" color="primary" size="small" disableElevation 
                                             onClick={() => {
                                                 setManagers();
-                                            }}><AddIcon /></Button>
+                                            }}><AddIcon /></Button>)
+                                            : (
+                                                <CircularProgress style={{ display: 'flex', margin: 'auto' }} />
+                                            )}
                                         </div>
                                     <div style={{
                                         alignItems: 'center',
@@ -680,10 +733,15 @@ class CreateProviders extends Component {
                                         onChange={(e) => {
                                             this.setState({...this.state, provider: e.target.value});
                                         }} />
-                                        <Button variant="contained" color="primary" size="small" disableElevation 
+                                        {this.state.provProvidersLoading == false ? (
+                                            <Button variant="contained" color="primary" size="small" disableElevation 
                                         onClick={() => {
                                             setProviders();
                                         }}><AddIcon /></Button>
+                                        ) : (
+                                            <CircularProgress style={{ display: 'flex', margin: 'auto' }} />
+                                        )}
+                                        
                                     </div>
                                 <div style={{
                                     alignItems: 'center',
@@ -756,7 +814,7 @@ class CreateProviders extends Component {
                             </CardContent>
                         </Card>
                     </div>
-                </LForms>
+                </LForms>)}
             </Fragment>
         )
     }
