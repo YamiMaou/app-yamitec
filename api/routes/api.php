@@ -51,7 +51,7 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
         echo $data." ";
         return \App\Library\ExportClass::getXls($data);
     });
-    Route::get('report', function (){
+    Route::get('report', function (Request $request){
         //echo "ok";
         $model = \App\Models\Audit::get(['id', 'user_id', 'justification', 'from', 'to'])->map(function($item) {
             return array_values($item->toArray());
