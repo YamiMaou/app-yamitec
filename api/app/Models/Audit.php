@@ -22,7 +22,7 @@ class Audit extends Model
 
     public function user()
     {
-        return $this->hasOne(\App\User::class,'id', 'user_id')->latest();
+        return $this->hasOne(\App\User::class,'id', 'user_id')->with(['contributor']);
     }
 
     public function provider()

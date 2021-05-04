@@ -53,9 +53,17 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
     });
     Route::get('report', function (Request $request){
         //echo "ok";
-        $model = \App\Models\Audit::get(['id', 'user_id', 'justification', 'from', 'to'])->map(function($item) {
-            return array_values($item->toArray());
+
+        $model = \App\Models\Audit::with(['user'])->get()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'user' => $item->user->email,
+                'justification' => $item->justification,
+                'from' => json_decode($item->from),
+                'to' => json_decode($item->to)
+            ];//array_values($item->toArray());
         });
+        return response()->json($model);
         echo " ";
         return \App\Library\ExportClass::getCsv(['ID','Usuario', 'Justificativa', 'DE', 'PARA'], $model);
     });
