@@ -59,13 +59,25 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
                 'id' => $item->id,
                 'user' => $item->user->email,
                 'justification' => $item->justification,
-                'from' => json_decode($item->from),
-                'to' => json_decode($item->to)
+                'to' => implode(', ', array_map(
+                    function ($v, $k) use($item){ 
+                        $from = json_decode($item->from,true);
+                        //echo $from[$k] ?? "Nothins";
+                        if(!is_array($v) && !is_object($v)){
+                            //echo $from[$k]?? "Nothins";
+                            return sprintf("%s de \"%s\" para \"%s\"", $k, $from[$k] ?? "",$v); 
+                        }
+                        
+                    },
+                    json_decode($item->to,true),
+                    array_keys(json_decode($item->to,true))
+                )),
+                'date' => date('d/m/Y h:i:s',strtotime($item->created_at))
             ];//array_values($item->toArray());
         });
-        return response()->json($model);
+        //return response()->json($model);
         echo " ";
-        return \App\Library\ExportClass::getCsv(['ID','Usuario', 'Justificativa', 'DE', 'PARA'], $model);
+        return \App\Library\ExportClass::getCsv(['ID','Usuario', 'Justificativa','DE/PARA','Data'], $model);
     });
 Route::post('/contributors/downloads', 'Api\ContributorsController@download');
 Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
