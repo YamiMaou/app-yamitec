@@ -229,6 +229,29 @@ class EditProviders extends Component {
             providertypes: providertypes.data 
         });
 
+                        if(data.matriz_id != (null||undefined)){
+                            let fields = this.state.fields;
+                            Object.entries(data.addresses)
+                                .map(([key, val]) => {
+                                    fields[key] = val
+                            });
+                            Object.entries(data.contacts)
+                                .map(([key, val]) => {
+                                    fields[key] = val
+                            });
+                            Object.entries(data.contracts)
+                                .map(([key, val]) => {
+                                    if(key == 'rate'){
+                                        fields[key] = formatReal(getMoney(val))
+                                    }else{
+                                        fields[key] = val
+                                    }
+                                    
+                            });
+                            this.setState({...this.state, fields: {... this.state.fields}});
+                        }
+        //console.log(this.state.fields);
+
     }
     onChange(e){
         //console.log(e);
@@ -255,6 +278,7 @@ class EditProviders extends Component {
             delete data.addresses;
             delete data.contacts;
             delete data.contracts;
+            data.rate = formatReal(getMoney(data.rate))
             console.log(data.rate)
             this.state.provManagersDeleted.map(async (v,k) => {
                 let del = await deleteApiManagersProviders({provider_id: this.props.match.params.id, manager_id: v.id });
@@ -419,15 +443,15 @@ class EditProviders extends Component {
                 //json: "address",
                 fields: [
                     { column: 'addr_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%", value: this.state.data.addr_clone },
-                    { column: 'zipcode', label: 'CEP', type: 'text', disabled: (this.state.fields['addr_clone'] == 1), mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['zipcode'] : this.state.data['addresses'].zipcode },
-                    { column: 'street', label: 'Endereço', disabled: (this.state.fields['addr_clone'] == 1),validate: { max: 100, required: true }, type: 'text', flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['street'] : this.state.data['addresses'].street },
-                    { column: 'additional', label: 'Complemento', disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 20}, type: 'text', flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['additional'] : (this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '') },
+                    { column: 'zipcode', label: 'CEP', type: 'text', disabled: (this.state.fields['addr_clone'] == 1), mask: InputCep, validate: { max: 9, required: true }, flexBasis: '9%', value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1 && this.state.fields['zipcode'] != (""|| null || undefined)) ? this.state.fields['zipcode'] : this.state.data['addresses'].zipcode },
+                    { column: 'street', label: 'Endereço', disabled: (this.state.fields['addr_clone'] == 1),validate: { max: 100, required: true }, type: 'text', flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1 && this.state.fields['street'] != (""|| null || undefined)) ? this.state.fields['street'] : this.state.data['addresses'].street },
+                    { column: 'additional', label: 'Complemento', disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 20}, type: 'text', flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1 && this.state.fields['additional'] != (""|| null || undefined)) ? this.state.fields['additional'] : (this.state.data['addresses'].additional != 'null' ? this.state.data['addresses'].additional : '') },
                     {
                         column: 'uf', label: 'Estado', type: 'select', disabled: (this.state.fields['addr_clone'] == 1),
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
-                        value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['uf'] : this.state.data['addresses'].uf, flexBasis, flexGrow: 2, style: { minWidth: "192px" }
+                        value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1  && this.state.fields['uf'] != (""|| null || undefined)) ? this.state.fields['uf'] : this.state.data['addresses'].uf, flexBasis, flexGrow: 2, style: { minWidth: "192px" }
                     },
-                    { column: 'city', label: 'Cidade', type: 'text', disabled: (this.state.fields['addr_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['city'] : this.state.data['addresses'].city },
+                    { column: 'city', label: 'Cidade', type: 'text', disabled: (this.state.fields['addr_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1 && this.state.fields['city'] != (""|| null || undefined)) ? this.state.fields['city'] : this.state.data['addresses'].city },
                 ]
             },
             {
@@ -435,19 +459,19 @@ class EditProviders extends Component {
                 //json: 'contact',
                 fields: [
                     { column: 'contact_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1 ? true : false), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }},flexBasis: "100%", value: this.state.data.contact_clone },
-                    { column: 'phone1', label: 'Contato', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['phone1'] : this.state.data['contacts'].phone1 },
-                    { column: 'phone2', label: 'Contato alternativo', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), mask: InputPhone, validate: { max: 15 }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['phone2'] : this.state.data['contacts'].phone2 },
-                    { column: 'email', label: 'E-mail', type: 'email', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['email'] : this.state.data['contacts'].email },
-                    { column: 'site', label: 'Site', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100 }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['site'] : (this.state.data['contacts'].site == "null" ? "" : this.state.data['contacts'].site) },
+                    { column: 'phone1', label: 'Contato', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), mask: InputPhone, validate: { max: 15, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['phone1'] != (""|| null || undefined)) ? this.state.fields['phone1'] : this.state.data['contacts'].phone1 },
+                    { column: 'phone2', label: 'Contato alternativo', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), mask: InputPhone, validate: { max: 15 }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['phone2'] != (""|| null || undefined)) ? this.state.fields['phone2'] : this.state.data['contacts'].phone2 },
+                    { column: 'email', label: 'E-mail', type: 'email', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100 }, validateHandler: validaEmail, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['email'] != (""|| null || undefined)) ? this.state.fields['email'] : this.state.data['contacts'].email },
+                    { column: 'site', label: 'Site', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100 }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['site'] != (""|| null || undefined)) ? this.state.fields['site'] : (this.state.data['contacts'].site == "null" ? "" : this.state.data['contacts'].site) },
                 ]
             },
             {
                 title: 'Redes Sociais',
                 //json: 'contact',
                 fields: [
-                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['linkedin'] : this.state.data['contacts'].linkedin },
-                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['facebook'] : this.state.data['contacts'].facebook },
-                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1) ? this.state.fields['instagram'] : this.state.data['contacts'].instagram },
+                    { column: 'linkedin', label: 'Usuário do LinkedIn', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['linkedin'] != (""|| null || undefined)) ? this.state.fields['linkedin'] : this.state.data['contacts'].linkedin },
+                    { column: 'facebook', label: 'Usuário do Facebook', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['facebook'] != (""|| null || undefined)) ? this.state.fields['facebook'] : this.state.data['contacts'].facebook },
+                    { column: 'instagram', label: 'Usuário do Instagram', type: 'text', disabled: (this.state.fields['contact_clone'] == 1), validate: { max: 100, required: true }, flexBasis, value: (this.state.fields['type'] == 2 && this.state.fields['contact_clone'] == 1 && this.state.fields['instagram'] != (""|| null || undefined)) ? this.state.fields['instagram'] : this.state.data['contacts'].instagram },
                 ]
             },
             {
@@ -455,20 +479,20 @@ class EditProviders extends Component {
                 //json: 'contact',
                 fields: [
                     { column: 'contract_clone', label: 'Clonar Matriz', disabled: (this.state.fields['type'] == 1 ? true : false), type: 'checkbox', validate:{depends:{label: 'Tipo', value: 2, column: 'type', text: 'Filial' }}, flexBasis: "100%" },
-                    { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', disabled: (this.state.fields['contract_clone'] == 1), validate: { required: true }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['accession_date'] : this.state.data['contracts'].accession_date },
-                    { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', disabled: (this.state.fields['contract_clone'] == 1), validate: { required: true }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['end_date'] :this.state.data['contracts'].end_date },
+                    { column: 'accession_date', label: 'Data de Adesão - Início', type: 'date', disabled: (this.state.fields['contract_clone'] == 1), validate: { required: true }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['accession_date'] != (""|| null || undefined)) ? this.state.fields['accession_date'] : this.state.data['contracts'].accession_date },
+                    { column: 'end_date', label: 'Data de Adesão - Fim', type: 'date', disabled: (this.state.fields['contract_clone'] == 1), validate: { required: true }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['end_date'] != (""|| null || undefined)) ? this.state.fields['end_date'] :this.state.data['contracts'].end_date },
                     { 
                         column: 'contributor_id', 
                         label: 'Vendedor', 
                         type: 'autocomplete',
                         validate:{required: true}, 
-                        value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['contributors_id'] : this.state.data['contracts'].contributors_id, 
+                        value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['contributors_id'] != (""|| null || undefined)) ? this.state.fields['contributors_id'] : this.state.data['contracts'].contributors_id, 
                         json: true,
                         valueLabel: 'name',
                         values: this.state.contributors,
                         flexBasis: '20%', disabled: (this.state.fields['contract_clone'] == 1)
                     },
-                    { column: 'rate', label: 'Taxa de Adesão', type: 'decimal', disabled: (this.state.fields['contract_clone'] == 1), validate: { required: true, decimal: true }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? formatReal(getMoney(this.state.fields['rate'])) : formatReal(getMoney(this.state.data['contracts'].rate)) },
+                    { column: 'rate', label: 'Taxa de Adesão', type: 'decimal', disabled: (this.state.fields['contract_clone'] == 1), validate: { required: true, decimal: true }, flexBasis: '20%', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['rate'] != (""|| null || undefined)) ? formatReal(getMoney(this.state.fields['rate'])) : formatReal(getMoney(this.state.data['contracts'].rate)) },
                 ]
             }
         ];

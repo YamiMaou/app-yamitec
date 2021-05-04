@@ -247,7 +247,7 @@ class CreateProviders extends Component {
             }
             data.providers = providers;
             data.managers = managers;
-            data.rate = data.rate.replace(/\./g,'').replace(',', '.');
+            //data.rate = data.rate.replace(/\./g,'').replace(',', '.');
             this.setState({ ...this.state, loading: true });
             let response = await postApiProviders(data);
             //console.log(response);

@@ -54,13 +54,14 @@ const CustomAutocomplete = (props) => {
   const [value, setValue] = React.useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
   const [inputValue, setInputValue] = React.useState('');
   const [defaultVal, setDefault] = useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
-    useEffect(() => {
+    /*useEffect(() => {
         if(props.value !== defaultVal){
             const vl = props.value ? props.values.find((item) => item.id == props.value) : undefined;
+            setDefault(vl)
             setValue(vl)
             setInputValue(vl !== undefined ? vl[props.valueLabel] : "")
         }
-    })
+    })*/
     //console.log("Vendedor"+props.value)
     //console.log(props.value ? props.values.find((item) => item.id == props.value) :  "aa");
 
@@ -85,10 +86,11 @@ const CustomAutocomplete = (props) => {
         value={value}
         inputValue={inputValue}
         onChange={handleChange}
-        /*getOptionSelected={(option, value) => {
+        getOptionSelected={(option, value) => {
             //console.log(value);
+            //setInputValue(option.id == value.id ? option[props.valueLabel] : "")
             return option.id == value.id
-        }}*/
+        }}
         getOptionLabel={(option) => option[props.valueLabel]}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
@@ -494,14 +496,14 @@ const SelectInput = (props) => {
     const [defaultVal, setDefault] = useState(props.value ?? "Selecione");
     useEffect(() => {
         if(props.value !== defaultVal){
-            setValue(props.value ?? "Selecione")
+            setValue(props.value)
         }
     })
 
     function handleChange(e) {
-        const { value, id } = e.target;
+        const { val, id } = e.target;
         if (props.validate !== undefined) {
-            if (props.validate(value)) {
+            if (props.validate(val)) {
                 setError(false);
             } else {
                 setError(true)

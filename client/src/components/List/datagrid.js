@@ -437,7 +437,13 @@ class LDataGrid extends Component {
                                     disableClickEventBubbling
                                     disableColumnMenu={true}
                                     loading={this.state.loading}
-                                    localetext={DEFAULT_LOCALE_TEXT}
+                                    localeText={{
+                                        noRowsLabel: 'Não há registros para exibir',
+                                        footerTotalRows: 'Total de Registros:',// Pagination footer text
+                                        footerPaginationRowsPerPage: 'registros por página:',
+                                        footerPaginationOf: 'de'
+                                    }}
+                                    //localetext={{...DEFAULT_LOCALE_TEXT, noRowsLabel: 'Não há registros para exibir'}}
                                     paginationMode="server"
                                     rowCount={this.state.data.total ?? 0}
                                     pageSize={10} rowsPerPageOptions={[10]} pagination

@@ -122,6 +122,7 @@ public function index(Request $request)
             $files = new \App\Http\Controllers\FilesController();
             $files = $files->multUpload($request, 'provider');
             $data = $files->request;
+            //return response()->json($data);
             // type = 1 para matriz e 0 para filial
             $provider_data = [
                 "type" => $request->type,
@@ -135,8 +136,8 @@ public function index(Request $request)
                 "contract_clone" => $request->contract_clone ? true : false,
                 "providertype_id" => $request->providertype_id,
             ];
-            $provider_data['anexo'] == "[object Object]" ? $data['anexo'] : $data['file_anexo'];
-            $provider_data['logo'] == "[object Object]" ? $data['logo'] : $data['file_logo'];
+            $provider_data['anexo'] = $data['anexo'];
+            $provider_data['logo'] = $data['logo'];
 
             $provider = Provider::create($provider_data);
             if($provider){
@@ -185,9 +186,9 @@ public function index(Request $request)
 
             //if ($request->contract_clone == null):
                 $contract_data = [
-                    "rate" => str_replace(",",".",$request->rate) ?? "0.00",
+                    "rate" => str_replace(",",".",str_replace('.','',$request->rate)) ?? "0.00",
                     "accession_date" => $request->accession_date ?? "",
-                    "contributor_id" => $request->contributor_id ?? "",
+                    "contributors_id" => $request->contributor_id ?? "",
                     "end_date" => $request->end_date ?? "",
                     "provider_id" => $provider->id,
                 ];
@@ -204,7 +205,7 @@ public function index(Request $request)
             }
             return response()->json(["success"=> false, "type" => "store", "message" => "Erro ao cadastrar!"]);
         } catch(\Exception $error) {
-            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getTraceAsString()], 201);
         }
 
     }
@@ -286,7 +287,7 @@ public function index(Request $request)
             endif;
             
             $contract_data = [
-                "rate" => $request->rate,
+                "rate" => str_replace(",",".",str_replace('.','',$request->rate)),
                 "accession_date" => $request->accession_date,
                 "end_date" => $request->end_date,
                 "contributors_id" => $request->contributor_id ?? 1,

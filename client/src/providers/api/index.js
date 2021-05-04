@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   apiHost = hostname;
 }
-//apiHost = hostname;
+apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({

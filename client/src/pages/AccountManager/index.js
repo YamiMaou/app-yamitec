@@ -123,14 +123,14 @@ class AccountManager extends Component {
                     return window.innerWidth > 720 ?
                      (<div>
                         {stringToDate(params.value, 'DD/MM/YYYY')}
-                        <Tooltip placement="right" title={`Motivo: ${params.row.note != ('null'| undefined) ? params.row.note : "Sem Motivo"}`} arrow>
+                        <Tooltip placement="right" title={`Motivo: ${params.row.note != (null|| undefined) ? params.row.note : "Sem Motivo"}`} arrow>
                             <FiberManualRecord color="primary" />
                         </Tooltip>
                         </div>
                     ) : (
                         <div>
                             {stringToDate(params.row.launch_date, 'DD/MM/YYYY')}
-                            <ListItemText primary={<span style={{color:'black'}}>Motivo</span>} secondary={params.row.note != ('null'| undefined) ? params.row.note : "Sem Motivo"} />
+                            <ListItemText primary={<span style={{color:'black'}}>Motivo</span>} secondary={params.row.note != (null|| undefined) ? params.row.note : "Sem Motivo"} />
                         </div>
                     )
                     
@@ -232,8 +232,8 @@ class AccountManager extends Component {
             { column: 'launch_date', label: 'De', type: 'date' },
             { column: 'launch_date_to', label: 'Até', type: 'date' },
             { column: 'cpf_cnpj', label: 'CPF/CNPJ', type: 'text', mask: 'cpfcnpj', flexBasis },
-            { column: 'status', label: 'Situação', type: 'select', values: ["Efetuada", "Dependente"], value: "Todos", grow: 2 },
-            { column: 'name', label: 'Nome', type: 'text' },
+            { column: 'status', label: 'Situação', type: 'select', values: ["Efetuada", "Dependente"], value: "Todos", flexBasis },
+            { column: 'name', label: 'Nome', type: 'text', flexBasis },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 
