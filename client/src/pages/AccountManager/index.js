@@ -34,7 +34,8 @@ import { stringToDate } from '../../providers/commonMethods';
 import { withRouter } from 'react-router-dom'
 
 // MODULE ID
-const module_id = 1
+const module_id = 6
+
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
@@ -176,7 +177,7 @@ class AccountManager extends Component {
                 headerName: 'Ações',
                 flex: 1,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
-                    let view = this.state.session.permissions.find(x => x.module === module_id)
+                    let view = this.state.session.permissions.find(x => x.module_id === module_id)
 
                     return (
                         <div>
@@ -197,7 +198,7 @@ class AccountManager extends Component {
                             </Button>
                             {params.row.detached == 1 &&
                                 <Button
-                                    disabled={view.update === 0}
+                                    disabled={view.delete === 0}
                                     variant="contained"
                                     color="primary"
                                     onClick={async (e) => {
@@ -245,7 +246,7 @@ class AccountManager extends Component {
                             <HomeIcon />  <span>Gerênciador de Contas</span>
                         </Typography>
                         {
-                            this.state.session.permissions.find(x => x.module === module_id).create === 1 ? (
+                            this.state.session.permissions.find(x => x.module_id === module_id).create === 1 ? (
                                 <Link to="contas/novo" style={{ textDecoration: 'none' }} >
                                     <Button variant="contained" size="small" fullWidth color="primary"
                                         style={{

@@ -19,6 +19,9 @@ import { validaEmail, validaCpf,validaCnpj, stringToaddDate } from '../../../pro
 import { InputCep, InputCpf,InputCnpj, InputPhone } from '../../../providers/masks'
 import { IconButton } from '@material-ui/core';
 import { SearchIcon } from '@material-ui/data-grid';
+// MODULE ID
+const module_id = 6
+
 const TextInputsAutocomplete = (props) => {
     const [value, setValue] = useState(props.value ?? "");
     const [value1, setValue1] = useState(props.value1 ?? "");

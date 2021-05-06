@@ -22,6 +22,9 @@ import { Redirect } from 'react-router-dom';
 import { withSnackbar  } from 'notistack';
 import { Button, IconButton } from '@material-ui/core';
 import { SearchIcon } from '@material-ui/data-grid';
+// MODULE ID
+const module_id = 6
+
 const MaskedDecimalInput = (props) => {
     const [value1, setValue] = useState(props.value ?? 0);
     const [error, setError] = useState(false);

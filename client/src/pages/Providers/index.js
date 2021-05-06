@@ -30,6 +30,9 @@ import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 import { stringToDate } from '../../providers/commonMethods';
+// MODULE ID
+
+const module_id = 4;
 
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
@@ -92,6 +95,7 @@ function BlockDialog(props) {
 
 class Providers extends Component {
     state = {
+        session: JSON.parse(localStorage.getItem("user")),
         providers: [],
         pageRequest: {},
         blockDialog: {open: false, id: undefined,active: 0, handle: undefined},
@@ -139,11 +143,14 @@ class Providers extends Component {
                 field: 'id',
                 headerName: 'Ações',
                 flex: 1,
-                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => (
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
+                    let view = this.state.session.permissions.find(x => x.module_id === module_id)
+                    return(
                         
                     <div>
-                    <Link to={`/fornecedores/${params.value}`} style={{textDecoration: 'none'}} >
+                    <Link to={view.update === 0 ? '#' : `/fornecedores/${params.value}`} style={{textDecoration: 'none'}} >
                         <Button
+                            disabled={view.update === 0}
                             variant="contained"
                             color="primary"
                             size="small"
@@ -152,6 +159,7 @@ class Providers extends Component {
                         </Button>
                     </Link>
                       <Button
+                        disabled={view.delete === 0}
                         variant="contained"
                         color="primary"
                         size="small"
@@ -166,7 +174,7 @@ class Providers extends Component {
                         {params.row.active === 1 ? <BlockIcon fontSize="small"/> : <CheckCircleIcon fontSize="small" /> }
                       </Button>
                     </div>
-                  ),
+                  )},
             },
         ];
         const flexBasis = '25%';
@@ -180,9 +188,9 @@ class Providers extends Component {
                     "Filial",
                 ],
                 value: "Todos",
-                flexBasis
+                flexBasis:'12%'
             },
-            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis },
+            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis: '12%'},
             { column: 'created_at', label: 'Periodo de Adesão', type: 'date' },
             { column: 'created_at_to', label: ' até', type: 'date' },
             
@@ -195,6 +203,9 @@ class Providers extends Component {
                         <Typography variant="h6" style={{flexGrow: 1}}>
                             <HomeIcon />  <span>Cadastro / Fornecedores</span>
                         </Typography>
+                        {
+                        this.state.session.permissions.find(x => x.module_id === module_id).create === 1 ?
+                        (
                         <Link to="fornecedores/novo" style={{textDecoration: 'none'}} >
                         <Button variant="contained" size="small" fullWidth color="primary"
                             style={{
@@ -203,6 +214,7 @@ class Providers extends Component {
                                 Novo <Add style={{color: 'white'}} fontSize="small"/>
                             </Button>
                         </Link>
+                        ) : ('')}
                         
                     </Toolbar>
                     

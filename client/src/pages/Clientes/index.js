@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 // MODULE ID
-const module_id = 1
+const module_id = 2
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
@@ -158,7 +158,7 @@ class Clients extends Component {
                 headerName: 'Ações',
                 flex: 1,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
-                    let view = this.state.session.permissions.find(x => x.module === module_id)
+                    let view = this.state.session.permissions.find(x => x.module_id === module_id)
                     return (
                     <div>
                     <Link to={ view.update === 0 ? '#' :  `/clientes/${params.value}`} style={{textDecoration: 'none'}} >
@@ -172,7 +172,7 @@ class Clients extends Component {
                         </Button>
                     </Link>
                       <Button
-                        disabled={view.update === 0}
+                        disabled={view.delete === 0}
                         variant="contained"
                         color="primary"
                         size="small"
@@ -208,7 +208,7 @@ class Clients extends Component {
                             <HomeIcon />  <span>Cadastro / Clientes</span>
                         </Typography>
                         {
-                            this.state.session.permissions.find(x => x.module === module_id).create === 1 ?(
+                            this.state.session.permissions.find(x => x.module_id === module_id).create === 1 ?(
                                 <Link to="clientes/novo" style={{textDecoration: 'none'}} >
                                 <Button variant="contained" size="small" fullWidth color="primary"
                                     style={{

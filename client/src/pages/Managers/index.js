@@ -32,7 +32,7 @@ import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 // MODULE ID
-const module_id = 2
+const module_id = 3
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
@@ -163,7 +163,7 @@ class Managers extends Component {
                 headerName: 'Ações',
                 flex: 1,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
-                    let view = this.state.session.permissions.find(x => x.module === module_id)
+                    let view = this.state.session.permissions.find(x => x.module_id === module_id)
                     return (
                     <div>
                     <Link to={ view.update === 0 ? '#' :  `/responsaveis/${params.value}`} style={{textDecoration: 'none'}} >
@@ -177,7 +177,7 @@ class Managers extends Component {
                         </Button>
                     </Link>
                       <Button
-                      disabled={view.update === 0}
+                      disabled={view.delete === 0}
                         variant="contained"
                         color="primary"
                         size="small"
@@ -221,7 +221,7 @@ class Managers extends Component {
                             <HomeIcon />  <span>Cadastro / Responsáveis</span>
                         </Typography>
                         {
-                            this.state.session.permissions.find(x => x.module === module_id).create === 1 ?(
+                            this.state.session.permissions.find(x => x.module_id === module_id).create === 1 ?(
                                 <Link to="responsaveis/novo" style={{textDecoration: 'none'}} >
                         <Button variant="contained" size="small" fullWidth color="primary"
                             style={{

@@ -38,25 +38,29 @@ function Sidebar(props) {
       {url: "/fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
       {url: "/bonificacao", label: 'Bonificação', icon: <PeopleIcon fontSize="small" />},
       {url: "/contas", label: 'Ger. Contas', icon: <PeopleIcon fontSize="small" />},
-      {url: "/responsaveis", label: 'Responsáveis', icon: <PeopleIcon fontSize="small" />},
+      {url: "/perfis", label: 'Permissões', icon: <PeopleIcon fontSize="small" />},
+      {url: "/auditoria", label: 'Auditoria', icon: <PeopleIcon fontSize="small" />},
       //{url: "/Fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
     ]
     if(authData === null) return ('');
-    //console.log(authData);
+    console.log(authData);
 
     return authData.permissions.map((v, k) => {
-      //console.log(v);
-      if(k > 5) return ('');
+      //console.log(v.module_id);
+      //console.log(views[(v.module_id-1)]);
+      if(k >= 8) return ('');
       if(v.read === 0) return ('');
+
+      //return ('');
       return(
       <MenuItem key={`sidebar-menu-ind-${k}`} >
-        <Link style={styles.link} to={views[v.module].url} >
+        <Link style={styles.link} to={views[(v.module_id-1)].url} >
           <ListItemIcon>
             <StyledBadge badgeContent={0} color="secondary">
-              {views[v.module].icon}
+              {views[(v.module_id-1)].icon}
             </StyledBadge>
           </ListItemIcon>
-          <Typography variant="inherit">{views[v.module].label}</Typography>
+          <Typography variant="inherit">{views[(v.module_id-1)].label}</Typography>
         </Link>
       </MenuItem>)
     });

@@ -77,7 +77,7 @@ const CustomAutocomplete = (props) => {
     }
     props.onChange(vl)
     setValue(newValue);
-}
+    }
   return <Autocomplete
         key={`autocomplete-${props.id}`}
         id={props.id}
@@ -494,11 +494,11 @@ const SelectInput = (props) => {
     const [value, setValue] = useState(props.value ?? "Selecione");
     const [error, setError] = useState(false);
     const [defaultVal, setDefault] = useState(props.value ?? "Selecione");
-    useEffect(() => {
+    /*useEffect(() => {
         if(props.value !== defaultVal){
-            setValue(props.value)
+            setValue(props.value ?? "Selecione")
         }
-    })
+    })*/
 
     function handleChange(e) {
         const { val, id } = e.target;

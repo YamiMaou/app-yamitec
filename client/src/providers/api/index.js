@@ -706,25 +706,48 @@ export const deleteApiAccountmanager = async (id,params = {}) => {
   }
 }
 
+/// list permissions
+export const getApiPermissions = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/permissions/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwib3JnYW5pemF0aW9uX2lkIjoxLCJpYXQiOjE2MTIzMDIyNTYsImV4cCI6MTYxMjkwNzA1Nn0.mnNuXdmqF487x_K4zfOkhhrkdJ6rwLB61NaSPhGZyJo'//localStorage.getItem('token')
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+
 /// update accountmanagers
 export const putApiPermissions = async (id,params = {}) => {
   localStorage.setItem("sessionTime", 900)
   params.justification = params.justification  ?? " ";
-  const data = new FormData();
-  data.append("_method", "put");
-  Object.entries(params)
-    .map(([key, val]) => {
-      data.append(key, (typeof string == "string") ? `${val}` : val);
-    });
+  params._method = 'PUT';
+  /*const data = new FormData();
+  data.append("_method", "put");*/
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
     
   const options = {
     method: 'POST',
     //mode: 'cors', // pode ser cors ou basic(default)
     headers: {
-      'Content-Type': 'multipart/form-data',
+      //'Content-Type': 'appli',
+      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    data,
+    params,
     url: apiHost +  `/permissions/${id}`,
   };
   try{
@@ -735,6 +758,7 @@ export const putApiPermissions = async (id,params = {}) => {
     return { data: {  data: [], success: false, error, message: "problema ao se conectar com o servidor!" } }
   }
 }
+
 /// list audits
 export const getApiAudits = async (params = '',id = undefined) => {
   localStorage.setItem("sessionTime", 900)
@@ -756,7 +780,29 @@ export const getApiAudits = async (params = '',id = undefined) => {
     return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
   });
 }
-
+//Download Report
+export const getApiReportFile = async (params = '') => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  axios({
+    method: 'get',
+    url: `${apiHost}/report/?${data}`,
+    responseType: 'arraybuffer',
+    //data: dates
+  }).then(function(response) {
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download','auditoria.csv'); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
 
 //Download Document
 export const getApiDownloadFile = async (params = '') => {

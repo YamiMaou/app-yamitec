@@ -58,6 +58,7 @@ import { setAuth } from './actions/authAction';
 import { setSnackbar, setTimer } from './actions/appActions';
 // Theme
 import * as locales from '@material-ui/core/locale';
+import Audits from "./pages/Audits";
 const YamiTheme = createMuiTheme(themeStyle, locales['ptbr'])
 //background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
 
@@ -144,6 +145,7 @@ const AppRouter = (props) => {
               <Route path="/contas/:id" exact={true} render={() => (isAuth ? <EditAccountManager /> : <Redirect push to="/login" />)} />
 
               <Route path="/perfis" exact={true} render={() => (isAuth ? <Profiles /> : <Redirect push to="/login" />)} />
+              <Route path="/auditoria" exact={true} render={() => (isAuth ? <Audits /> : <Redirect push to="/login" />)} />
               
               <Route path="*">
                 <Box>

@@ -23,7 +23,7 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiBonus, putApiBonus, putApiPermissions } from '../../providers/api'
+import { getApiBonus, getApiPermissions, putApiBonus, putApiPermissions } from '../../providers/api'
 
 import { InputCpf, stringCpf } from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
@@ -32,7 +32,7 @@ import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 // MODULE ID
-const module_id = 1
+const module_id = 7
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);
@@ -97,29 +97,59 @@ class Profiles extends Component {
         loading: false,
         session: JSON.parse(localStorage.getItem("user")),
         data: [],
-        permissions: [
-            { id: 1, module: 0, profile_id: 1, modelName: 'Colaboradores', profileName: "Administração", create: 0, read: 0, update: 0, delete: 0 },
-            { id: 2, module: 0, profile_id: 2, modelName: 'Colaboradores', profileName: "Coordenador de usuários", create: 0, read: 0, update: 0, delete: 0 },
-            { id: 3, module: 0, profile_id: 3, modelName: 'Colaboradores', profileName: "Coordenador de parceiros", create: 0, read: 0, update: 0, delete: 0 },
-            { id: 4, module: 0, profile_id: 4, modelName: 'Colaboradores', profileName: "Gerente", create: 0, read: 0, update: 0, delete: 0 }
-        ],
+        permissions: [],
         pageRequest: {},
         blockDialog: { open: false, id: undefined, active: 0, handle: undefined },
 
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const session = JSON.parse(localStorage.getItem("user"));
         if (session == null) {
             window.location.href = '/login';
             return;
         }
+        let remotePermissions = await getApiPermissions();
+        let permissions = [];
+        let id = 1;
+        if(remotePermissions !== undefined)
+        remotePermissions.modules.map((module,k1) => {
+            remotePermissions.profiles.map((profile,k2) => {
+                        let permission = remotePermissions.permissions.find(perm => perm.profile_id == profile.id && perm.module_id == module.id);
+                        //console.log(permission);
+                        //return;
+                        permissions.push(
+                            { 
+                                id,
+                                module_id: 1, 
+                                profile_id: profile.id, 
+                                modelName: module.name, 
+                                profileName: profile.name, 
+                                create: permission ? permission.create: 0, 
+                                read: permission ? permission.read: 0, 
+                                update: permission ? permission.update: 0, 
+                                delete: permission ? permission.delete: 0,  
+                            });
+                            id++;
+                    });
+                });
+                this.setState({...this.state, permissions})
+            console.log(permissions);
+
     }
-    onChangeSwitch(e, permcas) {
+    async onChangeSwitch(permcas) {
+        /*console.log(permcas);
         let row = this.state.permissions;
-        row[row.findIndex(x => x.id === permcas.xid)][e.target.name] = e.target.checked ? 1 : 0;
+        row[row.findIndex(x => x.id === permcas.id)][e.target.name] = e.target.checked ? 1 : 0;
+        console.log(row.findIndex(x => x.id === permcas.id));
         this.setState({ ...this.state, permissions: row });
-        console.log(this.state.permissions);
+        //console.log(this.state.permissions);*/
+        this.setState({ ...this.state, loading: true });
+        let save = await putApiPermissions(1,permcas);
+        if(save.data.success){
+            this.setState({ ...this.state, loading: false });
+        }
+
     }
     async onSavePermcas(){
         this.setState({ ...this.state, loading: true });
@@ -131,7 +161,8 @@ class Profiles extends Component {
     }
 
     render() {
-        const rows: RowsProp = this.state.permissions;
+
+        const rows: RowsProp = this.state.permissions.length > 0 ? this.state.permissions : [];
         const columns: ColDef[] = [
             { field: 'modelName', headerName: 'Módulo', flex: 0.7 },
             { field: 'profileName', headerName: 'Perfil', flex: 0.7 },
@@ -140,19 +171,28 @@ class Profiles extends Component {
                 headerName: 'Cadastrar',
                 flex: 0.3,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
-                    const { id, module, profile_id, create, read, update } = params.row;
-                    //let prop = this.state.permissions.find(x => x.xid === permcas.xid)
-                    let permca = { xid: id, module, profile_id, create, read, update }
+                    let { id, module_id, profile_id, create, read, update } = params.row;
+                    let permca = { id, module_id, profile_id, create, read, update }
+                    let prop = this.state.permissions.find(x => x.id === id)
+                    let checked = false;
+                    if(prop){
+                        checked = (prop.create == 1)
+                    }
                     return (
                         <Switch
-                            //checked={!prop ?? prop.create == 1}
-                            onChange={(e) => {
-                                params.value = e.target.checked ? 1 : 0;
-                                permca[e.target.name] = e.target.checked ? 1 : 0;
-                                return this.onChangeSwitch(e, permca)
-                            }}
+                        key={id+"-module-"+module_id+"-profile-"+profile_id}
+                        checked={this.state.permissions[this.state.permissions.findIndex(x => x.id == id)].create == 1}
+                        color="primary"
+                        onClick={(e)=> {
+                            let permissions = this.state.permissions;
+                            console.log(permissions)
+                            permissions[this.state.permissions.findIndex(x => x.id == id)].create = !permissions[this.state.permissions.findIndex(x => x.id == id)].create
+                            let save = permissions[this.state.permissions.findIndex(x => x.id == id)];
+                            this.onChangeSwitch(save);
+                            this.setState({...this.state, permissions})
+                        }}
                             name="create"
-                            inputProps={{ 'aria-label': 'secondary checkbox' }}
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
                         />
                     )
                 },
@@ -162,19 +202,37 @@ class Profiles extends Component {
                 headerName: 'Visualizar',
                 flex: 0.3,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
-                    const { id, module, profile_id, create, read, update } = params.row;
-                    //let prop = this.state.permissions.find(x => x.xid === permcas.xid)
-                    let permca = { xid: id, module, profile_id, create, read, update }
+                    let { id, module_id, profile_id, create, read, update } = params.row;
+                    let permca = { id, module_id, profile_id, create, read, update }
+                    let prop = this.state.permissions.find(x => x.id === id)
+                    let checked = false;
+                    if(prop){
+                        checked = (prop.read == 1)
+                    }
                     return (
                         <Switch
-                            //checked={!prop ?? prop.read == 1}
+                            key={id+"-module-"+module_id+"-profile-"+profile_id}
+                            checked={this.state.permissions[this.state.permissions.findIndex(x => x.id == id)].read == 1}
+                            color="primary"
+                            onClick={(e)=> {
+                                let permissions = this.state.permissions;
+                                //console.log(permissions)
+                                permissions[this.state.permissions.findIndex(x => x.id == id)].read = !permissions[this.state.permissions.findIndex(x => x.id == id)].read
+                                let save = permissions[this.state.permissions.findIndex(x => x.id == id)];
+                                this.onChangeSwitch(save);
+                                this.setState({...this.state, permissions})
+                            }}
                             onChange={(e) => {
-                                params.value = e.target.checked ? 1 : 0;
-                                permca[e.target.name] = e.target.checked ? 1 : 0;
-                                return this.onChangeSwitch(e, permca)
+                                /*let permissions = this.state.permissions;
+                                console.log(permissions)
+                                permissions[this.state.permissions.findIndex(x => x.id == id)].read = !permissions[this.state.permissions.findIndex(x => x.id == id)].read
+                                this.setState({...this.state, permissions})*/
+                                //params.value = e.target.checked ? 1 : 0;
+                                //permca[e.target.name] = e.target.checked ? 1 : 0;
+                                //return this.onChangeSwitch(e, permca)
                             }}
                             name="read"
-                            inputProps={{ 'aria-label': 'secondary checkbox' }}
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
                         />
                     )
                 },
@@ -183,19 +241,58 @@ class Profiles extends Component {
                 headerName: 'Atualizar',
                 flex: 0.3,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
-                    const { id, module, profile_id, create, read, update } = params.row;
-                    //let prop = this.state.permissions.find(x => x.xid === permcas.xid)
-                    let permca = { xid: id, module, profile_id, create, read, update }
+                    let { id, module_id, profile_id, create, read, update } = params.row;
+                    let permca = { id, module_id, profile_id, create, read, update }
+                    let prop = this.state.permissions.find(x => x.id === id)
+                    let checked = false;
+                    if(prop){
+                        checked = (prop.update == 1)
+                    }
                     return (
                         <Switch
-                            //checked={!prop ?? prop.update == 1}
-                            onChange={(e) => {
-                                params.value = e.target.checked ? 1 : 0;
-                                permca[e.target.name] = e.target.checked ? 1 : 0;
-                                return this.onChangeSwitch(e, permca)
+                            key={id+"-module-"+module_id+"-profile-"+profile_id}
+                            checked={this.state.permissions[this.state.permissions.findIndex(x => x.id == id)].update == 1}
+                            color="primary"
+                            onClick={(e)=> {
+                                let permissions = this.state.permissions;
+                                //console.log(permissions)
+                                permissions[this.state.permissions.findIndex(x => x.id == id)].update = !permissions[this.state.permissions.findIndex(x => x.id == id)].update
+                                let save = permissions[this.state.permissions.findIndex(x => x.id == id)];
+                                this.onChangeSwitch(save);
+                                this.setState({...this.state, permissions})
                             }}
                             name="update"
-                            inputProps={{ 'aria-label': 'secondary checkbox' }}
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                        />
+                    )
+                },
+            },{
+                field: 'delete',
+                headerName: 'Deletar/Bloquear',
+                flex: 0.3,
+                renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
+                    let { id, module_id, profile_id, create, read, update } = params.row;
+                    let permca = { id, module_id, profile_id, create, read, update }
+                    let prop = this.state.permissions.find(x => x.id === id)
+                    let checked = false;
+                    if(prop){
+                        checked = (prop.delete == 1)
+                    }
+                    return (
+                        <Switch
+                            key={id+"-module-"+module_id+"-profile-"+profile_id}
+                            checked={this.state.permissions[this.state.permissions.findIndex(x => x.id == id)].delete == 1}
+                            color="primary"
+                            onClick={(e)=> {
+                                let permissions = this.state.permissions;
+                                //console.log(permissions)
+                                permissions[this.state.permissions.findIndex(x => x.id == id)].delete = !permissions[this.state.permissions.findIndex(x => x.id == id)].delete
+                                let save = permissions[this.state.permissions.findIndex(x => x.id == id)];
+                                this.onChangeSwitch(save);
+                                this.setState({...this.state, permissions})
+                            }}
+                            name="delete"
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
                         />
                     )
                 },
@@ -207,14 +304,13 @@ class Profiles extends Component {
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Toolbar>
                         <Typography variant="h6" style={{ flexGrow: 1 }}>
-                            <HomeIcon />  <span>Cadastro / Bonificação</span>
+                            <HomeIcon />  <span>Permissões</span>
                         </Typography>
                     </Toolbar>
 
                 </AppBar>
-                {
-                    window.innerWidth > 720 ? (
-                        <div style={{ height: 700, width: '100%' }}><DataGrid
+                        <div style={{ height: 700, width: '100%' }}>
+                        <DataGrid
                             sx={{
                                 '& .MuiDataGrid-root': {
                                     '& .MuiDataGrid-viewport': {
@@ -229,25 +325,6 @@ class Profiles extends Component {
                             disableColumnMenu={true}
 
                         /></div>
-                    )
-                        : (<LCardGrid rows={rows} columns={columns}
-                            pageRequest={
-                                (params) => {
-                                    if (params.active !== undefined) {
-                                        params.active = params.active == "Ativo" ? 1 : 0;
-                                    }
-                                    this.setState({ ...this.state, pageRequest: params })
-                                    return getApiBonus(params)
-                                }} />
-                        )}
-                {!this.props.loading ?
-                    (<div><Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => {
-                        this.onSavePermcas();
-                    }}> Salvar</Button>
-                        <Button size="small" style={{ margin: 5 }} variant="contained" color="primary" onClick={() => { this.props.history.goBack(); }} > Cancelar</Button>
-                    </div>) : (
-                        <CircularProgress style={{ display: 'flex', margin: 'auto' }} />
-                    )}
             </Fragment>
         )
     }

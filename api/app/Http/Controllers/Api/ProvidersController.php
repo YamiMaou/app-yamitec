@@ -290,7 +290,7 @@ public function index(Request $request)
                 "rate" => str_replace(",",".",str_replace('.','',$request->rate)),
                 "accession_date" => $request->accession_date,
                 "end_date" => $request->end_date,
-                "contributors_id" => $request->contributor_id ?? 1,
+                "contributors_id" => $request->contributors_id ?? 1,
                 "provider_id" => $provider->id,
             ];
             

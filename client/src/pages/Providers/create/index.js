@@ -37,7 +37,121 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import { CardActions, CircularProgress, List, ListItem, ListItemText } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
+// MODULE ID
+const module_id = 4
+const AutocompleteMatriz = (props) => {
+  
+    const [value, setValue] = React.useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
+    const [inputValue, setInputValue] = React.useState('');
+    const [defaultVal, setDefault] = useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
+      useEffect(() => {
+          if(props.value !== defaultVal){
+              const vl = props.value ? props.values.find((item) => item.id == props.value) : undefined;
+              if(vl !== undefined){
+                console.log(vl);
+                setValue(vl);
+                setInputValue(vl !== undefined ? vl[props.valueLabel] : "");
+              }
+          }
+      })
+  
+    function handleChange(e, newValue) {
+        const { val } = e.target;
+        let vl = { target: { id: 'contributors_id', value: newValue ? newValue.id : "" } }
+        props.onChange(vl)
+      if (props.validate !== undefined) {
+          if (props.validate(val)) {
+              setError(false);
+          } else {
+              setError(true)
+          }
+      }
+        props.onChange(vl)
+        //console.log(newValue);
+        setValue(newValue);
+      }
+    return <Autocomplete
+          key={`autocomplete-${props.id}`}
+          id={props.id}
+          disabled={props.disabled ?? false}
+          name={props.name}
+          value={value}
+          inputValue={inputValue}
+          onChange={handleChange}
+          getOptionSelected={(option, value) => {
+              if(option.id == value.id){
+                  setInputValue(value[props.valueLabel])
+              }
+              
+              return option.id == value.id
+          }}
+          getOptionLabel={(option) => option[props.valueLabel]}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue);
+          }}
+          options={props.values}
+          style={props.style}
+          renderInput={(params) => <TextField {...params} 
+          label={props.label} 
+           />}
+        />;
+  }
+  
+const SelectMatriz = (props) => {
+    const [value, setValue] = useState(props.value ?? "Selecione");
+    const [error, setError] = useState(false);
+    const [defaultVal, setDefault] = useState(props.value ?? "Selecione");
+    useEffect(() => {
+        if(props.value !== defaultVal){
+            setValue(props.value ?? "Selecione")
+        }
+    })
+
+    function handleChange(e) {
+        const { val, id } = e.target;
+        if (props.validate !== undefined) {
+            if (props.validate(val)) {
+                setError(false);
+            } else {
+                setError(true)
+            }
+        }
+        props.onChange(e)
+        console.log(e.target.value)
+        setValue(e.target.value);
+    }
+    return (
+        <FormControl id={props.column} style={{ ...props.style, marginTop: '25px' }}>
+            <InputLabel id={props.column}>{props.label}</InputLabel>
+            <Select size="small"
+                labelId={props.id}
+                id={props.id}
+                disabled={props.disabled ?? false}
+                name={props.name}
+                value={value}
+                error={error}
+                placeholder="Selecione"
+                //helperText={props.error ? props.helperText ?? "conteúdo inválido" : ""}
+                onChange={handleChange}
+                onBlur={handleChange}
+            >
+                <MenuItem key={`input-00`} value="Selecione">Selecione</MenuItem>
+                {props.json ? (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
+                    })
+                ) : (
+                    props.values.map((val, ind) => {
+                        return <MenuItem key={`input-${ind}`} value={val}>{val}</MenuItem>
+                    })
+                )
+                }
+
+            </Select>
+        </FormControl>)
+}
 const MaskedDecimalInput = (props) => {
     const [value1, setValue] = useState(props.value ?? undefined);
     const [error, setError] = useState(false);
@@ -168,12 +282,12 @@ class CreateProviders extends Component {
         states: []
     }
     async componentDidMount() {
-        const data = await getApiProviders({type: 1, active: 1});
-        const contributors = await getApiContributors({active: 1});
-        const managers = await getApiManagers();
+        const data = await getApiProviders({type: 1, active: 1, pageSize: 500 });
+        const contributors = await getApiContributors({active: 1, pageSize: 500 });
+        const managers = await getApiManagers({ active: 1, pageSize: 500 });
         const providertypes = await getApiProviderTypes();
         const providers = await getApiProviders();
-        const filials = await getApiProviders({type: 2, active: 1});
+        const filials = await getApiProviders({type: 2, active: 1, pageSize: 500 });
         this.setState({
             ...this.state, 
             matrizData: undefined,
@@ -397,7 +511,8 @@ class CreateProviders extends Component {
                     { column: 'street', value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['street'] : "", label: 'Endereço',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 100, required: true}, type: 'text', flexBasis },
                     { column: 'additional',value: (this.state.fields['type'] == 2 && this.state.fields['addr_clone'] == 1) ? this.state.fields['additional'] : "", label: 'Complemento',disabled: (this.state.fields['addr_clone'] == 1), validate: {max: 20}, type: 'text', flexBasis },
                     {
-                        column: 'uf', label: 'Estado', type: 'select',
+                        column: 'uf', label: 'Estado', type: 'custom',
+                        component: SelectMatriz,
                         validate: {required: true },disabled: (this.state.fields['addr_clone'] == 1),
                         values: ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Brasília", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins"],
                         flexBasis, style:{minWidth: "192px"},
@@ -436,7 +551,8 @@ class CreateProviders extends Component {
                     { 
                         column: 'contributor_id', 
                         label: 'Vendedor', 
-                        type: 'autocomplete',
+                        type: 'custom',
+                        component: AutocompleteMatriz,
                         validate:{required: true}, 
                         json: true,
                         valueLabel: 'name',
@@ -714,7 +830,7 @@ class CreateProviders extends Component {
                                             filter['fornecedores-ind'] = this.state.filter['fornecedores-ind'] == 'block' ? 'none' : 'block'
                                             this.setState({ ...this.state, filter })
                                         }}>
-                                    <IndeterminateCheckBoxIcon /> Fornecedores
+                                    <IndeterminateCheckBoxIcon /> Fornecedores Vinculados à Matriz
                                 </Typography>
                                 <div style={{
                                     display: this.state.filter['fornecedores-ind'] ?? 'block',

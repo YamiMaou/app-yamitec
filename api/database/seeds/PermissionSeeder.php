@@ -15,7 +15,7 @@ class PermissionSeeder extends Seeder
     {
         DB::table('permissions')->insert([
             [
-                'module' => 0,
+                'module_id' => 1,
                 'profile_id' => 1,
                 'create' => 1,
                 'read' => 1,
@@ -23,7 +23,7 @@ class PermissionSeeder extends Seeder
                 'delete' => 1
             ],
             [
-                'module' => 1,
+                'module_id' => 2,
                 'profile_id' => 1,
                 'create' => 1,
                 'read' => 1,
@@ -31,7 +31,7 @@ class PermissionSeeder extends Seeder
                 'delete' => 1
             ],
             [
-                'module' => 2,
+                'module_id' => 3,
                 'profile_id' => 1,
                 'create' => 1,
                 'read' => 1,
@@ -39,7 +39,7 @@ class PermissionSeeder extends Seeder
                 'delete' => 1
             ],
             [
-                'module' => 3,
+                'module_id' => 4,
                 'profile_id' => 1,
                 'create' => 1,
                 'read' => 1,
@@ -47,7 +47,29 @@ class PermissionSeeder extends Seeder
                 'delete' => 1
             ],
             [
-                'module' => 4,
+                'module_id' => 5,
+                'profile_id' => 1,
+                'create' => 1,
+                'read' => 1,
+                'update' => 1,
+                'delete' => 1
+            ],
+            [
+                'module_id' => 6,
+                'profile_id' => 1,
+                'create' => 1,
+                'read' => 1,
+                'update' => 1,
+                'delete' => 1
+            ],[
+                'module_id' => 7,
+                'profile_id' => 1,
+                'create' => 1,
+                'read' => 1,
+                'update' => 1,
+                'delete' => 1
+            ],[
+                'module_id' => 8,
                 'profile_id' => 1,
                 'create' => 1,
                 'read' => 1,

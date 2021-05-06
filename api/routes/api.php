@@ -53,10 +53,28 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
     });
     Route::get('report', function (Request $request){
         //echo "ok";
-
-        $model = \App\Models\Audit::with(['user'])->get()->map(function($item) {
+       try{
+        $model = \App\Models\Audit::with(['user']);
+        if(isset($request->from) && $request->from != ""){
+            if(!isset($request->to) && $request->to == "")
+                $request->merge([
+                    'to'=> $request->from
+                ]);
+            $model->whereBetween('created_at', [$request->from." 00:00:00", $request->to." 23:59:59"]);
+        }
+        if(isset($request->name) && $request->name != ""){
+            $user = \App\User::where('name', 'like',"%{$request->name}%")->get();
+            $model =$model->whereIn('user_id', $user->pluck('id'));
+        }
+        if(isset($request->email) && $request->email != ""){
+            $user = \App\User::where('email', 'like',"%{$request->name}%")->get();
+            $model =$model->whereIn('user_id', $user->pluck('id'));
+        }
+        
+        $model = $model->get()->map(function($item) {
             return [
                 'id' => $item->id,
+                'name' => $item->user->name,
                 'user' => $item->user->email,
                 'justification' => $item->justification,
                 'to' => implode(', ', array_map(
@@ -75,9 +93,13 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
                 'date' => date('d/m/Y h:i:s',strtotime($item->created_at))
             ];//array_values($item->toArray());
         });
+        //dd($model->get());
         //return response()->json($model);
         echo " ";
-        return \App\Library\ExportClass::getCsv(['ID','Usuario', 'Justificativa','DE/PARA','Data'], $model);
+        return \App\Library\ExportClass::getCsv(['ID','Nome','Usuario', 'Justificativa','DE/PARA','Data'], $model);
+    }catch(\Exception $ex){
+        echo $ex->getMessage();
+    }
     });
 Route::post('/contributors/downloads', 'Api\ContributorsController@download');
 Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
