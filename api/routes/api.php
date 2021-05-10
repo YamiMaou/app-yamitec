@@ -74,29 +74,42 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
         $model = $model->get()->map(function($item) {
             return [
                 'id' => $item->id,
+                'date' => date('d/m/Y h:i:s',strtotime($item->created_at)),
                 'name' => $item->user->name,
                 'user' => $item->user->email,
                 'justification' => $item->justification,
-                'to' => implode(', ', array_map(
+                'from' => implode(', ', array_map(
                     function ($v, $k) use($item){ 
                         $from = json_decode($item->from,true);
                         //echo $from[$k] ?? "Nothins";
                         if(!is_array($v) && !is_object($v)){
                             //echo $from[$k]?? "Nothins";
-                            return sprintf("%s de \"%s\" para \"%s\"", $k, $from[$k] ?? "",$v); 
+                            return sprintf("%s = \"%s\"", $k,$v); 
+                        }
+                        
+                    },
+                    json_decode($item->from,true),
+                    array_keys(json_decode($item->from,true))
+                )),
+                'to' => implode(', ', array_map(
+                    function ($v, $k) use($item){ 
+                        $from = json_decode($item->to,true);
+                        //echo $from[$k] ?? "Nothins";
+                        if(!is_array($v) && !is_object($v)){
+                            //echo $from[$k]?? "Nothins";
+                            return sprintf("%s = \"%s\"", $k, $v); 
                         }
                         
                     },
                     json_decode($item->to,true),
                     array_keys(json_decode($item->to,true))
-                )),
-                'date' => date('d/m/Y h:i:s',strtotime($item->created_at))
+                ))
             ];//array_values($item->toArray());
         });
         //dd($model->get());
         //return response()->json($model);
         echo " ";
-        return \App\Library\ExportClass::getCsv(['ID','Nome','Usuario', 'Justificativa','DE/PARA','Data'], $model);
+        return \App\Library\ExportClass::getCsv(['ID','Data','Nome','Usuario', 'Justificativa','DE/PARA'], $model);
     }catch(\Exception $ex){
         echo $ex->getMessage();
     }
