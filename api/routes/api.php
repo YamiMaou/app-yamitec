@@ -109,7 +109,7 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
         //dd($model->get());
         //return response()->json($model);
         echo " ";
-        return \App\Library\ExportClass::getCsv(['ID','Data','Nome','Usuario', 'Justificativa','DE/PARA'], $model);
+        return \App\Library\ExportClass::getCsv(['ID','Data','Nome','Usuario', 'Justificativa','De', 'Para'], $model);
     }catch(\Exception $ex){
         echo $ex->getMessage();
     }
@@ -162,5 +162,8 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/bonuses', 'Api\BonusesController')->middleware(['auth:api', 'scope:view-posts']);
     // PERMISSIONS
     Route::resource('/permissions', 'Api\PermissionsController')->middleware(['auth:api', 'scope:view-posts']);
+
+    // PERFIS
+    Route::resource('/function', 'Api\ProfilesController')->middleware(['auth:api', 'scope:view-posts']);
 
 });

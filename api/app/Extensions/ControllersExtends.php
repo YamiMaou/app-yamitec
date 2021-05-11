@@ -221,9 +221,9 @@ abstract class ControllersExtends extends Controller implements ControllersInter
         $this->saveLog($id, $request, $modelName);
         try {
             $this->model->destroy($id);
-            return response()->json(["type" => "delete", "message" => "Deletado com Sucesso!"]);
+            return response()->json(["success"=> true, "type" => "delete", "message" => "Excluídos com Sucesso!"]);
         } catch (Exception $error) {
-            return response()->json(["type" => "error", "message" => "Problema ao Deletar. ", "trace" => $error->getMessage()], 200);
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Deletar. ", "trace" => $error->getMessage()], 200);
         }
     }
 

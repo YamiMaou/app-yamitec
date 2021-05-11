@@ -38,6 +38,7 @@ function Sidebar(props) {
       {url: "/fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
       {url: "/bonificacao", label: 'Bonificação', icon: <PeopleIcon fontSize="small" />},
       {url: "/contas", label: 'Ger. Contas', icon: <PeopleIcon fontSize="small" />},
+      {url: "/funcoes", label: 'Perfis', icon: <PeopleIcon fontSize="small" />},
       {url: "/perfis", label: 'Permissões', icon: <PeopleIcon fontSize="small" />},
       {url: "/auditoria", label: 'Auditoria', icon: <PeopleIcon fontSize="small" />},
       //{url: "/Fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
@@ -48,7 +49,7 @@ function Sidebar(props) {
     return authData.permissions.map((v, k) => {
       //console.log(v.module_id);
       //console.log(views[(v.module_id-1)]);
-      if(k >= 8) return ('');
+      if(k >= 9) return ('');
       if(v.read === 0) return ('');
 
       //return ('');
