@@ -69,4 +69,10 @@ class Contributor extends Model
         return $this->hasOne(\App\Models\Client::class,'cpf', 'cpf');
     }
 
+    // ALTERADO AQUI, INCLUSÃO DE MÉTODO by MARKUS 11/05
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class);
+    }
+
 }

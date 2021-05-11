@@ -151,3 +151,5 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     Route::resource('/permissions', 'Api\PermissionsController')->middleware(['auth:api', 'scope:view-posts']);
 
 });
+
+Route::get('report-teste', 'Api\ReportController@reportProviders');
