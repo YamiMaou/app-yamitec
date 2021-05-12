@@ -131,4 +131,8 @@ class Provider extends Model
         );
     }
 
+    public function account_managers(){
+        return $this->hasMany(AccountManager::class,'cpf_cnpj','cnpj');
+    }
+
 }

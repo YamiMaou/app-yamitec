@@ -211,43 +211,12 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
         ]);
     });
 });
-// REPORT RANKING
-Route::get('/report-ranking', function(Request $request) {
-$return = \App\Models\AccountManager::with(['client', 'manager', 'provider', 'contributor'])
-        ->get()->map(function($item) {
-            $type = "other";
-            if($item->client != null)
-                $type = "client";
-            if($item->manager != null)
-                $type = "manager";
-            if($item->contributor != null)
-                $type = "contributor";
-            if($item->provider != null)
-                $type = "provider";
-            return [
-                'id' => $item->id,
-                'amount' => $item->bill_type == 2 ? -$item->amount : $item->amount,
-                'type' => $type,
-                'bill_type' => $item->bill_type,
-            ];
-        });
-        
-        $client = array_filter($return->toArray(), function($v, $k) {
-            return $v['type'] =="cliente";
-        }, ARRAY_FILTER_USE_BOTH);
-        $provider = array_filter($return->toArray(), function($v, $k) {
-            return $v['type'] == "provider";
-        }, ARRAY_FILTER_USE_BOTH);
-        $manager = array_filter($return->toArray(), function($v, $k) {
-            return $v['type'] == "manager";
-        }, ARRAY_FILTER_USE_BOTH);
-        $contributor = array_filter($return->toArray(), function($v, $k) {
-            return $v['type'] == "contributor";
-        }, ARRAY_FILTER_USE_BOTH);
-        $others = array_filter($return->toArray(), function($v, $k) {
-            return $v['type'] == "other";
-        }, ARRAY_FILTER_USE_BOTH);
-        return response()->json($return);
-});
+// REPORT RANKING PROVIDER
+Route::get('/ranking-provider','Api\ReportController@providerRank');
+
+// REPORT RANKING Client
+Route::get('/ranking-client', 'Api\ReportController@clientRank');
+
+
 // REPORT TESTE
 Route::get('report-teste', 'Api\ReportController@reportProviders');
