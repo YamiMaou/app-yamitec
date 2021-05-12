@@ -121,7 +121,7 @@ class EditContributors extends Component {
         }
         localStorage.setItem("sessionTime", 9000)
         let data = await getApiManagers({}, this.props.match.params.id);
-        let providers = await getApiProviders();
+        let providers = await getApiProviders({pageSize: 9999});
         this.setState({ ...this.state, data, provManagers: data.providers,providers: providers.data });
 
     }

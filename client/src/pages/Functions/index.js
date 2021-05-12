@@ -31,7 +31,7 @@ import { Link, withRouter } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 // MODULE ID
-const module_id = 7
+const module_id = 9
 function BlockDialog(props) {
     const [open, setOpen] = React.useState(props.open);
     const [loading, setLoading] = React.useState(false);

@@ -50,7 +50,7 @@ function Sidebar(props) {
     return authData.permissions.map((v, k) => {
       //console.log(v.module_id);
       //console.log(views[(v.module_id-1)]);
-      if(k >= 11) return ('');
+      if(k >= 12) return ('');
       if(v.read === 0) return ('');
 
       //return ('');

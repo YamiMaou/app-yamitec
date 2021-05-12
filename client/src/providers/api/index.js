@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   apiHost = hostname;
 }
-//apiHost = hostname;
+apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({
@@ -912,6 +912,30 @@ export const getApiAudits = async (params = '',id = undefined) => {
     return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
   });
 }
+//Download Report
+export const getApiReportFileS = async (rel, ext,params = '') => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  axios({
+    method: 'get',
+    url: `${apiHost}/${rel}/?${data}`,
+    responseType: 'arraybuffer',
+    //data: dates
+  }).then(function(response) {
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download',`relatorio.${ext}`); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+
 //Download Report
 export const getApiReportFile = async (params = '') => {
   localStorage.setItem("sessionTime", 900)
