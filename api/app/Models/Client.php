@@ -61,4 +61,8 @@ class Client extends Model
         return $this->hasOne(\App\Models\Contributor::class,'cpf', 'cpf');
     }
 
+    public function account_managers(){
+        return $this->hasMany(AccountManager::class,'cpf_cnpj','cpf');
+    }
+
 }

@@ -203,4 +203,42 @@ class ReportController extends Controller {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
         }
     }
+    public function clientRank(Request $request){
+        $return = \App\Models\Client::with(['account_managers'])
+            ->get()->map(function($item) {
+                if(count($item->account_managers) > 0){
+                    $accs = $item->account_managers->map(function($acc){
+                        $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
+                        return $acc;
+                    });
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'amount' => array_sum(array_column($accs->toArray(), 'amount')),
+                        'type' => "Plataforma",
+                    ];
+                }
+            });
+        return response()->json(array_filter($return->toArray()));
+    }
+    public function providerRank(Request $request){
+        $return = \App\Models\Provider::with(['account_managers', 'providertype'])
+        ->get()->map(function($item) {
+            if(count($item->account_managers) > 0){
+                $accs = $item->account_managers->map(function($acc){
+                    $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
+                    return $acc;
+                });
+                return [
+                    'id' => $item->id,
+                    'fantasy_name' => $item->fantasy_name,
+                    'company_name' => $item->company_name,
+                    'amount' => array_sum(array_column($accs->toArray(), 'amount')),
+                    'type' => $item->providertype->name,
+                    'bill_type' => $item->bill_type == 2 ? "Despesa" : "Receita",
+                ];
+            }
+        });
+    return response()->json(array_filter($return->toArray()));
+    }
 }

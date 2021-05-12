@@ -211,26 +211,12 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
         ]);
     });
 });
-// REPORT RANKING
-Route::get('/report-ranking', function(Request $request) {
-$return = \App\Models\Provider::with(['account_managers', 'providertype'])
-        ->get()->map(function($item) {
-            if(count($item->account_managers) > 0){
-                $accs = $item->account_managers->map(function($acc){
-                    $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
-                    return $acc;
-                });
-                return [
-                    'id' => $item->id,
-                    'fantasy_name' => $item->fantasy_name,
-                    'company_name' => $item->company_name,
-                    'amount' => array_sum(array_column($accs->toArray(), 'amount')),
-                    'type' => $item->providertype->name,
-                    'bill_type' => $item->bill_type == 2 ? "Despesa" : "Receita",
-                ];
-            }
-        });
-    return response()->json(array_filter($return->toArray()));
-});
+// REPORT RANKING PROVIDER
+Route::get('/ranking-provider','Api\ReportController@providerRank');
+
+// REPORT RANKING Client
+Route::get('/ranking-client', 'Api\ReportController@clientRank');
+
+
 // REPORT TESTE
 Route::get('report-teste', 'Api\ReportController@reportProviders');
