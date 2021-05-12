@@ -73,6 +73,11 @@ class Reports extends Component {
                         </Typography>
                     </Toolbar>
                 </AppBar>
+                    <div>
+                    <Button variant="outlined" size="large" color="primary" onClick={async () => {
+                        await getApiReportFileS('provider-report','xlsx',params)
+                    }}> Fornecedor </Button>
+                    </div>
                     <LDataGrid hideList={true} rows={rows} columns={columns} filterInputs={filter} 
                     pageRequest={
                         (params) => {

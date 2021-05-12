@@ -219,7 +219,7 @@ Route::get('/ranking-client', 'Api\ReportController@clientRank');
 
 
 // REPORT TESTE
-Route::post('report-teste', 'Api\ReportController@reportSales');
-Route::get('report-form', 'Api\ReportController@index');
+Route::get('report-teste', 'Api\ReportController@reportSales');
+Route::get('report-form', 'Api\ReportController@reportProviders');
 Route::get('ranking-client-teste', 'Api\ReportController@reportClientRank');
 Route::get('ranking-provider-teste', 'Api\ReportController@reportProviderRank');

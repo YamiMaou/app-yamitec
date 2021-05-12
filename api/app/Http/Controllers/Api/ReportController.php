@@ -33,6 +33,7 @@ class ReportController extends Controller {
 
     public function reportProviders(Request $request) 
     {
+        $this->providersList = $this->provider;
         if ($request->filled('from')) {
             if (!$request->filled('to')) {
                 $request->merge([
@@ -40,8 +41,9 @@ class ReportController extends Controller {
                 ]);
             }
 
-            $this->providersList = $this->provider->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
+            $this->providersList = $this->providersList->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
         }
+        $this->providersList = $this->providersList->get();
 
         try 
         {
@@ -165,7 +167,7 @@ class ReportController extends Controller {
                     $sheet->setCellValueByColumnAndRow(1, $line, $active);
                     $sheet->setCellValueByColumnAndRow(2, $line, $provider->providertype->name);
                     $sheet->setCellValueByColumnAndRow(3, $line, $type);
-                    $sheet->setCellValueByColumnAndRow(4, $line, "{$provider->cnpj}");
+                    $sheet->setCellValueByColumnAndRow(4, $line, "{$provider->cnpj} ");
                     $sheet->setCellValueByColumnAndRow(5, $line, $provider->company_name);
                     $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
                     $sheet->setCellValueByColumnAndRow(7, $line, ' ');
@@ -222,6 +224,8 @@ class ReportController extends Controller {
             }
 
             $this->accountManagerList = $this->accountManager->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
+        }else{
+            $this->accountManagerList = $this->accountManager->get();
         }
 
         try 
@@ -299,6 +303,7 @@ class ReportController extends Controller {
                 $line = 6;
 
                 foreach ($this->accountManagerList as $key => $accountManager) {
+                    dd($accountManager->contributor);
 
                     /*$type = ($provider->type == 1) ? 'Matriz' : 'Filial';
                     $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
@@ -315,14 +320,14 @@ class ReportController extends Controller {
                     $facebook = ($provider->contacts->facebook != 'null') ? $provider->contacts->facebook : '';
                     $instagram = ($provider->contacts->instagram != 'null') ? $provider->contacts->instagram : '';*/
 
-                    $active = ($accountManager->contributor->actibe == 1) ? 'Ativo' : 'Desativado';
+                    $active = ($accountManager->contributor->active == 1) ? 'Ativo' : 'Desativado';
 
 
                     $sheet->setCellValueByColumnAndRow(1, $line, $accountManager->contributor->name);
                     $sheet->setCellValueByColumnAndRow(2, $line, $accountManager->contributor->function);
                     $sheet->setCellValueByColumnAndRow(3, $line, $accountManager->contributor->addresses->city);
                     $sheet->setCellValueByColumnAndRow(4, $line, $active);
-                    $sheet->setCellValueByColumnAndRow(5, $line, "{$accountManager->provider->cnpj}");/*
+                    $sheet->setCellValueByColumnAndRow(5, $line, "{$accountManager->provider->cnpj} ");/*
                     $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
                     $sheet->setCellValueByColumnAndRow(7, $line, ' ');
                     $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
@@ -347,8 +352,8 @@ class ReportController extends Controller {
             return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum venda encontrada."]);
 
         } catch(\Exception $error) {
-            //echo $error->getTraceAsString();
-            //return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
+            echo $error->getTraceAsString();
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
         }
     }
 
@@ -414,11 +419,29 @@ class ReportController extends Controller {
 
         $line = 2;
 
+        $rank = \App\Models\Client::with(['account_managers'])
+            ->get()->map(function($item) {
+                if(count($item->account_managers) > 0){
+                    $accs = $item->account_managers->map(function($acc){
+                        $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
+                        return $acc;
+                    });
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'amount' => array_sum(array_column($accs->toArray(), 'amount')),
+                        'type' => "Plataforma",
+                    ];
+                }
+            });
+            $rank = array_filter($rank->toArray());
+            foreach($rank as $k => $ranking)
+
         for ($i = 0; $i < 10; $i++) {
 
-            $sheet->setCellValueByColumnAndRow(1, $line, 'Teste');
-            $sheet->setCellValueByColumnAndRow(2, $line, '');
-            $sheet->setCellValueByColumnAndRow(3, $line, '');
+            $sheet->setCellValueByColumnAndRow(1, $line, $ranking['name']);
+            $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);
+            $sheet->setCellValueByColumnAndRow(3, $line, number_format($ranking['amount'],2,',','.'));
             
             $line++;
         }
@@ -452,12 +475,28 @@ class ReportController extends Controller {
         $sheet->setCellValue('C1', __('Movimento'));
 
         $line = 2;
-
-        for ($i = 0; $i < 10; $i++) {
-
-            $sheet->setCellValueByColumnAndRow(1, $line, 'Teste');
-            $sheet->setCellValueByColumnAndRow(2, $line, '');
-            $sheet->setCellValueByColumnAndRow(3, $line, '');
+        $rank = \App\Models\Provider::with(['account_managers', 'providertype'])
+        ->get()->map(function($item) {
+            if(count($item->account_managers) > 0){
+                $accs = $item->account_managers->map(function($acc){
+                    $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
+                    return $acc;
+                });
+                return [
+                    'id' => $item->id,
+                    'fantasy_name' => $item->fantasy_name,
+                    'company_name' => $item->company_name,
+                    'amount' => array_sum(array_column($accs->toArray(), 'amount')),
+                    'type' => $item->providertype->name,
+                    'bill_type' => $item->bill_type == 2 ? "Despesa" : "Receita",
+                ];
+            }
+        });
+        $rank = array_filter($rank->toArray());
+        foreach($rank as $k => $ranking){
+            $sheet->setCellValueByColumnAndRow(1, $line, $ranking['fantasy_name']);
+            $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);
+            $sheet->setCellValueByColumnAndRow(3, $line, number_format($ranking['amount'], 2,',','.'));
             
             $line++;
         }
