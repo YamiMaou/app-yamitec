@@ -95,7 +95,7 @@ class CreateManagers extends Component {
     }
     async componentDidMount() {
         localStorage.setItem("sessionTime", 900)
-        const providers = await getApiProviders();
+        const providers = await getApiProviders({pageSize: 9999});
         this.setState({...this.state, providers: providers.data});
 
     }

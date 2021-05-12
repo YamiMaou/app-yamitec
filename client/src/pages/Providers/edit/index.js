@@ -324,12 +324,12 @@ class EditProviders extends Component {
             return;
         }
         localStorage.setItem("sessionTime", 9000)
-        const contributors = await getApiContributors({ active: 1 });
+        const contributors = await getApiContributors({ pageSize: 9999, active: 1 });
         const data = await getApiProviders({}, this.props.match.params.id);
         const providers = await getApiProviders({ type: 1, active: 1 });
-        const filials = await getApiProviders({ type: 2, active: 1, pageSize: 500 });
-        const managers = await getApiManagers({ active: 1, pageSize: 500 });
-        const providertypes = await getApiProviderTypes();
+        const filials = await getApiProviders({ type: 2, active: 1, pageSize: 9999 });
+        const managers = await getApiManagers({ active: 1, pageSize: 9999 });
+        const providertypes = await getApiProviderTypes({pageSize: 9999});
         //console.log(providers.data.filter(x => x.id != this.props.match.params.id))
         this.setState({
             ...this.state,

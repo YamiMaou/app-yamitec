@@ -282,12 +282,12 @@ class CreateProviders extends Component {
         states: []
     }
     async componentDidMount() {
-        const data = await getApiProviders({type: 1, active: 1, pageSize: 500 });
-        const contributors = await getApiContributors({active: 1, pageSize: 500 });
-        const managers = await getApiManagers({ active: 1, pageSize: 500 });
-        const providertypes = await getApiProviderTypes();
-        const providers = await getApiProviders();
-        const filials = await getApiProviders({type: 2, active: 1, pageSize: 500 });
+        const data = await getApiProviders({type: 1, active: 1, pageSize: 9999 });
+        const contributors = await getApiContributors({active: 1, pageSize: 9999 });
+        const managers = await getApiManagers({ active: 1, pageSize: 9999 });
+        const providertypes = await getApiProviderTypes({pageSize: 9999});
+        const providers = await getApiProviders({pageSize: 9999});
+        const filials = await getApiProviders({type: 2, active: 1, pageSize: 9999 });
         this.setState({
             ...this.state, 
             matrizData: undefined,

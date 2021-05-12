@@ -22,7 +22,7 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { deleteApiBonus, getApiBonus, getApiReportFile, putApiBonus } from '../../providers/api'
+import { deleteApiBonus, getApiBonus, getApiReportFile, getApiReportFileS, putApiBonus } from '../../providers/api'
 
 import {InputCpf, stringCpf} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
@@ -31,7 +31,7 @@ import { Link, withRouter } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
 
 // MODULE ID
-const module_id = 9
+const module_id = 10
 
 class Reports extends Component {
     state = {
@@ -58,8 +58,8 @@ class Reports extends Component {
             { column: 'from', label: 'De', type: 'date', flexBasis },
             { column: 'to', label: 'Até', type: 'date', flexBasis },
             { 
-                column: 'name', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
-                values: ['Fornecedor', 'Vendas']
+                column: 'type', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
+                values: ['Fornecedor', 'Vendas', 'Ranking Fornecedor', 'Ranking Cliente']
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
@@ -69,14 +69,24 @@ class Reports extends Component {
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10}}>
                     <Toolbar>
                         <Typography variant="h6" style={{flexGrow: 1}}>
-                            <HomeIcon />  <span>Auditoria</span>
+                            <HomeIcon />  <span>Relatórios</span>
                         </Typography>
                     </Toolbar>
                 </AppBar>
                     <LDataGrid hideList={true} rows={rows} columns={columns} filterInputs={filter} 
                     pageRequest={
                         (params) => {
-                            return getApiReportFile(params)
+                            let type = {
+                                "Fornecedor" : "provider-report",
+                                "Vendas" : "sales-report",
+                                "Ranking Cliente" : "ranking-client",
+                                "Ranking Fornecedor" : "ranking-provider",
+                            }
+                            if(params.type == undefined || params.type == ""){
+                                this.props.setSnackbar({open: true, message: "Tipo de relatório Obrigatório"})
+                            }else{
+                                return getApiReportFileS(type[params.type],'xlsx',params)
+                            }
                     }} />
             </Fragment>
         )
