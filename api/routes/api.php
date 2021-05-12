@@ -228,7 +228,7 @@ $return = \App\Models\AccountManager::with(['client', 'manager', 'provider', 'co
                 'id' => $item->id,
                 'amount' => $item->bill_type == 2 ? -$item->amount : $item->amount,
                 'type' => $type,
-                'bill_type' => $item->bill_type,
+                'bill_type' => $item->bill_type == 2 ? "Despesa" : "Receita",
             ];
         });
         
