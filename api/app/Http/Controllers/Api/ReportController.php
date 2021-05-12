@@ -3,24 +3,44 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Provider;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportController extends Controller {
-    
-    public function reportProviders() 
+    private $publicStorege = 'reports/';
+    private $provider;
+    private $providersList;
+
+    public function __construct()
     {
+        $this->provider = new Provider();
+        $this->providersList = new Provider();
+    }
+    
+    public function index()
+    {
+        return view('report.index');
+    }
+
+    public function reportProviders(Request $request) 
+    {
+        if ($request->filled('from')) {
+            if (!$request->filled('to')) {
+                $request->merge([
+                    'to' => $request->from
+                ]);
+            }
+
+            $this->providersList = $this->provider->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
+        }
 
         try 
         {
-            $providers = Provider::all(); 
-            //$providers = array_shift($providers[0]);
-            //echo ($providers->isEmpty() ? 'Vazio' : 'Não Vazio');
-            //echo "<pre>"; print_r($providers[4]->managers[0]->contacts->email); die;
 
-            if (!$providers->isEmpty()) 
+            if (!$this->providersList->isEmpty()) 
             {
                 $spreadsheet = new Spreadsheet();
                 $sheet = $spreadsheet->getActiveSheet();
@@ -28,22 +48,22 @@ class ReportController extends Controller {
                 $sheet->setTitle(__('Relatório de Fornecedores'));
 
                 $sheet->getStyle('A1:B1')->getBorders()->getAllBorders()->setBorderStyle(true);
-                $sheet->getStyle('A1:B1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('#e2efd9');
+                $sheet->getStyle('A1:B1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
                 $sheet->getStyle('A1:B1')->getFont()->setBold(true);
                 $sheet->getStyle('A1:B1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
                 $sheet->getStyle('A2:B2')->getBorders()->getAllBorders()->setBorderStyle(true);
-                $sheet->getStyle('A2:B2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('#e2efd9');
+                $sheet->getStyle('A2:B2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
                 $sheet->getStyle('A2:B2')->getFont()->setBold(true);
                 $sheet->getStyle('A2:B2')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
                 $sheet->getStyle('A3:B3')->getBorders()->getAllBorders()->setBorderStyle(true);
-                $sheet->getStyle('A3:B3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('#e2efd9');
+                $sheet->getStyle('A3:B3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
                 $sheet->getStyle('A3:B3')->getFont()->setBold(true);
                 $sheet->getStyle('A3:B3')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
                 $sheet->getStyle('A5:AB5')->getBorders()->getAllBorders()->setBorderStyle(true);
-                $sheet->getStyle('A5:AB5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('#e2efd9');
+                $sheet->getStyle('A5:AB5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
                 $sheet->getStyle('A5:AB5')->getFont()->setBold(true);
                 $sheet->getStyle('A5:AB5')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
@@ -109,9 +129,9 @@ class ReportController extends Controller {
                 $sheet->setCellValue('AA5', __('Última alteração'));
                 $sheet->setCellValue('AB5', __('Cadastrante'));
 
-                $qtyTotal = count($providers); 
-                $qttyActive = count(Provider::where('active', 1)->get());
-                $qttyDesactive = count(Provider::where('active', 0)->get());
+                $qtyTotal = count($this->providersList); 
+                $qttyActive = count($this->providersList->where('active', 1));
+                $qttyDesactive = count($this->providersList->where('active', 0));
 
                 $sheet->setCellValueByColumnAndRow(2, 1, $qtyTotal);
                 $sheet->setCellValueByColumnAndRow(2, 2, $qttyActive);
@@ -119,7 +139,7 @@ class ReportController extends Controller {
 
                 $line = 6;
 
-                foreach ($providers as $key => $provider) {
+                foreach ($this->providersList as $key => $provider) {
 
                     $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
                     $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
@@ -158,22 +178,22 @@ class ReportController extends Controller {
                     $sheet->setCellValueByColumnAndRow(20, $line, $facebook);
                     $sheet->setCellValueByColumnAndRow(21, $line, $instagram);
                     $sheet->setCellValueByColumnAndRow(22, $line, $provider->managers[0]->name);
-                    $sheet->setCellValueByColumnAndRow(23, $line, $providers[4]->managers[0]->contacts->phone1);
+                    $sheet->setCellValueByColumnAndRow(23, $line, $provider->managers[0]->contacts->phone1);
                     $sheet->setCellValueByColumnAndRow(24, $line, $provider->managers[0]->contacts->email);
                     $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
                     $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
                     $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
                     $sheet->setCellValueByColumnAndRow(28, $line, ' ');
 
-
                     $line++;
                 }
 
                 $writer = new Xlsx($spreadsheet);
                 $filename = "report-" . time() . ".xlsx";
+                Storage::disk('local')->makeDirectory('reports');
                 $writer->save(storage_path('app/reports/'.$filename));
 
-                return response()->json(["success"=> true, "type" => "error", "message" => "Relatório gerado com sucesso."]);
+                return Storage::download($this->publicStorege.$filename);
             }
 
             return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum fornecedor encontrado."]);

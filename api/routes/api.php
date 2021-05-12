@@ -165,4 +165,5 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
 
 });
 
-Route::get('report-teste', 'Api\ReportController@reportProviders');
+Route::post('report-teste', 'Api\ReportController@reportProviders');
+Route::get('report-form', 'Api\ReportController@index');
