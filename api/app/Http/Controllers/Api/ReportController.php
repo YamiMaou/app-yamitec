@@ -159,7 +159,7 @@ class ReportController extends Controller {
                     $sheet->setCellValueByColumnAndRow(1, $line, $active);
                     $sheet->setCellValueByColumnAndRow(2, $line, $provider->providertype->name);
                     $sheet->setCellValueByColumnAndRow(3, $line, $type);
-                    $sheet->setCellValueByColumnAndRow(4, $line, $provider->cnpj);
+                    $sheet->setCellValueByColumnAndRow(4, $line, "{$provider->cnpj}");
                     $sheet->setCellValueByColumnAndRow(5, $line, $provider->company_name);
                     $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
                     $sheet->setCellValueByColumnAndRow(7, $line, ' ');
