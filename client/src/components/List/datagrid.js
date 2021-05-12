@@ -405,7 +405,7 @@ class LDataGrid extends Component {
                                                 </FormControl>
                                             )
                                         } else if (input.type == "select") {
-                                            return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: input.flexBasis }} onBlur={onChangeInputs} />)
+                                            return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: input.flexBasis ?? '22%' }} onBlur={onChangeInputs} />)
                                         } else if (input.type == "decimal" || input.type == "percent") {
                                             return <MaskedDecimalInput percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         }

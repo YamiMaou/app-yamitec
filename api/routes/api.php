@@ -165,6 +165,9 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
 
     // PERFIS
     Route::resource('/function', 'Api\ProfilesController')->middleware(['auth:api', 'scope:view-posts']);
-    // REPORT TESTE
-    Route::get('report-teste', 'Api\ReportController@reportProviders');
+    
+    
 });
+
+// REPORT TESTE
+Route::get('report-teste', 'Api\ReportController@reportProviders');

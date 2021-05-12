@@ -43,7 +43,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { getApiDownloadFile } from '../../providers/api'
 import MaskedInput from 'react-text-mask';
 const idNumbers = [
-    'cpf', 'cnpj', 'zipcode'
+    'cpf', 'cnpj', 'zipcode', 'indication_qtty'
 ];
 // Autocomplete
 
@@ -351,9 +351,13 @@ function TextInputCustom(props) {
     function handleChange(e) {
         const { id } = e.target;
         let e1 = {target: {id: e.target.id, name: e.target.name, type: e.target.type, value: e.target.value.replace(',', '.')}}
-        let val = e.target.value;
+        let e2 = {target: {id: e.target.id, name: e.target.name, type: e.target.type, value: e.target.value.replace(/[^\d]+/g, '')}}
         
+        let val = e.target.value;
         setValue(val);
+        if(props.number){
+            setValue(val.replace(/[^\d]+/g, ''));
+        }
         if (props.validate !== undefined) {
             if (props.validate(val) !== false) {
                 setError(false);
@@ -717,6 +721,7 @@ class LForms extends Component {
                                                             id={input.column} label={input.label}
                                                             mask={input.mask ?? undefined}
                                                             decimal={input.validate ? input.validate.decimal !== undefined : undefined }
+                                                            number={input.validate ? input.validate.number !== undefined : undefined }
                                                             validate={input.validateHandler}
                                                             helperText={input.helperText ?? ""}
                                                             onChange={(e) => mainChange(e, { handle: input.handle ?? undefined, json: form.json ?? undefined, validate: input.validate ?? undefined })}
