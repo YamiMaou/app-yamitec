@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccountManager;
 use Illuminate\Http\Request;
 use App\Models\Provider;
 use Illuminate\Support\Facades\Storage;
@@ -13,11 +14,16 @@ class ReportController extends Controller {
     private $publicStorege = 'reports/';
     private $provider;
     private $providersList;
+    private $accountManager;
+    private $accountManagerList;
 
     public function __construct()
     {
         $this->provider = new Provider();
         $this->providersList = new Provider();
+
+        $this->accountManager = new AccountManager();
+        $this->accountManagerList = new AccountManager();
     }
     
     public function index()
@@ -159,7 +165,7 @@ class ReportController extends Controller {
                     $sheet->setCellValueByColumnAndRow(1, $line, $active);
                     $sheet->setCellValueByColumnAndRow(2, $line, $provider->providertype->name);
                     $sheet->setCellValueByColumnAndRow(3, $line, $type);
-                    $sheet->setCellValueByColumnAndRow(4, $line, $provider->cnpj);
+                    $sheet->setCellValueByColumnAndRow(4, $line, "{$provider->cnpj}");
                     $sheet->setCellValueByColumnAndRow(5, $line, $provider->company_name);
                     $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
                     $sheet->setCellValueByColumnAndRow(7, $line, ' ');
@@ -203,6 +209,150 @@ class ReportController extends Controller {
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
         }
     }
+
+
+    public function reportSales(Request $request) 
+    {
+        //echo "<pre>"; dd($accManager[0]->contributor->name);die;
+        if ($request->filled('from')) {
+            if (!$request->filled('to')) {
+                $request->merge([
+                    'to' => $request->from
+                ]);
+            }
+
+            $this->accountManagerList = $this->accountManager->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
+        }
+
+        try 
+        {
+
+            if (!$this->accountManagerList->isEmpty()) 
+            {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+                
+                $sheet->setTitle(__('Relatório de Vendas'));
+
+                $sheet->getStyle('A1:B1')->getBorders()->getAllBorders()->setBorderStyle(true);
+                $sheet->getStyle('A1:B1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+                $sheet->getStyle('A1:B1')->getFont()->setBold(true);
+                $sheet->getStyle('A1:B1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+
+                $sheet->getStyle('A2:B2')->getBorders()->getAllBorders()->setBorderStyle(true);
+                $sheet->getStyle('A2:B2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+                $sheet->getStyle('A2:B2')->getFont()->setBold(true);
+                $sheet->getStyle('A2:B2')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+
+                $sheet->getStyle('A3:B3')->getBorders()->getAllBorders()->setBorderStyle(true);
+                $sheet->getStyle('A3:B3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+                $sheet->getStyle('A3:B3')->getFont()->setBold(true);
+                $sheet->getStyle('A3:B3')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+
+                $sheet->getStyle('A5:N5')->getBorders()->getAllBorders()->setBorderStyle(true);
+                $sheet->getStyle('A5:N5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+                $sheet->getStyle('A5:N5')->getFont()->setBold(true);
+                $sheet->getStyle('A5:N5')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+
+                $sheet->getColumnDimension('A')->setAutoSize(true);
+                $sheet->getColumnDimension('B')->setAutoSize(true);
+                $sheet->getColumnDimension('C')->setAutoSize(true);
+                $sheet->getColumnDimension('D')->setAutoSize(true);
+                $sheet->getColumnDimension('E')->setAutoSize(true);
+                $sheet->getColumnDimension('F')->setAutoSize(true);
+                $sheet->getColumnDimension('G')->setAutoSize(true);
+                $sheet->getColumnDimension('H')->setAutoSize(true);
+                $sheet->getColumnDimension('I')->setAutoSize(true);
+                $sheet->getColumnDimension('J')->setAutoSize(true);
+                $sheet->getColumnDimension('K')->setAutoSize(true);
+                $sheet->getColumnDimension('L')->setAutoSize(true);
+                $sheet->getColumnDimension('M')->setAutoSize(true);
+                $sheet->getColumnDimension('N')->setAutoSize(true);
+
+                $sheet->setCellValue('A1', __('Qtd Total'));
+                $sheet->setCellValue('A2', __('Qtd Ativas'));
+                $sheet->setCellValue('A3', __('Qtd inativas'));
+
+                $sheet->setCellValue('A5', __('Colaborador'));
+                $sheet->setCellValue('B5', __('Tipo de Colaborador'));
+                $sheet->setCellValue('C5', __('Cidade'));
+                $sheet->setCellValue('D5', __('Situação'));
+                $sheet->setCellValue('E5', __('CNPJ'));
+                $sheet->setCellValue('F5', __('Razão Social'));
+                $sheet->setCellValue('G5', __('Nome Fantasia'));
+                $sheet->setCellValue('H5', __('Data de adesão'));
+                $sheet->setCellValue('I5', __('Data de finalização'));
+                $sheet->setCellValue('J5', __('Taxa de adesão'));
+                $sheet->setCellValue('K5', __('Nome Resp'));
+                $sheet->setCellValue('L5', __('Telefone Resp'));
+                $sheet->setCellValue('M5', __('E-mail Resp'));
+                $sheet->setCellValue('N5', __('Função Resp'));
+
+                $qtyTotal = count($this->accountManagerList); 
+                $qttyActive = count($this->accountManagerList->where('active', 1));
+                $qttyDesactive = count($this->accountManagerList->where('active', 0));
+
+                $sheet->setCellValueByColumnAndRow(2, 1, $qtyTotal);
+                $sheet->setCellValueByColumnAndRow(2, 2, $qttyActive);
+                $sheet->setCellValueByColumnAndRow(2, 3, $qttyDesactive);
+
+                $line = 6;
+
+                foreach ($this->accountManagerList as $key => $accountManager) {
+
+                    /*$type = ($provider->type == 1) ? 'Matriz' : 'Filial';
+                    $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
+                    $created_at = date('d/m/Y', strtotime($provider->created_at));
+                    $updated_at = date('d/m/Y', strtotime($provider->updated_at));
+                    $accession_date = date('d/m/Y', strtotime($provider->contracts[0]->accession_date));
+                    $end_date = date('d/m/Y', strtotime($provider->contracts[0]->end_date));
+                    $rate = number_format($provider->contracts[0]->rate, 2, ',', '.');
+                    $additional = ($provider->addresses->additional != 'null') ? $provider->addresses->additional : '';
+                    $phone2 = ($provider->contacts->phone2 != 'null') ? $provider->contacts->phone2 : '';
+                    $site = ($provider->contacts->site != 'null') ? $provider->contacts->site : '';
+                    $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
+                    $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
+                    $facebook = ($provider->contacts->facebook != 'null') ? $provider->contacts->facebook : '';
+                    $instagram = ($provider->contacts->instagram != 'null') ? $provider->contacts->instagram : '';*/
+
+                    $active = ($accountManager->contributor->actibe == 1) ? 'Ativo' : 'Desativado';
+
+
+                    $sheet->setCellValueByColumnAndRow(1, $line, $accountManager->contributor->name);
+                    $sheet->setCellValueByColumnAndRow(2, $line, $accountManager->contributor->function);
+                    $sheet->setCellValueByColumnAndRow(3, $line, $accountManager->contributor->addresses->city);
+                    $sheet->setCellValueByColumnAndRow(4, $line, $active);
+                    $sheet->setCellValueByColumnAndRow(5, $line, "{$accountManager->provider->cnpj}");/*
+                    $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
+                    $sheet->setCellValueByColumnAndRow(7, $line, ' ');
+                    $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
+                    $sheet->setCellValueByColumnAndRow(9, $line, $end_date);
+                    $sheet->setCellValueByColumnAndRow(10, $line, $rate);
+                    $sheet->setCellValueByColumnAndRow(11, $line, $provider->contracts[0]->contributors->name);
+                    $sheet->setCellValueByColumnAndRow(12, $line, $provider->addresses->zipcode);
+                    $sheet->setCellValueByColumnAndRow(13, $line, $provider->addresses->street);
+                    $sheet->setCellValueByColumnAndRow(14, $line, $additional);*/
+
+                    $line++;
+                }
+
+                $writer = new Xlsx($spreadsheet);
+                $filename = "vendas-" . time() . ".xlsx";
+                Storage::disk('local')->makeDirectory('reports');
+                $writer->save(storage_path('app/reports/'.$filename));
+
+                return Storage::download($this->publicStorege.$filename);
+            }
+
+            return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum venda encontrada."]);
+
+        } catch(\Exception $error) {
+            //echo $error->getTraceAsString();
+            //return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
+        }
+    }
+
+
     public function clientRank(Request $request){
         $return = \App\Models\Client::with(['account_managers'])
             ->get()->map(function($item) {
@@ -240,5 +390,83 @@ class ReportController extends Controller {
             }
         });
     return response()->json(array_filter($return->toArray()));
+    }
+
+    public function reportClientRank(Request $request){
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $sheet->setTitle(__('Ranking de Clientes'));
+
+        $sheet->getStyle('A1:C1')->getBorders()->getAllBorders()->setBorderStyle(true);
+        $sheet->getStyle('A1:C1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:C1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        
+        $sheet->setCellValue('A1', __('Nome'));
+        $sheet->setCellValue('B1', __('Tipo'));
+        $sheet->setCellValue('C1', __('Movimento'));
+
+        $line = 2;
+
+        for ($i = 0; $i < 10; $i++) {
+
+            $sheet->setCellValueByColumnAndRow(1, $line, 'Teste');
+            $sheet->setCellValueByColumnAndRow(2, $line, '');
+            $sheet->setCellValueByColumnAndRow(3, $line, '');
+            
+            $line++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "ranking-cliente-" . time() . ".xlsx";
+        Storage::disk('local')->makeDirectory('reports');
+        $writer->save(storage_path('app/reports/'.$filename));
+
+        return Storage::download($this->publicStorege.$filename);
+    }
+
+    public function reportProviderRank(Request $request){
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $sheet->setTitle(__('Ranking de Fornecedores'));
+
+        $sheet->getStyle('A1:C1')->getBorders()->getAllBorders()->setBorderStyle(true);
+        $sheet->getStyle('A1:C1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:C1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        
+        $sheet->setCellValue('A1', __('Fornecedor'));
+        $sheet->setCellValue('B1', __('Tipo'));
+        $sheet->setCellValue('C1', __('Movimento'));
+
+        $line = 2;
+
+        for ($i = 0; $i < 10; $i++) {
+
+            $sheet->setCellValueByColumnAndRow(1, $line, 'Teste');
+            $sheet->setCellValueByColumnAndRow(2, $line, '');
+            $sheet->setCellValueByColumnAndRow(3, $line, '');
+            
+            $line++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "ranking-fornecedor-" . time() . ".xlsx";
+        Storage::disk('local')->makeDirectory('reports');
+        $writer->save(storage_path('app/reports/'.$filename));
+
+        return Storage::download($this->publicStorege.$filename);
     }
 }

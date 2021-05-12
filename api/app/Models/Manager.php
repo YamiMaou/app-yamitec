@@ -60,4 +60,8 @@ class Manager extends Model
     public function contributor() {
         return $this->hasOne(\App\Models\Contributor::class,'cpf', 'cpf');
     }
+    
+    public function accountManager(){
+        return $this->belongsTo(Manager::class,'cpf','cpf_cnpj');
+    }
 }
