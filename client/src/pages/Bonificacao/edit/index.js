@@ -201,7 +201,7 @@ class EditBonus extends Component {
                 <AppBar position="static" style={{ padding: 10, marginTop: 10, marginBottom: 10 }}>
                     <Toolbar>
                         <Typography variant="h6"  style={{flexGrow: 1}}>
-                            <HomeIcon />  <span>Editar / Colaboradores</span>
+                            <HomeIcon />  <span>Editar / Bonificação</span>
                         </Typography>
                         { /*<Button variant="contained" size="small" color="primary"
                             style={{

@@ -451,7 +451,7 @@ class CreateProviders extends Component {
                         values: this.state.providertypes,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
                         validate: {required: true },
                         value: "Selecione",
-                        flexBasis:'13%'
+                        flexBasis:'20%'
                     },
                     {
                         column: 'matriz_id', 
@@ -459,8 +459,8 @@ class CreateProviders extends Component {
                         type: 'custom',
                         json: true, 
                         valueLabel: "company_name",
-                        values: this.state.providers,
-                        flexBasis:'30%',
+                        values: this.state.fields['providertype_id'] == undefined ? [] : this.state.providers.filter(x => x.providertype_id == this.state.fields['providertype_id']),
+                        flexBasis:'35%',
                         component: TypeEmpresaInput,
                         handler: async (id) => {
                             let matrizData = await getApiProviders({},id);

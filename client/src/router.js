@@ -38,8 +38,12 @@ import AccountManager from './pages/AccountManager';
 import CreateAccountManager from './pages/AccountManager/create';
 import EditAccountManager from './pages/AccountManager/edit';
 
+import Functions from "./pages/Functions";
+import CreateFunction from './pages/Functions/create';
+import EditFunction from './pages/Functions/edit';
 
 import Profiles from './pages/Profiles';
+import Reports from './pages/Reports';
 
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
@@ -59,6 +63,7 @@ import { setSnackbar, setTimer } from './actions/appActions';
 // Theme
 import * as locales from '@material-ui/core/locale';
 import Audits from "./pages/Audits";
+
 const YamiTheme = createMuiTheme(themeStyle, locales['ptbr'])
 //background: 'linear-gradient(45deg, #025ea2 30%, #0086e8 90%)',
 
@@ -143,9 +148,14 @@ const AppRouter = (props) => {
               <Route path="/contas" exact={true} render={() => (isAuth ? <AccountManager /> : <Redirect push to="/login" />)} />
               <Route path="/contas/novo" exact={true} render={() => (isAuth ? <CreateAccountManager /> : <Redirect push to="/login" />)} />
               <Route path="/contas/:id" exact={true} render={() => (isAuth ? <EditAccountManager /> : <Redirect push to="/login" />)} />
+              
+              <Route path="/funcoes" exact={true} render={() => (isAuth ? <Functions /> : <Redirect push to="/login" />)} />
+              <Route path="/funcoes/novo" exact={true} render={() => (isAuth ? <CreateFunction /> : <Redirect push to="/login" />)} />
+              <Route path="/funcoes/:id" exact={true} render={() => (isAuth ? <EditFunction /> : <Redirect push to="/login" />)} />
 
               <Route path="/perfis" exact={true} render={() => (isAuth ? <Profiles /> : <Redirect push to="/login" />)} />
               <Route path="/auditoria" exact={true} render={() => (isAuth ? <Audits /> : <Redirect push to="/login" />)} />
+              <Route path="/relatorios" exact={true} render={() => (isAuth ? <Reports /> : <Redirect push to="/login" />)} />
               
               <Route path="*">
                 <Box>

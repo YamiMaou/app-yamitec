@@ -8,19 +8,25 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
+import { Bar } from 'react-chartjs-2';
 //
 
 import { setSnackbar, setTimer} from '../../actions/appActions'
+import { getApiRanking } from '../../providers/api';
 class Home extends Component {
     state = {
         item: undefined,
+        ranking: [0, 0, 0, 0, 0, 0]
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if(JSON.parse(localStorage.getItem("user")) == null){
             window.location.href = '/login';
             return;
         }
+        const ranking = await getApiRanking();
+        if(ranking !== undefined)
+            this.setState({...this.state,  ranking: [ranking.client, ranking.provider, ranking.manager, ranking.contributor, ranking.other]});
     }
 
     dialogHandler(item) {
@@ -34,12 +40,42 @@ class Home extends Component {
             window.location.href = '/login';
             return <div> Sessão Encerrada.</div>;
         }
-        const styles = {
-            backgroundColor: "#fff",
-            borderRadius: 3,
-            padding: 10,
-            paddingTop: 0
-        }
+        const data = {
+            labels: ['Clientes', 'Farmácia', 'Responsáveis', 'Colaboradores','Outros'],
+            datasets: [
+              {
+                label: '# Ranking',
+                data: this.state.ranking,//[12, 50, 3, 5, 2, 3],
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          };
+          
+          const options = {
+            scales: {
+              yAxes: [
+                {
+                  ticks: {
+                    beginAtZero: true,
+                  },
+                },
+              ],
+            },
+          };
         const classes = {
             root: {
                 maxWidth: 345,
@@ -60,9 +96,13 @@ class Home extends Component {
                     <Typography gutterBottom variant="h5" component="h2">
                         Bem Vindo <b>{authData.name}</b>
                     </Typography>
+                    
                     <Typography variant="body2" color="textSecondary" component="p">
-                        Você foi Autenticado com sucesso.
+                        Resumo de Lançamentos Ger. de contas:
                     </Typography>
+                    <div>
+                    <Bar width={window.innerWidth > 720 ? 100 : 50} height={window.innerWidth > 720 ? 35 : 35} data={data} options={options} />
+                    </div>
                     </CardContent>
                     <CardActionArea>
                     </CardActionArea>

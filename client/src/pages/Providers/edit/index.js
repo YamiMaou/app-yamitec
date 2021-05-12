@@ -519,8 +519,8 @@ class EditProviders extends Component {
                         valueLabel: "fantasy_name",
                         value: this.state.data['type'],
                         value1: this.state.data['matriz_id'],
-                        values: this.state.providers,//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
-                        flexBasis: '66%',
+                        values: this.state.fields['providertype_id'] == undefined ? [] : this.state.providers.filter(x => x.providertype_id == this.state.fields['providertype_id']),//[{id: 1, value: "Farmácia"},{id: 2, value: "Loja"}],
+                        flexBasis: '35%',
                         component: TypeEmpresaInput,
                         handler: async (id) => {
                             let matrizData = await getApiProviders({}, id);

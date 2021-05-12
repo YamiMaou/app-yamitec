@@ -109,7 +109,7 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
         //dd($model->get());
         //return response()->json($model);
         echo " ";
-        return \App\Library\ExportClass::getCsv(['ID','Data','Nome','Usuario', 'Justificativa','DE/PARA'], $model);
+        return \App\Library\ExportClass::getCsv(['ID','Data','Nome','Usuario', 'Justificativa','De', 'Para'], $model);
     }catch(\Exception $ex){
         echo $ex->getMessage();
     }
@@ -163,7 +163,97 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
     // PERMISSIONS
     Route::resource('/permissions', 'Api\PermissionsController')->middleware(['auth:api', 'scope:view-posts']);
 
+    // PERFIS
+    Route::resource('/function', 'Api\ProfilesController')->middleware(['auth:api', 'scope:view-posts']);
+    
+    // Rank
+    Route::get('ranking', function(Request $request){
+        $return = \App\Models\AccountManager::with(['client', 'manager', 'provider', 'contributor'])
+        ->get()->map(function($item) {
+            $type = "other";
+            if($item->client != null)
+                $type = "client";
+            if($item->manager != null)
+                $type = "manager";
+            if($item->contributor != null)
+                $type = "contributor";
+            if($item->provider != null)
+                $type = "provider";
+            return [
+                'id' => $item->id,
+                'amount' => $item->bill_type == 2 ? -$item->amount : $item->amount,
+                'type' => $type,
+                'bill_type' => $item->bill_type,
+            ];
+        });
+        
+        $client = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] =="cliente";
+        }, ARRAY_FILTER_USE_BOTH);
+        $provider = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "provider";
+        }, ARRAY_FILTER_USE_BOTH);
+        $manager = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "manager";
+        }, ARRAY_FILTER_USE_BOTH);
+        $contributor = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "contributor";
+        }, ARRAY_FILTER_USE_BOTH);
+        $others = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "other";
+        }, ARRAY_FILTER_USE_BOTH);
+        return response()->json([
+            'client' => array_sum(array_column($client, 'amount')),
+            'provider' => array_sum(array_column($provider, 'amount')),
+            'manager' => array_sum(array_column($manager, 'amount')),
+            'contributor' => array_sum(array_column($contributor, 'amount')),
+            'other' => array_sum(array_column($others, 'amount')),
+        ]);
+    });
 });
+<<<<<<< HEAD
 
 Route::post('report-teste', 'Api\ReportController@reportProviders');
 Route::get('report-form', 'Api\ReportController@index');
+=======
+// REPORT RANKING
+Route::get('/report-ranking', function(Request $request) {
+$return = \App\Models\AccountManager::with(['client', 'manager', 'provider', 'contributor'])
+        ->get()->map(function($item) {
+            $type = "other";
+            if($item->client != null)
+                $type = "client";
+            if($item->manager != null)
+                $type = "manager";
+            if($item->contributor != null)
+                $type = "contributor";
+            if($item->provider != null)
+                $type = "provider";
+            return [
+                'id' => $item->id,
+                'amount' => $item->bill_type == 2 ? -$item->amount : $item->amount,
+                'type' => $type,
+                'bill_type' => $item->bill_type,
+            ];
+        });
+        
+        $client = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] =="cliente";
+        }, ARRAY_FILTER_USE_BOTH);
+        $provider = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "provider";
+        }, ARRAY_FILTER_USE_BOTH);
+        $manager = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "manager";
+        }, ARRAY_FILTER_USE_BOTH);
+        $contributor = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "contributor";
+        }, ARRAY_FILTER_USE_BOTH);
+        $others = array_filter($return->toArray(), function($v, $k) {
+            return $v['type'] == "other";
+        }, ARRAY_FILTER_USE_BOTH);
+        return response()->json($return);
+});
+// REPORT TESTE
+Route::get('report-teste', 'Api\ReportController@reportProviders');
+>>>>>>> 0fc14f4857270f9de2cfa6cc55f3cbd21f86f45f

@@ -199,6 +199,7 @@ class ReportController extends Controller {
             return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum fornecedor encontrado."]);
 
         } catch(\Exception $error) {
+            //echo $error->getTraceAsString();
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
         }
     }

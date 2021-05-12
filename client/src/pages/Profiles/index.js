@@ -30,6 +30,7 @@ import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
+import { DEFAULT_LOCALE_TEXT } from '../../providers/langs/datagrid';
 
 // MODULE ID
 const module_id = 7
@@ -161,7 +162,6 @@ class Profiles extends Component {
     }
 
     render() {
-
         const rows: RowsProp = this.state.permissions.length > 0 ? this.state.permissions : [];
         const columns: ColDef[] = [
             { field: 'modelName', headerName: 'Módulo', flex: 0.7 },
@@ -319,10 +319,11 @@ class Profiles extends Component {
                                 }
                             }}
                             rows={rows} columns={columns}
+                            localeText={{...DEFAULT_LOCALE_TEXT, filterPanelInputLabel:'Valor s'}}
                             spacing={0}
                             stickyHeader
                             disableClickEventBubbling
-                            disableColumnMenu={true}
+                            //disableColumnMenu={true}
 
                         /></div>
             </Fragment>
