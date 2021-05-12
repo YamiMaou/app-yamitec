@@ -25,10 +25,18 @@ class AccountManager extends Model
     }
 
     public function client(){
-        return $this->hasOne(Client::class,'cpf','cpf')->latest();
+        return $this->hasOne(Client::class,'cpf','cpf_cnpj');
     }
 
     public function provider(){
-        return $this->hasOne(Provider::class,'cnpj','cnpj')->latest();
+        return $this->hasOne(Provider::class,'cnpj','cpf_cnpj');
+    }
+
+    public function manager(){
+        return $this->hasOne(Manager::class,'cpf','cpf_cnpj');
+    }
+
+    public function contributor(){
+        return $this->hasOne(Contributor::class,'cpf','cpf_cnpj');
     }
 }

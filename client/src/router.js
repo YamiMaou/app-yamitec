@@ -43,6 +43,7 @@ import CreateFunction from './pages/Functions/create';
 import EditFunction from './pages/Functions/edit';
 
 import Profiles from './pages/Profiles';
+import Reports from './pages/Reports';
 
 import LauncherDialog from './components/Loading/LauncherLoading'
 import Header from './components/Layout/Header'
@@ -154,6 +155,7 @@ const AppRouter = (props) => {
 
               <Route path="/perfis" exact={true} render={() => (isAuth ? <Profiles /> : <Redirect push to="/login" />)} />
               <Route path="/auditoria" exact={true} render={() => (isAuth ? <Audits /> : <Redirect push to="/login" />)} />
+              <Route path="/relatorios" exact={true} render={() => (isAuth ? <Reports /> : <Redirect push to="/login" />)} />
               
               <Route path="*">
                 <Box>

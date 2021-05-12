@@ -98,6 +98,29 @@ export const postAuth = async (params = {}) => {
     return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }
   }
 };
+
+/// list function
+export const getApiRanking = async (params = '',id = undefined) => {
+  localStorage.setItem("sessionTime", 900)
+  const data = Object.entries(params)
+    .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+    .join('&');
+  return fetch(`${apiHost}/ranking/${id ?? ''}?${data}`, {
+    method: 'GET',
+    data,
+    mode: 'cors', // pode ser cors ou basic(default)
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }),
+  }).then((response) => {
+    return response.json();
+  }).catch((error) => {
+    console.log('Whoops! Houve um erro.', error.message || error)
+    return { data: { success: false, message: "problema ao se conectar com o servidor!" } }
+  });
+}
+
 /// report contributors
 export const getApiContributorsReport = async (params = '',id = undefined) => {
   localStorage.setItem("sessionTime", 900)
