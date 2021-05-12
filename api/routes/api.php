@@ -211,11 +211,6 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
         ]);
     });
 });
-<<<<<<< HEAD
-
-Route::post('report-teste', 'Api\ReportController@reportProviders');
-Route::get('report-form', 'Api\ReportController@index');
-=======
 // REPORT RANKING
 Route::get('/report-ranking', function(Request $request) {
 $return = \App\Models\AccountManager::with(['client', 'manager', 'provider', 'contributor'])
@@ -256,4 +251,3 @@ $return = \App\Models\AccountManager::with(['client', 'manager', 'provider', 'co
 });
 // REPORT TESTE
 Route::get('report-teste', 'Api\ReportController@reportProviders');
->>>>>>> 0fc14f4857270f9de2cfa6cc55f3cbd21f86f45f
