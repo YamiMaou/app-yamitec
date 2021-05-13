@@ -75,24 +75,18 @@ class Reports extends Component {
                 </AppBar>
                     <div>
                     <Button variant="outlined" size="large" color="primary" onClick={async () => {
-                        await getApiReportFileS('provider-report','xlsx',params)
+                        await getApiReportFileS('ranking-provider-teste','xlsx',params)
+                    }}> Ranking Fornecedor </Button>
+
+                    <Button variant="outlined" size="large" color="primary" onClick={async () => {
+                        await getApiReportFileS('ranking-client-teste','xlsx',params)
+                    }}> Ranking Cliente </Button>
+
+                    <Button variant="outlined" size="large" color="primary" onClick={async () => {
+                        await getApiReportFileS('report-form','xlsx',params)
                     }}> Fornecedor </Button>
                     </div>
-                    <LDataGrid hideList={true} rows={rows} columns={columns} filterInputs={filter} 
-                    pageRequest={
-                        (params) => {
-                            let type = {
-                                "Fornecedor" : "provider-report",
-                                "Vendas" : "sales-report",
-                                "Ranking Cliente" : "ranking-client",
-                                "Ranking Fornecedor" : "ranking-provider",
-                            }
-                            if(params.type == undefined || params.type == ""){
-                                this.props.setSnackbar({open: true, message: "Tipo de relatório Obrigatório"})
-                            }else{
-                                return getApiReportFileS(type[params.type],'xlsx',params)
-                            }
-                    }} />
+                    
             </Fragment>
         )
     }

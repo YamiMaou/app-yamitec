@@ -69,7 +69,7 @@ const AutocompleteMatriz = (props) => {
           }
       }
         props.onChange(vl)
-        //console.log(newValue);
+        console.log(vl);
         setValue(newValue);
       }
     return <Autocomplete
@@ -392,7 +392,7 @@ class CreateProviders extends Component {
 
         }
         const validateFields = (fields, values) => {
-            //console.log(fields);
+            console.log(values);
             let campo = undefined;
             fields.reverse().map((v,k) => {
                 v.fields.reverse().map((v1,k1)=>{
