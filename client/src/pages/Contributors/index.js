@@ -22,7 +22,7 @@ import LDataGrid from '../../components/List/datagrid';
 import LCardGrid from '../../components/List/cardgrid';
 //
 import { setSnackbar } from '../../actions/appActions'
-import { getApiContributorsReport, getApiContributors, putApiContributors } from '../../providers/api'
+import { getApiContributorsReport, getApiContributors, putApiContributors, getApiFunction } from '../../providers/api'
 
 import { InputCpf, stringCpf } from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar, Tooltip, ListItemText } from '@material-ui/core';
@@ -95,6 +95,7 @@ class Contributors extends Component {
     state = {
         session: JSON.parse(localStorage.getItem("user")),
         contributors: [],
+        functions: [],
         pageRequest: {},
         blockDialog: { open: false, id: undefined, active: 0, handle: undefined },
 
@@ -106,6 +107,8 @@ class Contributors extends Component {
             window.location.href = '/login';
             return;
         }
+        const functions = await getApiFunction({pageSize: 9999});
+        this.setState({...this.state, functions: functions.data});
 
         //let report = await getApiContributorsReport();
     }
@@ -216,14 +219,17 @@ class Contributors extends Component {
             { column: 'name', label: 'Nome', type: 'text', flexBasis },
             {
                 column: 'function', label: 'Função', type: 'select',
-                values: [
+                json: true,
+                valueLabel: 'name',
+                values: this.state.functions ?? [],
+                /*values: [
                     "Administração",
                     "Coordenador de usuários",
                     "Coordenador de parceiros",
                     "Gerente",
                     "Operador de marketing",
                     "Vendedor"
-                ],
+                ],*/
                 value: "Todos",
                 flexBasis
             },

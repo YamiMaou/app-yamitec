@@ -92,7 +92,7 @@ class Reports extends Component {
                     pageRequest={
                         (params) => {
                             let type = {
-                                'Fornecedor': 'reports/provider',
+                                'Fornecedor': 'reports/providers',
                                 'Vendas': 'reports/sales'
                             }
                             return getApiReportFileS(type[params.type_rel],'xlsx',params)

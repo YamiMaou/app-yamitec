@@ -220,7 +220,7 @@ class ReportController extends Controller {
                     $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
                     $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
                     $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
-                    $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom()->user->email);
+                    $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom() != null ? $provider->burnFrom()->user->email : "");
 
                     $line++;
                 }

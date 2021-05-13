@@ -287,7 +287,7 @@ class LDataGrid extends Component {
             
             if (value.length == 0) {
                 filters[e.target.id ?? e.target.name] = "";
-                //delete filters[e.target.id ?? e.target.name];
+                delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {
                     //value = `${value.toJSON().split('T')[0]}`
@@ -306,7 +306,8 @@ class LDataGrid extends Component {
         const onClearFilter = () => {
             let filters = {};
             this.props.filterInputs.map(input => {
-                filters[input.column] = undefined;
+                filters[input.column] = "";
+                delete filters[input.column];
             });
 
             this.setState({ ...this.state, filters });
@@ -335,7 +336,7 @@ class LDataGrid extends Component {
                                     this.props.filterInputs.map(input => {
                                         if (input.type == "text") {
                                             if (input.mask === undefined)
-                                                return <TextField value={this.state.filters[input.column]} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                                return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                             else
                                                 return (
                                                     <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >

@@ -289,6 +289,7 @@ class LCardGrid extends Component {
             let filters = {};
             this.props.filterInputs.map(input => {
                 filters[input.column] = input.value ?? "";
+                delete filters[input.column];
             });
 
             this.setState({ ...this.state, filters });

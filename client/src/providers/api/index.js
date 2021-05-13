@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   apiHost = hostname;
 }
-apiHost = hostname;
+//apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({
@@ -921,7 +921,7 @@ export const getApiReportFileS = async (rel, ext,params = '') => {
   axios({
     method: 'get',
     url: `${apiHost}/${rel}/?${data}`,
-    responseType: 'arraybuffer',
+    //responseType: 'arraybuffer',
     //data: dates
   }).then(function(response) {
     const url = window.URL.createObjectURL(new Blob([response.data]));

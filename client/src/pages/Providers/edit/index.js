@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import HomeIcon from '@material-ui/icons/Home';
 import Typography from '@material-ui/core/Typography';
 import Snackbar from '@material-ui/core/Snackbar';
-import LForms from '../../../components/Forms';
+import LProviderForms from '../../../components/Forms/provider';
 //
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -50,10 +50,11 @@ const module_id = 4
 const AutocompleteMatriz = (props) => {
 
     const [value, setValue] = React.useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
-    const [inputValue, setInputValue] = React.useState('');
+    const [inputValue, setInputValue] = React.useState(props.value ? props.values.find((item) => item.id == props.value).name : undefined);
     const [defaultVal, setDefault] = useState(props.value ? props.values.find((item) => item.id == props.value) : undefined);
+    console.log(value);
     useEffect(() => {
-        if (props.value !== defaultVal) {
+        //if (props.value !== defaultVal) {
             console.log(props.value)
             const vl = props.value ? props.values.find((item) => item.id == props.value) : undefined;
             if (vl !== undefined) {
@@ -62,7 +63,7 @@ const AutocompleteMatriz = (props) => {
                 setInputValue(vl !== undefined ? vl[props.valueLabel] : "");
                 setDefault(vl)
             }
-        }
+        //}
     })
 
     function handleChange(e, newValue) {
@@ -525,7 +526,7 @@ class EditProviders extends Component {
                         component: TypeEmpresaInput,
                         handler: async (id) => {
                             let matrizData = await getApiProviders({}, id);
-                            let fields = this.state.fields;
+                            let clone = this.state.clone;
                             Object.entries(matrizData.addresses)
                                 .map(([key, val]) => {
                                     if(key != 'addr_clone')
@@ -541,13 +542,13 @@ class EditProviders extends Component {
                                     if(key != 'contracts_clone')
                                         fields[key] = val
                                 });
-                            fields.addr_clone = this.state.fields['addr_clone']
-                            fields.contact_clone = this.state.fields['contact_clone']
-                            fields.contract_clone = this.state.fields['contract_clone']
-                            fields.type = this.state.data.type;
+                            clone.addr_clone = this.state.fields['addr_clone']
+                            clone.contact_clone = this.state.fields['contact_clone']
+                            clone.contract_clone = this.state.fields['contract_clone']
+                            clone.type = this.state.data.type;
 
-                            this.setState({ ...this.state, fields });
-                            console.log(this.state.fields['addr_clone']);
+                            this.setState({ ...this.state, clone });
+                            console.log(this.state.clone['addr_clone']);
                             //console.log(fields);
                         }
                     },
@@ -610,7 +611,9 @@ class EditProviders extends Component {
                         type: 'custom',
                         component: AutocompleteMatriz,
                         validate: { required: true },
-                        value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['contributors_id'] != ("" || null || undefined)) ? this.state.fields['contributors_id'] : this.state.fields['contributors_id'],
+                        value: this.state.clone == undefined ? this.state.data.contracts.contributors_id : this.state.clone.contributors_id,
+                        //value: this.state.data['contracts'].contributors_id,
+                        //value: this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['contributors_id'] != (undefined || null || "") ? this.state.fields['contributors_id'] : this.state.data['contributors_id'],
                         //value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1 && this.state.fields['contributors_id'] != ("" || null || undefined)) ? this.state.fields['contributors_id'] : this.state.data['contracts'].contributors_id,
                         json: true,
                         valueLabel: 'name',
@@ -760,7 +763,7 @@ class EditProviders extends Component {
                     </Typography>
                 </AppBar>
                 {
-                    <LForms
+                    <LProviderForms
                         forms={forms}
                         onChange={(e) => { this.onChange(e) }}
                         request={(data) => { request(this.state.data, data) }}
@@ -990,7 +993,7 @@ class EditProviders extends Component {
                                 </Card>
                             </div>)
                         }
-                    </LForms>
+                    </LProviderForms>
                 }
                 { this.state.data.audits &&
                     <Paper style={{ marginTop: 10, marginBottom: 10, padding: 15, height: window.innerWidth < 720 ? 210 : 90 }}>
