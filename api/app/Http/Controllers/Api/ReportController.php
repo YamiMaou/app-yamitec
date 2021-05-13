@@ -33,17 +33,41 @@ class ReportController extends Controller {
 
     public function reportProviders(Request $request) 
     {
-        $this->providersList = $this->provider;
-        if ($request->filled('from')) {
-            if (!$request->filled('to')) {
-                $request->merge([
-                    'to' => $request->from
-                ]);
+        //$this->providersList = $this->provider;
+
+        if (empty($request->all())) {
+            $this->providersList = $this->provider->all();
+        }
+
+        $this->provider = $this->provider->newQuery();
+
+        if ($request->has('from')) {
+            if ($request->has('to')) {
+                $this->provider->where('created_at', '>=', $request->input('from').' 00:00:00')->where('created_at', '<=', $request->input('to').' 23:59:59');
+            } else {
+                $this->provider->where('created_at', '>=', $request->input('from').' 00:00:00')->where('created_at', '<=', $request->input('from').' 23:59:59');;
             }
 
-            $this->providersList = $this->providersList->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
+            if ($request->has('cnpj')) {
+                $this->provider->where('cnpj', $request->input('cnpj'));
+            }
+
+            if ($request->has('company_name')) {
+                $this->provider->where('company_name', $request->input('company_name'));
+            }
+
+            $this->providersList = $this->provider->get();
+        } else {
+            if ($request->has('cnpj')) {
+                $this->provider->where('cnpj', $request->input('cnpj'));
+            }
+    
+            if ($request->has('company_name')) {
+                $this->provider->where('company_name', $request->input('company_name'));
+            }
+
+            $this->providersList = $this->provider->get();
         }
-        $this->providersList = $this->providersList->get();
 
         try 
         {
