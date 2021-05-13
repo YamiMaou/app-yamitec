@@ -280,12 +280,14 @@ class LDataGrid extends Component {
         let filters = this.state.filters;
         const onChangeInputs = (e) => {
             let value = e.target.value;
+            
             if (idNumbers.includes(e.target.id)) {
                 value = value.replace(/[^\d]+/g, '');
             }
+            
             if (value.length == 0) {
                 filters[e.target.id ?? e.target.name] = "";
-                delete filters[e.target.id ?? e.target.name];
+                //delete filters[e.target.id ?? e.target.name];
             } else {
                 if (e.target.id == 'created_at') {
                     //value = `${value.toJSON().split('T')[0]}`
@@ -296,9 +298,9 @@ class LDataGrid extends Component {
                 if (idNumbers.includes(e.target.id)) {
                     value = value.replace(/[^\d]+/g, '');
                 }
-                filters[e.target.id ?? e.target.name] = value
-                this.setState({ ...this.state, filters });
+                filters[e.target.id ?? e.target.name] = value;
             }
+            this.setState({ ...this.state, filters });
         }
 
         const onClearFilter = () => {
@@ -333,7 +335,7 @@ class LDataGrid extends Component {
                                     this.props.filterInputs.map(input => {
                                         if (input.type == "text") {
                                             if (input.mask === undefined)
-                                                return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                                return <TextField value={this.state.filters[input.column]} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                             else
                                                 return (
                                                     <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >

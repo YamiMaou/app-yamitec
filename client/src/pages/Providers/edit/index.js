@@ -501,6 +501,7 @@ class EditProviders extends Component {
                         justification: this.state.data['audits'] ? this.state.data['audits'].justification == null ? " " : this.state.data['audits'].justification : '',
                         flexBasis: "100%"
                     },
+                    { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: { min: 11, number: true, required: true }, validateHandler: validaCnpj, flexBasis: '22%', helperText: "o valor digitado é inválido" },
                     {
                         column: 'providertype_id', label: 'Tipo Fornecedor', type: 'select',
                         json: true,
@@ -550,7 +551,6 @@ class EditProviders extends Component {
                             //console.log(fields);
                         }
                     },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', value: this.state.data['cnpj'], mask: InputCnpj, validate: { min: 11, number: true, required: true }, validateHandler: validaCnpj, flexBasis: '22%', helperText: "o valor digitado é inválido" },
                     { column: 'company_name', label: 'Razão Social', type: 'text', value: this.state.data['company_name'], validate: { max: 50, required: true }, flexBasis: '25%' },
                     { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', value: this.state.data['fantasy_name'], validate: { max: 50, required: true }, flexBasis: '25%' },
                     { column: 'file_anexo', label: 'Documento', type: 'file', file: this.state.data['file_anexo'] ? this.state.data['file_anexo'].name : '', flexBasis },

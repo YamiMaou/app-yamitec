@@ -280,8 +280,9 @@ class LCardGrid extends Component {
                     value = value.replace(/[^\d]+/g, '');
                 }
                 filters[e.target.id ?? e.target.name] = value
-                this.setState({ ...this.state, filters });
+                
             }
+            this.setState({ ...this.state, filters });
         }
 
         const onClearFilter = () => {

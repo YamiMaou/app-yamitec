@@ -101,6 +101,7 @@ public function index(Request $request)
     
     public function store(Request $request)
     {
+        //return response()->json(["success" => false, "data" => $request->all()]);
         try {
             $provider = DB::table('providers')->where('cnpj', $request->cnpj)->first();
             if ($provider):
@@ -161,6 +162,7 @@ public function index(Request $request)
                 $address = Address::create($address_data);
                 if(!$address){
                     $provider->delete();
+                    return response()->json(["success"=> false, "type" => "store", "message" => "Erro ao cadastrar!"]);
                 }
             //endif;
 
@@ -180,6 +182,7 @@ public function index(Request $request)
                 if(!$contact){
                     $address->delete();
                     $provider->delete();
+                    return response()->json(["success"=> false, "type" => "store", "message" => "Erro ao cadastrar!"]);
                 }
             //endif;
 
@@ -187,9 +190,9 @@ public function index(Request $request)
             //if ($request->contract_clone == null):
                 $contract_data = [
                     "rate" => str_replace(",",".",str_replace('.','',$request->rate)) ?? "0.00",
-                    "accession_date" => $request->accession_date ?? "",
-                    "contributors_id" => $request->contributor_id ?? "",
-                    "end_date" => $request->end_date ?? "",
+                    "accession_date" => $request->accession_date,
+                    "contributors_id" => $request->contributors_id ,
+                    "end_date" => $request->end_date,
                     "provider_id" => $provider->id,
                 ];
     
@@ -198,6 +201,7 @@ public function index(Request $request)
                     $address->delete();
                     $provider->delete();
                     $contact->delete();
+                    return response()->json(["success"=> false, "type" => "store", "message" => "Erro ao cadastrar!"]);
                 }
             //endif;
             parent::saveLog($provider->id, $request, 'provider');
@@ -205,7 +209,7 @@ public function index(Request $request)
             }
             return response()->json(["success"=> false, "type" => "store", "message" => "Erro ao cadastrar!"]);
         } catch(\Exception $error) {
-            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getTraceAsString()], 201);
+            return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao Cadastrar. ", "error" => $error->getMessage()], 201);
         }
 
     }

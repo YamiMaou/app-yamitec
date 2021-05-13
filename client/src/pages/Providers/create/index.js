@@ -444,6 +444,7 @@ class CreateProviders extends Component {
                 title: 'Dados Básicos',
                 fields: [
                     { column: 'active', label: 'Ativo', type: 'checkbox',  value: 1, disabled: true, flexBasis : "100%" },
+                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     {
                         column: 'providertype_id', label: 'Tipo Fornecedor', type: 'select',
                         json: true, 
@@ -482,7 +483,6 @@ class CreateProviders extends Component {
                             console.log(this.state.fields);
                         }
                     },
-                    { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj, validate: {min: 11, number: true, required: true},validateHandler: validaCnpj, flexBasis: '20%', helperText: "o valor digitado é inválido" },
                     { column: 'company_name', label: 'Razão Social', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
                     { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
                     { column: 'anexo', label: 'Documento', type: 'file', flexBasis },
@@ -549,7 +549,7 @@ class CreateProviders extends Component {
                     { column: 'accession_date', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['accession_date'] : "",label: 'Data de Adesão - Início', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
                     { column: 'end_date', value: (this.state.fields['type'] == 2 && this.state.fields['contract_clone'] == 1) ? this.state.fields['end_date'] : "", label: 'Data de Adesão - Fim', disabled: (this.state.fields['contract_clone'] == 1), type: 'date', validate: {required: true}, flexBasis: '20%' },
                     { 
-                        column: 'contributor_id', 
+                        column: 'contributors_id', 
                         label: 'Vendedor', 
                         type: 'custom',
                         component: AutocompleteMatriz,
