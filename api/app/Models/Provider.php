@@ -135,4 +135,11 @@ class Provider extends Model
         return $this->hasMany(AccountManager::class,'cpf_cnpj','cnpj');
     }
 
+    public function account_managers_detached(){
+        return $this->hasMany(AccountManager::class,'cpf_cnpj','cnpj')->where('detached',1);
+    }
+    public function account_managers_nodetached(){
+        return $this->hasMany(AccountManager::class,'cpf_cnpj','cnpj')->where('detached',0);
+    }
+
 }

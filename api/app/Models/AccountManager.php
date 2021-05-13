@@ -27,9 +27,16 @@ class AccountManager extends Model
     public function client(){
         return $this->hasOne(Client::class,'cpf','cpf_cnpj');
     }
+    public function clients(){
+        return $this->hasMany(Client::class,'cpf','cpf_cnpj');
+    }
 
     public function provider(){
         return $this->hasOne(Provider::class,'cnpj','cpf_cnpj');
+    }
+
+    public function providers(){
+        return $this->hasMany(Provider::class,'cnpj','cpf_cnpj');
     }
 
     public function manager(){
