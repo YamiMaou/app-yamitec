@@ -53,22 +53,24 @@ class Reports extends Component {
     render() {
         const flexBasis = '25%';
         const filter = [
-            { column: 'from', label: 'De', type: 'date', flexBasis },
-            { column: 'to', label: 'Até', type: 'date', flexBasis },
-            { column: 'from_launch', label: 'Lançado De', type: 'date', flexBasis },
-            { column: 'to_launch', label: 'Lançado Até', type: 'date', flexBasis },
+            { column: 'from', label: 'De', type: 'date', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
+            { column: 'to', label: 'Até', type: 'date', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
+            { column: 'from_launch', label: 'Lançado De', type: 'date', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
+            { column: 'to_launch', label: 'Lançado Até', type: 'text', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
+            { column: 'cnpj', label: 'CNPJ', type: 'date', flexBasis : window.innerWidth > 720 ? '33%' : '100%', grow: 1},
+            { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis : window.innerWidth > 720 ? '33%' : '100%', grow: 1 },
             { 
-                column: 'type', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
+                column: 'type_rel', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '9%' : '100%' , grow:0,
                 values: ['Fornecedor', 'Vendas']
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 
         const filter_ranking = [
-            { column: 'from', label: 'De', type: 'date', flexBasis },
-            { column: 'to', label: 'Até', type: 'date', flexBasis },
+            { column: 'from', label: 'De', type: 'date', flexBasis, grow: 0 },
+            { column: 'to', label: 'Até', type: 'date', flexBasis, grow: 0 },
             { 
-                column: 'type', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
+                column: 'type_rank', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
                 values: ['Cliente', 'Fornecedor']
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
@@ -89,7 +91,11 @@ class Reports extends Component {
                 <LDataGrid hideList={true} rows={[]} columns={[]} filterInputs={filter} 
                     pageRequest={
                         (params) => {
-                            return getApiReportFile(params)
+                            let type = {
+                                'Fornecedor': 'reports/provider',
+                                'Vendas': 'reports/sales'
+                            }
+                            return getApiReportFileS(type[params.type_rel],'xlsx',params)
                     }} />
 
                 <Typography variant="h6" style={{flexGrow: 1}}>
@@ -98,7 +104,13 @@ class Reports extends Component {
                 <LDataGrid hideList={true} rows={[]} columns={[]} filterInputs={filter_ranking} 
                     pageRequest={
                         (params) => {
-                            return getApiReportFile(params)
+                            let type = {
+                                'Cliente': 'reports/client-ranking',
+                                'Fornecedor': 'reports/provider-ranking'
+                            }
+                            ///console.log(type[params.type_rank]);
+                            ///console.log(params.type_rank);
+                            return getApiReportFileS(type[params.type_rank],'xlsx',params)
                     }} />
                     
             </Fragment>
