@@ -67,7 +67,7 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
             $model =$model->whereIn('user_id', $user->pluck('id'));
         }
         if(isset($request->email) && $request->email != ""){
-            $user = \App\User::where('email', 'like',"%{$request->name}%")->get();
+            $user = \App\User::where('email', 'like',"%{$request->email}%")->get();
             $model =$model->whereIn('user_id', $user->pluck('id'));
         }
         
@@ -75,16 +75,16 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
             return [
                 'id' => $item->id,
                 'date' => date('d/m/Y h:i:s',strtotime($item->created_at)),
-                'name' => $item->user->name,
+                'name' => iconv("UTF-8", "ISO-8859-1//TRANSLIT",$item->user->name),
                 'user' => $item->user->email,
-                'justification' => $item->justification,
+                'justification' => iconv("UTF-8", "ISO-8859-1//TRANSLIT",$item->justification),
                 'from' => implode(', ', array_map(
                     function ($v, $k) use($item){ 
                         $from = json_decode($item->from,true);
                         //echo $from[$k] ?? "Nothins";
                         if(!is_array($v) && !is_object($v)){
                             //echo $from[$k]?? "Nothins";
-                            return sprintf("%s = \"%s\"", $k,$v); 
+                            return sprintf("%s = \"%s\"", $k,iconv("UTF-8", "ISO-8859-1//TRANSLIT",$v)); 
                         }
                         
                     },
@@ -97,7 +97,7 @@ Route::put('/posts/{id}', 'Api\PostsController@update')
                         //echo $from[$k] ?? "Nothins";
                         if(!is_array($v) && !is_object($v)){
                             //echo $from[$k]?? "Nothins";
-                            return sprintf("%s = \"%s\"", $k, $v); 
+                            return sprintf("%s = \"%s\"", $k, iconv("UTF-8", "ISO-8859-1//TRANSLIT",$v)); 
                         }
                         
                     },
@@ -211,15 +211,16 @@ Route::group(["middleware" => ['auth:api', 'scope:view-profile']], function(){
         ]);
     });
 });
+
+Route::group(["prefix" => "reports"/*,"middleware" => ['auth:api', 'scope:view-profile']*/], function(){
 // REPORT RANKING PROVIDER
-Route::get('/ranking-provider','Api\ReportController@providerRank');
+Route::get('/provider-ranking-data','Api\ReportController@providerRank');
 
 // REPORT RANKING Client
-Route::get('/ranking-client', 'Api\ReportController@clientRank');
-
-
+Route::get('/client-ranking-data', 'Api\ReportController@clientRank');
 // REPORT TESTE
-Route::get('report-teste', 'Api\ReportController@reportSales');
-Route::get('report-form', 'Api\ReportController@reportProviders');
-Route::get('ranking-client-teste', 'Api\ReportController@reportClientRank');
-Route::get('ranking-provider-teste', 'Api\ReportController@reportProviderRank');
+Route::get('sales', 'Api\ReportController@reportSales');
+Route::get('providers', 'Api\ReportController@reportProviders');
+Route::get('client-ranking', 'Api\ReportController@reportClientRank');
+Route::get('provider-ranking', 'Api\ReportController@reportProviderRank');
+});

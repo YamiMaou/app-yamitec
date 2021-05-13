@@ -442,33 +442,59 @@ class ReportController extends Controller {
         $sheet->setCellValue('C1', __('Movimento'));
 
         $line = 2;
-
-        $rank = \App\Models\Client::with(['account_managers'])
-            ->get()->map(function($item) {
-                if(count($item->account_managers) > 0){
-                    $accs = $item->account_managers->map(function($acc){
+        $rank = \App\Models\Client::with(['account_managers_detached', 'account_managers_nodetached']);
+        if(isset($request->from) && $request->from != ""){
+            if(!isset($request->to) || $request->to == ""){
+                $request->merge([
+                    'to' => $request->from
+                ]);
+            }
+            $account_manager = \App\Models\AccountManager::with('clients')->whereBetween('launch_date', [$request->from." 00:00:00", $request->to." 23:59:59"])->get();
+            if($account_manager->pluck('clients')->count() > 0 ){
+                $rank = $rank->whereIn('id', $account_manager->pluck('clients')[0]->pluck('id')->toArray());
+            }else{
+                return response()->json(['success'=> false, 'message' => 'Não há registros cadastrados neste intervalo']);
+            }
+        }
+        
+        
+        $rank = $rank->get()->map(function($item) {
+                $data = [];
+                if(count($item->account_managers_detached) > 0){
+                    $accs = $item->account_managers_detached->map(function($acc){
                         $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
                         return $acc;
                     });
-                    return [
+                    $data[] = [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'amount' => array_sum(array_column($accs->toArray(), 'amount')),
+                        'type' => "Farmácia",
+                    ];
+                }
+                if(count($item->account_managers_nodetached) > 0){
+                    $accs = $item->account_managers_nodetached->map(function($acc){
+                        $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
+                        return $acc;
+                    });
+                    $data[] = [
                         'id' => $item->id,
                         'name' => $item->name,
                         'amount' => array_sum(array_column($accs->toArray(), 'amount')),
                         'type' => "Plataforma",
                     ];
                 }
+                return $data;
             });
-            $rank = array_filter($rank->toArray());
-            foreach($rank as $k => $ranking)
-
-        for ($i = 0; $i < 10; $i++) {
-
-            $sheet->setCellValueByColumnAndRow(1, $line, $ranking['name']);
-            $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);
-            $sheet->setCellValueByColumnAndRow(3, $line, number_format($ranking['amount'],2,',','.'));
-            
-            $line++;
-        }
+            $rank = array_filter($rank->toArray())[0];
+            //return response()->json($rank);
+            foreach($rank as $k => $ranking){
+                $sheet->setCellValueByColumnAndRow(1, $line, $ranking['name']);
+                $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);
+                $sheet->setCellValueByColumnAndRow(3, $line, number_format($ranking['amount'],2,',','.'));
+                
+                $line++;
+            }
 
         $writer = new Xlsx($spreadsheet);
         $filename = "ranking-cliente-" . time() . ".xlsx";
@@ -499,24 +525,54 @@ class ReportController extends Controller {
         $sheet->setCellValue('C1', __('Movimento'));
 
         $line = 2;
-        $rank = \App\Models\Provider::with(['account_managers', 'providertype'])
-        ->get()->map(function($item) {
-            if(count($item->account_managers) > 0){
-                $accs = $item->account_managers->map(function($acc){
+
+        $rank = \App\Models\Provider::with(['account_managers_detached', 'account_managers_nodetached','providertype']);
+        if(isset($request->from) && $request->from != ""){
+            if(!isset($request->to) || $request->to == ""){
+                $request->merge([
+                    'to' => $request->from
+                ]);
+            }
+            $account_manager = \App\Models\AccountManager::with('clients')->whereBetween('launch_date', [$request->from." 00:00:00", $request->to." 23:59:59"])->get();
+            if($account_manager->pluck('providers')->count() > 0 ){
+                $rank = $rank->whereIn('id', $account_manager->pluck('providers')[0]->pluck('id')->toArray());
+            }else{
+                return response()->json(['success'=> false, 'message' => 'Não há registros cadastrados neste intervalo']);
+            }
+        }
+        $rank = $rank->get()->map(function($item) {
+            $data = [];
+            if(count($item->account_managers_detached) > 0){
+                $accs = $item->account_managers_detached->map(function($acc){
                     $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
                     return $acc;
                 });
-                return [
+                $data[] = [
                     'id' => $item->id,
                     'fantasy_name' => $item->fantasy_name,
                     'company_name' => $item->company_name,
                     'amount' => array_sum(array_column($accs->toArray(), 'amount')),
-                    'type' => $item->providertype->name,
+                    'type' => "Farmácia",
                     'bill_type' => $item->bill_type == 2 ? "Despesa" : "Receita",
                 ];
             }
+            if(count($item->account_managers_nodetached) > 0){
+                $accs = $item->account_managers_nodetached->map(function($acc){
+                    $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
+                    return $acc;
+                });
+                $data[] = [
+                    'id' => $item->id,
+                    'fantasy_name' => $item->fantasy_name,
+                    'company_name' => $item->company_name,
+                    'amount' => array_sum(array_column($accs->toArray(), 'amount')),
+                    'type' => "Plataforma",
+                    'bill_type' => $item->bill_type == 2 ? "Despesa" : "Receita",
+                ];
+            }
+            return $data;
         });
-        $rank = array_filter($rank->toArray());
+        $rank = array_filter($rank->toArray())[0];
         foreach($rank as $k => $ranking){
             $sheet->setCellValueByColumnAndRow(1, $line, $ranking['fantasy_name']);
             $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);

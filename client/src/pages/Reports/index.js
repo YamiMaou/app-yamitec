@@ -51,15 +51,25 @@ class Reports extends Component {
     }
 
     render() {
-        const rows = [];
-        const columns = [];
         const flexBasis = '25%';
         const filter = [
             { column: 'from', label: 'De', type: 'date', flexBasis },
             { column: 'to', label: 'Até', type: 'date', flexBasis },
+            { column: 'from_launch', label: 'Lançado De', type: 'date', flexBasis },
+            { column: 'to_launch', label: 'Lançado Até', type: 'date', flexBasis },
             { 
                 column: 'type', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
-                values: ['Fornecedor', 'Vendas', 'Ranking Fornecedor', 'Ranking Cliente']
+                values: ['Fornecedor', 'Vendas']
+            },
+            //{ column: 'created_at', label: 'Data', type: 'date' },
+        ]
+
+        const filter_ranking = [
+            { column: 'from', label: 'De', type: 'date', flexBasis },
+            { column: 'to', label: 'Até', type: 'date', flexBasis },
+            { 
+                column: 'type', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
+                values: ['Cliente', 'Fornecedor']
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
@@ -73,7 +83,19 @@ class Reports extends Component {
                         </Typography>
                     </Toolbar>
                 </AppBar>
-                <LDataGrid hideList={true} rows={rows} columns={columns} filterInputs={filter} 
+                <Typography variant="h6" style={{flexGrow: 1}}>
+                    <span>Fornecedores</span>
+                </Typography>
+                <LDataGrid hideList={true} rows={[]} columns={[]} filterInputs={filter} 
+                    pageRequest={
+                        (params) => {
+                            return getApiReportFile(params)
+                    }} />
+
+                <Typography variant="h6" style={{flexGrow: 1}}>
+                    <span>Ranking</span>
+                </Typography>
+                <LDataGrid hideList={true} rows={[]} columns={[]} filterInputs={filter_ranking} 
                     pageRequest={
                         (params) => {
                             return getApiReportFile(params)
