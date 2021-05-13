@@ -12,7 +12,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { putApiContributors, getAddressByCepla, getApiContributors } from '../../../providers/api'
+import { putApiContributors, getAddressByCepla, getApiContributors, getApiFunction } from '../../../providers/api'
 import { validaEmail, validaCpf, stringToaddDate } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
@@ -21,6 +21,7 @@ import { withSnackbar  } from 'notistack';
 class EditContributors extends Component {
     state = {
         data: {},
+        profiles: [],
         loading: false
     }
     async componentDidMount() {
@@ -30,7 +31,8 @@ class EditContributors extends Component {
         }
         localStorage.setItem("sessionTime", 9000)
         let data = await getApiContributors({}, this.props.match.params.id);
-        this.setState({ ...this.state, data });
+        const profiles = await getApiFunction({pageSize: 9999});
+        this.setState({ ...this.state, data, profiles: profiles.data });
 
     }
 
@@ -135,14 +137,17 @@ class EditContributors extends Component {
                     { column: 'birthdate', value: this.state.data['birthdate'], label: 'Data de nascimento', type: 'date', flexBasis},
                     {
                         column: 'function', label: 'Função', type: 'select',
-                        values: [
+                        json: true,
+                        values: this.state.profiles,
+                        valueLabel: 'name', 
+                        /*values: [
                             "Administração",
                             "Coordenador de usuários",
                             "Coordenador de parceiros",
                             "Gerente",
                             "Operador de marketing",
                             "Vendedor"
-                        ],
+                        ],*/
                         value: this.state.data['function'],
                         validate: {required: true },
                         flexBasis

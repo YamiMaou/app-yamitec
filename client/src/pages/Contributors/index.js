@@ -143,7 +143,7 @@ class Contributors extends Component {
                         return window.innerWidth > 720 ?
                             (
                             <div style={{display:'flex', alignItems: 'center'}}>
-                                {stringCpf(params.value)}
+                                {stringCpf(params.row.cpf)}
                                 <Tooltip placement="right" title={`Existente em ${haveIn.join(',')}`} arrow>
                                     <FiberManualRecord color="secondary" />
                                 </Tooltip>
@@ -155,7 +155,7 @@ class Contributors extends Component {
                             )
                     }catch(e){
                         console.error(e);
-                        return  <span>{stringCpf(params.value)}</span>
+                        return  <span>{stringCpf(params.row.cpf)}</span>
                     }
                 }
             },

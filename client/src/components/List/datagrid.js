@@ -420,10 +420,10 @@ class LDataGrid extends Component {
                             </div>
                         </CardContent>
                     </Card>)}
-
+                    {(!this.state.firstLoad && !this.state.hideList) &&
                 <Card>
                     <CardContent>
-                        {(!this.state.firstLoad && !this.state.hideList) &&
+                        
                             <div style={{ height: 700, width: '100%' }}>
                                 <DataGrid
                                     sx={{
@@ -459,7 +459,7 @@ class LDataGrid extends Component {
                                         this.setPage(filters);
                                     }}
                                 />
-                            </div>}
+                            </div>
                     </CardContent>
                     <CardActionArea>
                     </CardActionArea>
@@ -467,7 +467,7 @@ class LDataGrid extends Component {
 
                     </CardActions>
                 </Card>
-
+            }
             </div>
         )
     }

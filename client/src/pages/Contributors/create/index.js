@@ -12,7 +12,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import LForms from '../../../components/Forms';
 //
 import { setSnackbar } from '../../../actions/appActions'
-import { postApiContributors, getApiDownloadFile } from '../../../providers/api'
+import { postApiContributors, getApiDownloadFile, getApiFunction } from '../../../providers/api'
 import { validaEmail, validaCpf, isFutureData } from '../../../providers/commonMethods'
 
 import { InputCep, InputCpf, InputPhone } from '../../../providers/masks'
@@ -23,10 +23,18 @@ class CreateContributors extends Component {
     
     state = {
         contributors: [],
+        profiles: [],
         states: []
     }
     async componentDidMount() {
-        localStorage.setItem("sessionTime", 900)
+        if(JSON.parse(localStorage.getItem("user")) == null){
+            window.location.href = '/login';
+            return;
+        }
+        localStorage.setItem("sessionTime", 9000)
+        // let data = await getApiContributors({}, this.props.match.params.id);
+        const profiles = await getApiFunction({pageSize: 9999});
+        this.setState({ ...this.state, profiles: profiles.data });
 
     }
 
@@ -114,14 +122,17 @@ class CreateContributors extends Component {
                     { column: 'birthdate', label: 'Data de nascimento', type: 'date', validate: {required: true}, validateHandler: isFutureData, flexBasis, style:{maxWidth: '210px'} },
                     {
                         column: 'function', label: 'Função', type: 'select',
-                        values: [
+                        json: true,
+                        values: this.state.profiles,
+                        valueLabel: 'name', 
+                        /*values: [
                             "Administração",
                             "Coordenador de usuários", 
                             "Coordenador de parceiros", 
                             "Gerente", 
                             "Operador de marketing", 
                             "Vendedor"
-                        ],
+                        ],*/
                         validate: {required: true },
                         flexBasis, style:{width: '220px'}
                     },
