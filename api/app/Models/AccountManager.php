@@ -46,4 +46,8 @@ class AccountManager extends Model
     public function contributor(){
         return $this->hasOne(Contributor::class,'cpf','cpf_cnpj');
     }
+
+    public function saler(){
+        return $this->hasOne(Contributor::class,'id','contributor_id');
+    }
 }

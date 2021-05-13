@@ -24,6 +24,6 @@ class Contract extends Model
     public function contributors()
     {
         // ALTERADO AQUI, CLASSE 'Contributors' para 'Contributor' by MARKUS 11/05
-        return $this->belongsTo(Contributor::class);
+        return $this->belongsTo(Contributor::class)->with(['addresses','functions']);
     }
 }

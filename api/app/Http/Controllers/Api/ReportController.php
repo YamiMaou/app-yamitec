@@ -33,41 +33,46 @@ class ReportController extends Controller {
 
     public function reportProviders(Request $request) 
     {
-        //$this->providersList = $this->provider;
+       //$this->providersList = $this->provider;
 
-        if (empty($request->all())) {
-            $this->providersList = $this->provider->all();
+       if (empty($request->all())) {
+        $this->providersList = $this->provider->all();
+    }
+    //$this->provider = $this->provider->newQuery();
+    if($request->has('from_launch') && $request->from_launch != ""){
+        if(!$request->has('to_launch') || $request->to_launch == ""){
+            $request->merge([
+                'to_launch' => $request->from_launch
+            ]);
+        }
+        $acm = \App\Models\Contract::whereBetween('launch_date', [$request->from_launch." 00:00:00", $request->to_launch." 23:59:59"])->get();
+        if($acm->count() > 0){
+                $acm = $acm->pluck('provider')->pluck('id')->toArray();
+                $this->provider = $this->provider->whereIn('id', $acm);
+            }
         }
 
-        $this->provider = $this->provider->newQuery();
-
-        if ($request->has('from')) {
-            if ($request->has('to')) {
-                $this->provider->where('created_at', '>=', $request->input('from').' 00:00:00')->where('created_at', '<=', $request->input('to').' 23:59:59');
-            } else {
-                $this->provider->where('created_at', '>=', $request->input('from').' 00:00:00')->where('created_at', '<=', $request->input('from').' 23:59:59');;
-            }
-
-            if ($request->has('cnpj')) {
-                $this->provider->where('cnpj', $request->input('cnpj'));
-            }
-
-            if ($request->has('company_name')) {
-                $this->provider->where('company_name', $request->input('company_name'));
-            }
-
-            $this->providersList = $this->provider->get();
-        } else {
-            if ($request->has('cnpj')) {
-                $this->provider->where('cnpj', $request->input('cnpj'));
-            }
-    
-            if ($request->has('company_name')) {
-                $this->provider->where('company_name', $request->input('company_name'));
-            }
-
-            $this->providersList = $this->provider->get();
+    if($request->has('from') && $request->from != ""){
+        if(!$request->has('to') || $request->to == ""){
+            $request->merge([
+                'to' => $request->from
+            ]);
         }
+        $this->provider = $this->provider->whereBetween('created_at', [$request->from." 00:00:00", $request->to." 23:59:59"]);
+        
+    }
+    if ($request->has('cnpj') && $request->cnpj != "") {
+        $this->provider = $this->provider->where('cnpj','like', "%{$request->input('cnpj')}%");
+    }
+
+    if ($request->has('company_name') && $request->company_name != "") {
+        $this->provider = $this->provider->where('company_name','like', "%{$request->input('company_name')}%");
+    }
+    //dd($this->provider->toSql());
+
+    $this->providersList = $this->provider->get();
+
+        ///////////
 
         try 
         {
@@ -215,7 +220,7 @@ class ReportController extends Controller {
                     $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
                     $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
                     $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
-                    $sheet->setCellValueByColumnAndRow(28, $line, ' ');
+                    $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom()->user->email);
 
                     $line++;
                 }
@@ -231,36 +236,63 @@ class ReportController extends Controller {
             return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum fornecedor encontrado."]);
 
         } catch(\Exception $error) {
-            //echo $error->getTraceAsString();
+            echo $error->getTraceAsString();
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
         }
     }
 
-
     public function reportSales(Request $request) 
     {
-        //echo "<pre>"; dd($accManager[0]->contributor->name);die;
-        if ($request->filled('from')) {
-            if (!$request->filled('to')) {
+        //$this->providersList = $this->provider;
+
+        if (empty($request->all())) {
+            $this->providersList = $this->provider->all();
+        }
+        //$this->provider = $this->provider->newQuery();
+        if($request->has('from_launch') && $request->from_launch != ""){
+            if(!$request->has('to_launch') || $request->to_launch == ""){
+                $request->merge([
+                    'to_launch' => $request->from_launch
+                ]);
+            }
+            $acm = \App\Models\Contract::whereBetween('launch_date', [$request->from_launch." 00:00:00", $request->to_launch." 23:59:59"])->get();
+            if($acm->count() > 0){
+                    $acm = $acm->pluck('provider')->pluck('id')->toArray();
+                    $this->provider = $this->provider->whereIn('id', $acm);
+                }
+            }
+
+        if($request->has('from') && $request->from != ""){
+            if(!$request->has('to') || $request->to == ""){
                 $request->merge([
                     'to' => $request->from
                 ]);
             }
-
-            $this->accountManagerList = $this->accountManager->whereBetween('created_at', [$request->from.' 00:00:00', $request->to.' 23:59:59'])->get();
-        }else{
-            $this->accountManagerList = $this->accountManager->get();
+            $this->provider = $this->provider->whereBetween('created_at', [$request->from." 00:00:00", $request->to." 23:59:59"]);
+            
         }
+        if ($request->has('cnpj') && $request->cnpj != "") {
+            $this->provider = $this->provider->where('cnpj','like', "%{$request->input('cnpj')}%");
+        }
+
+        if ($request->has('company_name') && $request->company_name != "") {
+            $this->provider = $this->provider->where('company_name','like', "%{$request->input('company_name')}%");
+        }
+        //dd($this->provider->toSql());
+
+        $this->providersList = $this->provider->get();
+
+        ///////////
 
         try 
         {
 
-            if (!$this->accountManagerList->isEmpty()) 
+            if (!$this->providersList->isEmpty()) 
             {
                 $spreadsheet = new Spreadsheet();
                 $sheet = $spreadsheet->getActiveSheet();
                 
-                $sheet->setTitle(__('Relatório de Vendas'));
+                $sheet->setTitle(__('Relatório de Fornecedores'));
 
                 $sheet->getStyle('A1:B1')->getBorders()->getAllBorders()->setBorderStyle(true);
                 $sheet->getStyle('A1:B1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
@@ -277,10 +309,10 @@ class ReportController extends Controller {
                 $sheet->getStyle('A3:B3')->getFont()->setBold(true);
                 $sheet->getStyle('A3:B3')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
-                $sheet->getStyle('A5:N5')->getBorders()->getAllBorders()->setBorderStyle(true);
-                $sheet->getStyle('A5:N5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
-                $sheet->getStyle('A5:N5')->getFont()->setBold(true);
-                $sheet->getStyle('A5:N5')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+                $sheet->getStyle('A5:AB5')->getBorders()->getAllBorders()->setBorderStyle(true);
+                $sheet->getStyle('A5:AB5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
+                $sheet->getStyle('A5:AB5')->getFont()->setBold(true);
+                $sheet->getStyle('A5:AB5')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
                 $sheet->getColumnDimension('A')->setAutoSize(true);
                 $sheet->getColumnDimension('B')->setAutoSize(true);
@@ -296,29 +328,30 @@ class ReportController extends Controller {
                 $sheet->getColumnDimension('L')->setAutoSize(true);
                 $sheet->getColumnDimension('M')->setAutoSize(true);
                 $sheet->getColumnDimension('N')->setAutoSize(true);
+            
 
                 $sheet->setCellValue('A1', __('Qtd Total'));
                 $sheet->setCellValue('A2', __('Qtd Ativas'));
                 $sheet->setCellValue('A3', __('Qtd inativas'));
 
                 $sheet->setCellValue('A5', __('Colaborador'));
-                $sheet->setCellValue('B5', __('Tipo de Colaborador'));
+                $sheet->setCellValue('B5', __('Tipo Colaborador'));
                 $sheet->setCellValue('C5', __('Cidade'));
                 $sheet->setCellValue('D5', __('Situação'));
                 $sheet->setCellValue('E5', __('CNPJ'));
                 $sheet->setCellValue('F5', __('Razão Social'));
                 $sheet->setCellValue('G5', __('Nome Fantasia'));
                 $sheet->setCellValue('H5', __('Data de adesão'));
-                $sheet->setCellValue('I5', __('Data de finalização'));
                 $sheet->setCellValue('J5', __('Taxa de adesão'));
-                $sheet->setCellValue('K5', __('Nome Resp'));
+                $sheet->setCellValue('I5', __('Data de finalização'));
+                $sheet->setCellValue('K5', __('Responsável Empresa'));
                 $sheet->setCellValue('L5', __('Telefone Resp'));
                 $sheet->setCellValue('M5', __('E-mail Resp'));
                 $sheet->setCellValue('N5', __('Função Resp'));
 
-                $qtyTotal = count($this->accountManagerList); 
-                $qttyActive = count($this->accountManagerList->where('active', 1));
-                $qttyDesactive = count($this->accountManagerList->where('active', 0));
+                $qtyTotal = count($this->providersList); 
+                $qttyActive = count($this->providersList->where('active', 1));
+                $qttyDesactive = count($this->providersList->where('active', 0));
 
                 $sheet->setCellValueByColumnAndRow(2, 1, $qtyTotal);
                 $sheet->setCellValueByColumnAndRow(2, 2, $qttyActive);
@@ -326,60 +359,64 @@ class ReportController extends Controller {
 
                 $line = 6;
 
-                foreach ($this->accountManagerList as $key => $accountManager) {
-                    dd($accountManager->contributor);
+                foreach ($this->providersList as $key => $provider) {
 
-                    /*$type = ($provider->type == 1) ? 'Matriz' : 'Filial';
+                    $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
                     $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
                     $created_at = date('d/m/Y', strtotime($provider->created_at));
                     $updated_at = date('d/m/Y', strtotime($provider->updated_at));
                     $accession_date = date('d/m/Y', strtotime($provider->contracts[0]->accession_date));
                     $end_date = date('d/m/Y', strtotime($provider->contracts[0]->end_date));
                     $rate = number_format($provider->contracts[0]->rate, 2, ',', '.');
-                    $additional = ($provider->addresses->additional != 'null') ? $provider->addresses->additional : '';
-                    $phone2 = ($provider->contacts->phone2 != 'null') ? $provider->contacts->phone2 : '';
-                    $site = ($provider->contacts->site != 'null') ? $provider->contacts->site : '';
-                    $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
-                    $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
-                    $facebook = ($provider->contacts->facebook != 'null') ? $provider->contacts->facebook : '';
-                    $instagram = ($provider->contacts->instagram != 'null') ? $provider->contacts->instagram : '';*/
 
-                    $active = ($accountManager->contributor->active == 1) ? 'Ativo' : 'Desativado';
-
-
-                    $sheet->setCellValueByColumnAndRow(1, $line, $accountManager->contributor->name);
-                    $sheet->setCellValueByColumnAndRow(2, $line, $accountManager->contributor->function);
-                    $sheet->setCellValueByColumnAndRow(3, $line, $accountManager->contributor->addresses->city);
-                    $sheet->setCellValueByColumnAndRow(4, $line, $active);
-                    $sheet->setCellValueByColumnAndRow(5, $line, "{$accountManager->provider->cnpj} ");/*
-                    $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
-                    $sheet->setCellValueByColumnAndRow(7, $line, ' ');
+                    $sheet->setCellValueByColumnAndRow(1, $line, $provider->contracts[0]->contributors->name);
+                    $sheet->setCellValueByColumnAndRow(2, $line, $provider->contracts[0]->contributors->functions->name);
+                    $sheet->setCellValueByColumnAndRow(3, $line, $provider->contracts[0]->contributors->addresses->city);
+                    $sheet->setCellValueByColumnAndRow(4, $line, $provider->contracts[0]->contributors->active == 1 ? "Ativo" : "Inativo");
+                    $sheet->setCellValueByColumnAndRow(5, $line, "{$provider->cnpj} ");
+                    $sheet->setCellValueByColumnAndRow(6, $line, $provider->company_name);
+                    $sheet->setCellValueByColumnAndRow(7, $line, $provider->fantasy_name);
                     $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
-                    $sheet->setCellValueByColumnAndRow(9, $line, $end_date);
-                    $sheet->setCellValueByColumnAndRow(10, $line, $rate);
-                    $sheet->setCellValueByColumnAndRow(11, $line, $provider->contracts[0]->contributors->name);
-                    $sheet->setCellValueByColumnAndRow(12, $line, $provider->addresses->zipcode);
-                    $sheet->setCellValueByColumnAndRow(13, $line, $provider->addresses->street);
-                    $sheet->setCellValueByColumnAndRow(14, $line, $additional);*/
+                    $sheet->setCellValueByColumnAndRow(9, $line, $rate);
+                    $sheet->setCellValueByColumnAndRow(10, $line, $end_date);
+                    $sheet->setCellValueByColumnAndRow(11, $line, $provider->managers[0]->name);
+                    $sheet->setCellValueByColumnAndRow(12, $line, $provider->managers[0]->contacts->phone1);
+                    $sheet->setCellValueByColumnAndRow(13, $line, $provider->managers[0]->contacts->email);
+                    $sheet->setCellValueByColumnAndRow(14, $line, $provider->managers[0]->function);
+                    /*$sheet->setCellValueByColumnAndRow(15, $line, $provider->contacts->phone1);
+                    $sheet->setCellValueByColumnAndRow(16, $line, $phone2);
+                    $sheet->setCellValueByColumnAndRow(17, $line, $provider->contacts->email);
+                    $sheet->setCellValueByColumnAndRow(18, $line, $site);
+                    $sheet->setCellValueByColumnAndRow(19, $line, $linkedin);
+                    $sheet->setCellValueByColumnAndRow(20, $line, $facebook);
+                    $sheet->setCellValueByColumnAndRow(21, $line, $instagram);
+                    $sheet->setCellValueByColumnAndRow(22, $line, $provider->managers[0]->name);
+                    $sheet->setCellValueByColumnAndRow(23, $line, $provider->managers[0]->contacts->phone1);
+                    $sheet->setCellValueByColumnAndRow(24, $line, $provider->managers[0]->contacts->email);
+                    $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
+                    $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
+                    $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
+                    $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom()->user->email);*/
 
                     $line++;
                 }
 
                 $writer = new Xlsx($spreadsheet);
-                $filename = "vendas-" . time() . ".xlsx";
+                $filename = "report-" . time() . ".xlsx";
                 Storage::disk('local')->makeDirectory('reports');
                 $writer->save(storage_path('app/reports/'.$filename));
-
+                //return response()->json()
                 return Storage::download($this->publicStorege.$filename);
             }
 
-            return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum venda encontrada."]);
+            return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum fornecedor encontrado."]);
 
         } catch(\Exception $error) {
             echo $error->getTraceAsString();
             return response()->json(["success"=> false, "type" => "error", "message" => "Problema ao gerar o relatório", "error" => $error->getMessage()], 201);
         }
     }
+    
 
 
     public function clientRank(Request $request){

@@ -75,4 +75,9 @@ class Contributor extends Model
         return $this->hasMany(Contract::class);
     }
 
+    public function functions()
+    {
+        return $this->hasOne(Profile::class, 'id', 'function');
+    }
+
 }

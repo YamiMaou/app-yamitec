@@ -28,6 +28,11 @@ class Provider extends Model
         return $this->hasOne(Audit::class,'provider_id','id')->with(['user'])->latest();
     }
 
+    public function burnFrom()
+    {
+        return $this->hasMany(Audit::class,'provider_id','id')->with(['user'])->get()->first();
+    }
+
     public function providerFiles()
     {
         return $this->hasMany(ProviderFiles::class);
@@ -35,7 +40,7 @@ class Provider extends Model
 
     public function contracts()
     {
-        return $this->hasMany(Contract::class);
+        return $this->hasMany(Contract::class)->with(['contributors']);
     }
 
     public function managers()
