@@ -26,7 +26,7 @@ import { setSnackbar } from '../../actions/appActions'
 import { getApiBonus, getApiPermissions, putApiBonus, putApiPermissions } from '../../providers/api'
 
 import { InputCpf, stringCpf } from '../../providers/masks'
-import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
+import { Card, CardActions, CardContent, CircularProgress, IconButton, List, ListItem, ListItemText, TablePagination, Toolbar } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { DataGrid, RowsProp, ColDef, CheckCircleIcon } from '@material-ui/data-grid';
@@ -122,7 +122,7 @@ class Profiles extends Component {
                         permissions.push(
                             { 
                                 id,
-                                module_id: 1, 
+                                module_id: module.id, 
                                 profile_id: profile.id, 
                                 modelName: module.name, 
                                 profileName: profile.name, 
@@ -170,9 +170,10 @@ class Profiles extends Component {
                 field: 'create',
                 headerName: 'Cadastrar',
                 flex: 0.3,
+                row: true,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
                     let { id, module_id, profile_id, create, read, update } = params.row;
-                    let permca = { id, module_id, profile_id, create, read, update }
+                    //let permca = { id, module_id, profile_id, create, read, update }
                     let prop = this.state.permissions.find(x => x.id === id)
                     let checked = false;
                     if(prop){
@@ -201,6 +202,7 @@ class Profiles extends Component {
                 field: 'read',
                 headerName: 'Visualizar',
                 flex: 0.3,
+                row: true,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
                     let { id, module_id, profile_id, create, read, update } = params.row;
                     let permca = { id, module_id, profile_id, create, read, update }
@@ -240,6 +242,7 @@ class Profiles extends Component {
                 field: 'update',
                 headerName: 'Atualizar',
                 flex: 0.3,
+                row: true,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
                     let { id, module_id, profile_id, create, read, update } = params.row;
                     let permca = { id, module_id, profile_id, create, read, update }
@@ -270,6 +273,7 @@ class Profiles extends Component {
                 field: 'delete',
                 headerName: 'Deletar/Bloquear',
                 flex: 0.3,
+                row: true,
                 renderCell: (params: ValueFormatterParams, row: RowIdGetter) => {
                     let { id, module_id, profile_id, create, read, update } = params.row;
                     let permca = { id, module_id, profile_id, create, read, update }
@@ -310,6 +314,7 @@ class Profiles extends Component {
 
                 </AppBar>
                         <div style={{ height: 700, width: '100%' }}>
+                        {window.innerWidth > 720 ? (
                         <DataGrid
                             sx={{
                                 '& .MuiDataGrid-root': {
@@ -319,13 +324,66 @@ class Profiles extends Component {
                                 }
                             }}
                             rows={rows} columns={columns}
-                            localeText={{...DEFAULT_LOCALE_TEXT, filterPanelInputLabel:'Valor s'}}
+                            localeText={{...DEFAULT_LOCALE_TEXT, filterPanelInputLabel:'Valor'}}
                             spacing={0}
                             stickyHeader
                             disableClickEventBubbling
                             //disableColumnMenu={true}
 
-                        /></div>
+                        />) : (
+                            <div style={{ height: 450, width: '100%' }}>
+                        {rows.length == 0 ? (
+                            <Card style={{marginTop: 15}}>
+                                <CardContent> Não há registros</CardContent>
+                            </Card>) : ('')
+                        }
+                        {rows.map((row, key) => {
+                            //console.log(row);
+                            return (
+                                <Card key={`card-container${key}`} style={{marginTop: 15}}>
+                                    <CardContent>
+                                    <List key={`list_field_${key}`} component="nav">
+                                        {Object.entries(row).map(field => {
+                                            
+                                            let headerName = columns.find(column => column.field === field[0]);
+                                            if (headerName && headerName.field !== 'id') {
+                                                //console.log(field[1])
+                                                let value = headerName.valueFormatter ?? headerName.renderCell;
+                                                value = value == undefined ? field[1] : value(headerName.row == true ? {row} : {value: field[1]}); 
+                                                if(headerName.renderCell !== undefined)
+                                                {
+                                                    console.log(row);
+                                                    value = headerName.renderCell({value: field[1], row: row }, row);
+                                                    console.log(value);
+                                                    return (
+                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                            <ListItemText primary={`${headerName.headerName}`} secondary={value} />
+                                                        </ListItem>
+                                                    )
+                                                }else{
+                                                    return (
+                                                        <ListItem style={{paddingTop: 0, paddingBottom: 0}}>
+                                                            <ListItemText primary={`${headerName.headerName}`} secondary={`${value}`} />
+                                                        </ListItem>
+                                                    )}
+                                                }
+                                        })}
+                                        </List>
+                                    </CardContent>
+                                    <CardActions style={{justifyContent: 'center'}}>
+                                    {Object.entries(row).map(field => {
+                                        let headerName = columns.find(column => column.field === field[0]);
+                                        if(headerName && headerName.field == 'id') {
+                                            return headerName.renderCell({value: field[1], row }, row);
+                                        }
+                                    })}
+                                    </CardActions>
+                                </Card>
+                            )
+                        }
+                        )}
+                    </div>
+                        )}</div>
             </Fragment>
         )
     }

@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState, useRef } from 'react'
+import React, { Component, Fragment, useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 //
@@ -50,19 +50,32 @@ import { InputCnpj, InputCpf } from '../../providers/masks';
 
 //const [valus, setValues] = useState(new Date('2021-02-13'));
 const idNumbers = [
-    'cpf', 'cnpj'
+    'cpf', 'cnpj', 'indication_qtty'
 ];
 // Decimal 
 
 const MaskedDecimalInput = (props) => {
-    const [value1, setValue] = useState(props.value ?? 0);
+    const [value1, setValue] = useState(props.value);
     const [error, setError] = useState(false);
+    const [defaultVal, setDefault] = useState(props.value);
+    useEffect(() => {
+        //console.log(props.value)
+        if(props.value == ""){
+            setValue("")
+        }
+    })
+
     function getMoney( str )
     {
-        return parseInt( str.replace(/[\D]+/g,'') );
+        console.log(str)
+        if(str != "")
+            return parseInt( str.replace(/[\D]+/g,'') );
+        else
+            return "";
     }
     function formatReal( int )
     {
+        
         var tmp = int+'';
         tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
         
@@ -72,7 +85,7 @@ const MaskedDecimalInput = (props) => {
     }
     function handleChange(e) {
         //const { value, id } = e.target;
-        let val = e.target.value.length > 0 ? e.target.value : '0';
+        let val = e.target.value.length > 0 ? e.target.value.replace(/[\D]+/g,'') : '0';
         if(val.length == 6){
             val = '100,00'
         }
@@ -86,8 +99,7 @@ const MaskedDecimalInput = (props) => {
             required={props.required ?? false}
             disabled={props.disabled ?? false}
             error={error}
-            type={props.type ?? "text"}
-            value={value1 ?? ''}
+            value={value1}
             helperText={error == true ? props.helperText ?? "conteúdo inválido" : ""}
             id={props.id} label={props.label}
             onChange={handleChange}
@@ -304,13 +316,13 @@ class LDataGrid extends Component {
         }
 
         const onClearFilter = () => {
-            let filters = {};
+            let filters = this.state.filters;
             this.props.filterInputs.map(input => {
                 filters[input.column] = "";
                 delete filters[input.column];
             });
-
             this.setState({ ...this.state, filters });
+            console.log(filters);
         }
         const rows: RowsProp = this.state.data.data ?? [];
 
@@ -339,7 +351,7 @@ class LDataGrid extends Component {
                                                 return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                             else
                                                 return (
-                                                    <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                    <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} >
                                                         <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                         <Input
                                                             value={this.state.filters[input.column] ?? ""}
@@ -410,7 +422,7 @@ class LDataGrid extends Component {
                                         } else if (input.type == "select") {
                                             return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: input.flexBasis ?? '22%' }} onBlur={onChangeInputs} />)
                                         } else if (input.type == "decimal" || input.type == "percent") {
-                                            return <MaskedDecimalInput percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            return <MaskedDecimalInput name={input.column} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         }
                                     })
                                 }

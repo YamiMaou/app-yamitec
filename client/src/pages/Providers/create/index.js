@@ -744,7 +744,14 @@ class CreateProviders extends Component {
                                             {!this.state.provManagerLoading ? (
                                             <Button variant="contained" color="primary" size="small" disableElevation 
                                             onClick={() => {
-                                                setManagers();
+                                                if(this.state.manager > 0){
+                                                    try{
+                                                        setManagers();
+                                                    }catch(ex){
+                                                        console.error(ex);
+                                                    }
+                                                    
+                                                }
                                             }}><AddIcon /></Button>)
                                             : (
                                                 <CircularProgress style={{ display: 'flex', margin: 'auto' }} />
@@ -847,12 +854,20 @@ class CreateProviders extends Component {
                                         values={this.state.filials} 
                                         style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                         onChange={(e) => {
+                                            console.log(e.target.value)
                                             this.setState({...this.state, provider: e.target.value});
                                         }} />
                                         {this.state.provProvidersLoading == false ? (
                                             <Button variant="contained" color="primary" size="small" disableElevation 
                                         onClick={() => {
-                                            setProviders();
+                                            if(this.state.provider > 0){
+                                                try{
+                                                    setProviders();
+                                                }catch(ex){
+                                                    console.error(ex);
+                                                }
+                                            }
+                                                
                                         }}><AddIcon /></Button>
                                         ) : (
                                             <CircularProgress style={{ display: 'flex', margin: 'auto' }} />

@@ -119,6 +119,11 @@ public function index(Request $request)
             if($request->type == 2 && $request->matriz_id == null){
                 return response()->json(["success" => false, "message" => "É obrigatório selecionar uma Matriz"]);
             }
+            $matriz = null;
+            if($request->type == 2)
+            {
+                $matriz = \App\Models\Provider::find($request->matriz_id);
+            }
             $validate = $request;
             $files = new \App\Http\Controllers\FilesController();
             $files = $files->multUpload($request, 'provider');
@@ -189,10 +194,10 @@ public function index(Request $request)
 
             //if ($request->contract_clone == null):
                 $contract_data = [
-                    "rate" => str_replace(",",".",str_replace('.','',$request->rate)) ?? "0.00",
-                    "accession_date" => $request->accession_date,
-                    "contributors_id" => $request->contributors_id ,
-                    "end_date" => $request->end_date,
+                    "rate" => $request->rate ? str_replace(",",".",str_replace('.','',$request->rate)) : "0.00",
+                    "accession_date" => $request->accession_date ?? date('Y-m-d'),
+                    "contributors_id" => $request->contributors_id  ?? 1,
+                    "end_date" => $request->end_date ?? date('Y-m-d'),
                     "provider_id" => $provider->id,
                 ];
     

@@ -45,7 +45,7 @@ class ReportController extends Controller {
                 'to_launch' => $request->from_launch
             ]);
         }
-        $acm = \App\Models\Contract::whereBetween('launch_date', [$request->from_launch." 00:00:00", $request->to_launch." 23:59:59"])->get();
+        $acm = \App\Models\Contract::whereBetween('accession_date', [$request->from_launch." 00:00:00", $request->to_launch." 23:59:59"])->get();
         if($acm->count() > 0){
                 $acm = $acm->pluck('provider')->pluck('id')->toArray();
                 $this->provider = $this->provider->whereIn('id', $acm);
@@ -255,7 +255,7 @@ class ReportController extends Controller {
                     'to_launch' => $request->from_launch
                 ]);
             }
-            $acm = \App\Models\Contract::whereBetween('launch_date', [$request->from_launch." 00:00:00", $request->to_launch." 23:59:59"])->get();
+            $acm = \App\Models\Contract::whereBetween('accession_date', [$request->from_launch." 00:00:00", $request->to_launch." 23:59:59"])->get();
             if($acm->count() > 0){
                     $acm = $acm->pluck('provider')->pluck('id')->toArray();
                     $this->provider = $this->provider->whereIn('id', $acm);
@@ -360,47 +360,48 @@ class ReportController extends Controller {
                 $line = 6;
 
                 foreach ($this->providersList as $key => $provider) {
+                    foreach($provider->managers as $km => $manager){
 
-                    $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
-                    $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
-                    $created_at = date('d/m/Y', strtotime($provider->created_at));
-                    $updated_at = date('d/m/Y', strtotime($provider->updated_at));
-                    $accession_date = date('d/m/Y', strtotime($provider->contracts[0]->accession_date));
-                    $end_date = date('d/m/Y', strtotime($provider->contracts[0]->end_date));
-                    $rate = number_format($provider->contracts[0]->rate, 2, ',', '.');
+                        $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
+                        $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
+                        $created_at = date('d/m/Y', strtotime($provider->created_at));
+                        $updated_at = date('d/m/Y', strtotime($provider->updated_at));
+                        $accession_date = date('d/m/Y', strtotime($provider->contracts[0]->accession_date));
+                        $end_date = date('d/m/Y', strtotime($provider->contracts[0]->end_date));
+                        $rate = number_format($provider->contracts[0]->rate, 2, ',', '.');
 
-                    $sheet->setCellValueByColumnAndRow(1, $line, $provider->contracts[0]->contributors->name);
-                    $sheet->setCellValueByColumnAndRow(2, $line, $provider->contracts[0]->contributors->functions->name);
-                    $sheet->setCellValueByColumnAndRow(3, $line, $provider->contracts[0]->contributors->addresses->city);
-                    $sheet->setCellValueByColumnAndRow(4, $line, $provider->contracts[0]->contributors->active == 1 ? "Ativo" : "Inativo");
-                    $sheet->setCellValueByColumnAndRow(5, $line, "{$provider->cnpj} ");
-                    $sheet->setCellValueByColumnAndRow(6, $line, $provider->company_name);
-                    $sheet->setCellValueByColumnAndRow(7, $line, $provider->fantasy_name);
-                    $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
-                    $sheet->setCellValueByColumnAndRow(9, $line, $rate);
-                    $sheet->setCellValueByColumnAndRow(10, $line, $end_date);
-                    $sheet->setCellValueByColumnAndRow(11, $line, $provider->managers[0]->name);
-                    $sheet->setCellValueByColumnAndRow(12, $line, $provider->managers[0]->contacts->phone1);
-                    $sheet->setCellValueByColumnAndRow(13, $line, $provider->managers[0]->contacts->email);
-                    $sheet->setCellValueByColumnAndRow(14, $line, $provider->managers[0]->function);
-                    /*$sheet->setCellValueByColumnAndRow(15, $line, $provider->contacts->phone1);
-                    $sheet->setCellValueByColumnAndRow(16, $line, $phone2);
-                    $sheet->setCellValueByColumnAndRow(17, $line, $provider->contacts->email);
-                    $sheet->setCellValueByColumnAndRow(18, $line, $site);
-                    $sheet->setCellValueByColumnAndRow(19, $line, $linkedin);
-                    $sheet->setCellValueByColumnAndRow(20, $line, $facebook);
-                    $sheet->setCellValueByColumnAndRow(21, $line, $instagram);
-                    $sheet->setCellValueByColumnAndRow(22, $line, $provider->managers[0]->name);
-                    $sheet->setCellValueByColumnAndRow(23, $line, $provider->managers[0]->contacts->phone1);
-                    $sheet->setCellValueByColumnAndRow(24, $line, $provider->managers[0]->contacts->email);
-                    $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
-                    $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
-                    $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
-                    $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom()->user->email);*/
+                        $sheet->setCellValueByColumnAndRow(1, $line, $provider->contracts[0]->contributors->name);
+                        $sheet->setCellValueByColumnAndRow(2, $line, $provider->contracts[0]->contributors->functions->name);
+                        $sheet->setCellValueByColumnAndRow(3, $line, $provider->contracts[0]->contributors->addresses->city);
+                        $sheet->setCellValueByColumnAndRow(4, $line, $provider->contracts[0]->contributors->active == 1 ? "Ativo" : "Inativo");
+                        $sheet->setCellValueByColumnAndRow(5, $line, "{$provider->cnpj} ");
+                        $sheet->setCellValueByColumnAndRow(6, $line, $provider->company_name);
+                        $sheet->setCellValueByColumnAndRow(7, $line, $provider->fantasy_name);
+                        $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
+                        $sheet->setCellValueByColumnAndRow(9, $line, $rate);
+                        $sheet->setCellValueByColumnAndRow(10, $line, $end_date);
+                        $sheet->setCellValueByColumnAndRow(11, $line, $manager->name);
+                        $sheet->setCellValueByColumnAndRow(12, $line, $manager->contacts->phone1);
+                        $sheet->setCellValueByColumnAndRow(13, $line, $manager->contacts->email);
+                        $sheet->setCellValueByColumnAndRow(14, $line, $manager->function);
+                        /*$sheet->setCellValueByColumnAndRow(15, $line, $provider->contacts->phone1);
+                        $sheet->setCellValueByColumnAndRow(16, $line, $phone2);
+                        $sheet->setCellValueByColumnAndRow(17, $line, $provider->contacts->email);
+                        $sheet->setCellValueByColumnAndRow(18, $line, $site);
+                        $sheet->setCellValueByColumnAndRow(19, $line, $linkedin);
+                        $sheet->setCellValueByColumnAndRow(20, $line, $facebook);
+                        $sheet->setCellValueByColumnAndRow(21, $line, $instagram);
+                        $sheet->setCellValueByColumnAndRow(22, $line, $provider->managers[0]->name);
+                        $sheet->setCellValueByColumnAndRow(23, $line, $provider->managers[0]->contacts->phone1);
+                        $sheet->setCellValueByColumnAndRow(24, $line, $provider->managers[0]->contacts->email);
+                        $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
+                        $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
+                        $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
+                        $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom()->user->email);*/
 
-                    $line++;
+                        $line++;
+                    }
                 }
-
                 $writer = new Xlsx($spreadsheet);
                 $filename = "report-" . time() . ".xlsx";
                 Storage::disk('local')->makeDirectory('reports');
@@ -409,7 +410,7 @@ class ReportController extends Controller {
                 return Storage::download($this->publicStorege.$filename);
             }
 
-            return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum fornecedor encontrado."]);
+            return response(false);
 
         } catch(\Exception $error) {
             echo $error->getTraceAsString();
@@ -480,23 +481,30 @@ class ReportController extends Controller {
 
         $line = 2;
         $rank = \App\Models\Client::with(['account_managers_detached', 'account_managers_nodetached']);
-        if(isset($request->from) && $request->from != ""){
-            if(!isset($request->to) || $request->to == ""){
+        if($request->has('from') && $request->from != ""){
+            
+            if(!$request->has('to') || $request->to == ""){
                 $request->merge([
                     'to' => $request->from
                 ]);
             }
             $account_manager = \App\Models\AccountManager::with('clients')->whereBetween('launch_date', [$request->from." 00:00:00", $request->to." 23:59:59"])->get();
             if($account_manager->pluck('clients')->count() > 0 ){
-                $rank = $rank->whereIn('id', $account_manager->pluck('clients')[0]->pluck('id')->toArray());
+                $clients = $account_manager->pluck('clients')->map(function($client){
+                    return $client->count() > 0 ? $client->pluck('id')[0]: null;
+                });
+                //dd(array_filter($clients->toArray()));
+                //return response()->json(array_filter($clients->toArray()));
+                $rank = $rank->whereIn('id', array_filter($clients->toArray()));
             }else{
-                return response()->json(['success'=> false, 'message' => 'Não há registros cadastrados neste intervalo']);
+                return response(false);
             }
         }
         
         
         $rank = $rank->get()->map(function($item) {
                 $data = [];
+                //dd([$item->account_managers_detached, $item->account_managers_nodetached]);
                 if(count($item->account_managers_detached) > 0){
                     $accs = $item->account_managers_detached->map(function($acc){
                         $acc->amount = $acc->bill_type == 2 ? -$acc->amount : $acc->amount;
@@ -521,16 +529,22 @@ class ReportController extends Controller {
                         'type' => "Plataforma",
                     ];
                 }
+                //dd($data);
                 return $data;
             });
-            $rank = array_filter($rank->toArray())[0];
+            //dd(array_filter($rank->toArray()));
+            $rank = array_filter($rank->toArray());
             //return response()->json($rank);
             foreach($rank as $k => $ranking){
-                $sheet->setCellValueByColumnAndRow(1, $line, $ranking['name']);
-                $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);
-                $sheet->setCellValueByColumnAndRow(3, $line, number_format($ranking['amount'],2,',','.'));
-                
-                $line++;
+                //dd($ranking);
+                //$ranking = $ranking[0];
+                foreach($ranking as $k => $rk){
+                    $sheet->setCellValueByColumnAndRow(1, $line, $rk['name']);
+                    $sheet->setCellValueByColumnAndRow(2, $line, $rk['type']);
+                    $sheet->setCellValueByColumnAndRow(3, $line, number_format($rk['amount'],2,',','.'));
+                    
+                    $line++;
+                }
             }
 
         $writer = new Xlsx($spreadsheet);
@@ -564,17 +578,20 @@ class ReportController extends Controller {
         $line = 2;
 
         $rank = \App\Models\Provider::with(['account_managers_detached', 'account_managers_nodetached','providertype']);
-        if(isset($request->from) && $request->from != ""){
-            if(!isset($request->to) || $request->to == ""){
+        if($request->has('from') && $request->from != ""){
+            if(!$request->has('to') || $request->to == ""){
                 $request->merge([
                     'to' => $request->from
                 ]);
             }
             $account_manager = \App\Models\AccountManager::with('clients')->whereBetween('launch_date', [$request->from." 00:00:00", $request->to." 23:59:59"])->get();
             if($account_manager->pluck('providers')->count() > 0 ){
-                $rank = $rank->whereIn('id', $account_manager->pluck('providers')[0]->pluck('id')->toArray());
+                    $providers = $account_manager->pluck('clients')->map(function($providers){
+                    return $providers->count() > 0 ? $providers->pluck('id')[0]: null;
+                });
+                $rank = $rank->whereIn('id', array_filter($providers->toArray()));
             }else{
-                return response()->json(['success'=> false, 'message' => 'Não há registros cadastrados neste intervalo']);
+                return response('false');
             }
         }
         $rank = $rank->get()->map(function($item) {
@@ -609,12 +626,14 @@ class ReportController extends Controller {
             }
             return $data;
         });
-        $rank = array_filter($rank->toArray())[0];
+        $rank = array_filter($rank->toArray());
+        
         foreach($rank as $k => $ranking){
-            $sheet->setCellValueByColumnAndRow(1, $line, $ranking['fantasy_name']);
-            $sheet->setCellValueByColumnAndRow(2, $line, $ranking['type']);
-            $sheet->setCellValueByColumnAndRow(3, $line, number_format($ranking['amount'], 2,',','.'));
-            
+            foreach($ranking as $k => $rk){
+                $sheet->setCellValueByColumnAndRow(1, $line, $rk['fantasy_name']);
+                $sheet->setCellValueByColumnAndRow(2, $line, $rk['type']);
+                $sheet->setCellValueByColumnAndRow(3, $line, number_format($rk['amount'], 2,',','.'));
+            }
             $line++;
         }
 

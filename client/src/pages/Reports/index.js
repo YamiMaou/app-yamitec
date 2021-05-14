@@ -24,7 +24,7 @@ import LCardGrid from '../../components/List/cardgrid';
 import { setSnackbar } from '../../actions/appActions'
 import { deleteApiBonus, getApiBonus, getApiReportFile, getApiReportFileS, putApiBonus } from '../../providers/api'
 
-import {InputCpf, stringCpf} from '../../providers/masks'
+import {InputCnpj, InputCpf, stringCpf} from '../../providers/masks'
 import { CircularProgress, IconButton, Toolbar } from '@material-ui/core';
 import { Add, DeleteForeverOutlined } from '@material-ui/icons';
 import { Link, withRouter } from 'react-router-dom';
@@ -53,14 +53,14 @@ class Reports extends Component {
     render() {
         const flexBasis = '25%';
         const filter = [
-            { column: 'from', label: 'De', type: 'date', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
-            { column: 'to', label: 'Até', type: 'date', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
-            { column: 'from_launch', label: 'Lançado De', type: 'date', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
-            { column: 'to_launch', label: 'Lançado Até', type: 'text', flexBasis : window.innerWidth > 720 ? '9%' : '100%'},
-            { column: 'cnpj', label: 'CNPJ', type: 'date', flexBasis : window.innerWidth > 720 ? '33%' : '100%', grow: 1},
-            { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis : window.innerWidth > 720 ? '33%' : '100%', grow: 1 },
+            { column: 'from', label: 'De', type: 'date', flexBasis : window.innerWidth > 720 ? '33%' : '100%'},
+            { column: 'to', label: 'Até', type: 'date', flexBasis : window.innerWidth > 720 ? '33%' : '100%'},
+            { column: 'from_launch', label: 'Lançado De', type: 'date', flexBasis : window.innerWidth > 720 ? '33%' : '100%'},
+            { column: 'to_launch', label: 'Lançado Até', type: 'date', flexBasis : window.innerWidth > 720 ? '33%' : '100%'},
+            { column: 'cnpj', label: 'CNPJ', type: 'text',mask: InputCnpj, flexBasis : window.innerWidth > 720 ? '40%' : '100%'},
+            { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis : window.innerWidth > 720 ? '35%' : '100%'},
             { 
-                column: 'type_rel', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '9%' : '100%' , grow:0,
+                column: 'type_rel', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '22%' : '100%' , grow:0,
                 values: ['Fornecedor', 'Vendas']
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
@@ -90,12 +90,18 @@ class Reports extends Component {
                 </Typography>
                 <LDataGrid hideList={true} rows={[]} columns={[]} filterInputs={filter} 
                     pageRequest={
-                        (params) => {
+                        async (params) => {
                             let type = {
                                 'Fornecedor': 'reports/providers',
                                 'Vendas': 'reports/sales'
                             }
-                            return getApiReportFileS(type[params.type_rel],'xlsx',params)
+                            if(type[params.type_rel] != undefined){
+                                let report = await getApiReportFileS(type[params.type_rel],'xlsx',params)
+                                console.log(report);
+                            }else{
+                                this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatorio"});
+                            }
+                            
                     }} />
 
                 <Typography variant="h6" style={{flexGrow: 1}}>
@@ -103,14 +109,19 @@ class Reports extends Component {
                 </Typography>
                 <LDataGrid hideList={true} rows={[]} columns={[]} filterInputs={filter_ranking} 
                     pageRequest={
-                        (params) => {
+                        async (params) => {
                             let type = {
                                 'Cliente': 'reports/client-ranking',
                                 'Fornecedor': 'reports/provider-ranking'
                             }
                             ///console.log(type[params.type_rank]);
                             ///console.log(params.type_rank);
-                            return getApiReportFileS(type[params.type_rank],'xlsx',params)
+                            if(type[params.type_rank] != undefined){
+                               let report = await  getApiReportFileS(type[params.type_rank],'xlsx',params)
+                                console.log(report);
+                            }else{
+                                this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatorio"});
+                            }
                     }} />
                     
             </Fragment>

@@ -104,7 +104,7 @@ class Managers extends Component {
     
     async componentDidMount() {
         const session = JSON.parse(localStorage.getItem("user"));
-        const providers = await getApiProviders();
+        const providers = await getApiProviders({pageSize: 9999});
         this.setState({...this.state, providers: providers.data})
         if(session == null){
             window.location.href = '/login';

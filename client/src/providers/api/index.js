@@ -921,15 +921,21 @@ export const getApiReportFileS = async (rel, ext,params = '') => {
   axios({
     method: 'get',
     url: `${apiHost}/${rel}/?${data}`,
-    //responseType: 'arraybuffer',
-    //data: dates
+    responseType: 'arraybuffer',
+    headers: {
+      'Content-Disposition': `attachment; filename=${rel}.${ext}`,
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  }
   }).then(function(response) {
+    console.log(response);
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download',`relatorio.${ext}`); //or any other extension
+    link.setAttribute('download', `${rel}.${ext}`);
     document.body.appendChild(link);
     link.click();
+    //revokeObjectURL(url)
+
   }).catch((error) => {
     console.log('Whoops! Houve um erro.', error.message || error)
     return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }
