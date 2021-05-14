@@ -223,4 +223,5 @@ Route::get('sales', 'Api\ReportController@reportSales');
 Route::get('providers', 'Api\ReportController@reportProviders');
 Route::get('client-ranking', 'Api\ReportController@reportClientRank');
 Route::get('provider-ranking', 'Api\ReportController@reportProviderRank');
+Route::get('audit-report', 'Api\AuditReportController@reportAudit');
 });
