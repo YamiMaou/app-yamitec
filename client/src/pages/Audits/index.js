@@ -55,10 +55,10 @@ class Auditoria extends Component {
         const columns = [];
         const flexBasis = '25%';
         const filter = [
-            { column: 'from', label: 'De', type: 'date', flexBasis },
-            { column: 'to', label: 'Até', type: 'date', flexBasis },
-            { column: 'name', label: 'Nome', type: 'text', flexBasis },
-            { column: 'email', label: 'Usuário', type: 'text', flexBasis },
+            { column: 'from', label: 'De', type: 'date', flexBasis: window.innerWidth > 720 ? '30%' : '100%' },
+            { column: 'to', label: 'Até', type: 'date', flexBasis: window.innerWidth > 720 ? '30%' : '100%' },
+            { column: 'name', label: 'Nome', type: 'text', flexBasis: window.innerWidth > 720 ? '30%' : '100%' },
+            { column: 'email', label: 'Usuário', type: 'text', flexBasis: window.innerWidth > 720 ? '30%' : '100%' },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 

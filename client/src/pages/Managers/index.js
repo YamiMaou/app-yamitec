@@ -207,9 +207,9 @@ class Managers extends Component {
                 valueLabel: 'fantasy_name',
                 values: this.state.providers ?? [],
                 value: "Todos",
-                flexBasis
+                flexBasis: '19%'
             },
-            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis },
+            { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis: '19%' },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
 

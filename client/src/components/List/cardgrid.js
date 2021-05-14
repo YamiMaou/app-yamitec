@@ -317,10 +317,10 @@ class LCardGrid extends Component {
                                 this.props.filterInputs.map(input => {
                                     if (input.type == "text") {
                                         if (input.mask === undefined)
-                                            return <TextField key={`field_${input.column}`} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            return <TextField key={`field_${input.column}`} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         else
                                             return (
-                                                <FormControl key={`field_${input.column}`} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                <FormControl key={`field_${input.column}`} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%'}} >
                                                     <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                     <Input
                                                         value={this.state.filters[input.column] ?? ""}
@@ -351,7 +351,7 @@ class LCardGrid extends Component {
                                             }
 
                                             return (
-                                                <FormControl key={`field_${input.column}`} style={{ ...classes.m5, flexGrow: input.grow ?? 0 }} >
+                                                <FormControl key={`field_${input.column}`} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%' }} >
                                                     <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                     <Input
                                                         value={this.state.filters[input.column] ?? ""}
@@ -389,9 +389,9 @@ class LCardGrid extends Component {
                                                 </FormControl>
                                             )
                                     } else if (input.type == "decimal" || input.type == "percent") {
-                                        return <MaskedDecimalInput key={`field_${input.column}`} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                        return <MaskedDecimalInput key={`field_${input.column}`} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput key={`field_${input.column}`} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: input.flexBasis }} onBlur={onChangeInputs} />)
+                                        return (<SelectInput key={`field_${input.column}`} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%'}} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }

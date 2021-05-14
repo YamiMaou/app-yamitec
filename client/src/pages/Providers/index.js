@@ -179,8 +179,8 @@ class Providers extends Component {
         ];
         const flexBasis = '25%';
         const filter = [
-            { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj,  flexBasis },
-            { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis },
+            { column: 'cnpj', label: 'CNPJ', type: 'text', mask: InputCnpj,  flexBasis: '20%' },
+            { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis: '20%' },
             {
                 column: 'type', label: 'Tipo', type: 'select',
                 values: [
@@ -191,8 +191,8 @@ class Providers extends Component {
                 flexBasis:'12%'
             },
             { column: 'active', label: 'Situação', type: 'select', values: ["Ativo", "Inativo"], value: "Todos", flexBasis: '12%'},
-            { column: 'created_at', label: 'Periodo de Adesão', type: 'date' },
-            { column: 'created_at_to', label: ' até', type: 'date' },
+            { column: 'created_at', label: 'Periodo de Adesão', type: 'date', flexBasis: '22%' },
+            { column: 'created_at_to', label: ' até', type: 'date', flexBasis: '22%' },
             
         ]
 

@@ -163,7 +163,11 @@ class Contributors extends Component {
                 }
             },
             { field: 'name', headerName: 'Nome', flex: 1.5 },
-            { field: 'function', headerName: 'Função', flex: 1 },
+            { field: 'functions', headerName: 'Função', flex: 1 , 
+                valueFormatter: (params: ValueFormatterParams) => {
+                    return this.state.functions.find(func => func.id == params.row.function).name;
+                }
+            },
             {
                 field: 'active',
                 headerName: 'Situação',
@@ -209,7 +213,7 @@ class Contributors extends Component {
                 }
             },
         ];
-        const flexBasis = '25%';
+        const flexBasis = '22%';
         const filter = [
             {
                 column: 'cpf', label: 'CPF', type: 'text',

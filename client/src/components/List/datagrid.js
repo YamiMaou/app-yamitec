@@ -330,7 +330,7 @@ class LDataGrid extends Component {
         return (
             <div>
                 {this.props.filterInputs == undefined ? ('') :
-                    (<Card className={classes.root} style={{ marginBottom: 15 }}>
+                    (<Card key={'ATF'} style={{ marginBottom: 15 }}>
                         <CardContent>
                             <Typography onClick={() => {
                                 this.setState({ ...this.state, filter: this.state.filter == 'none' ? 'flex' : 'none' })
@@ -348,10 +348,10 @@ class LDataGrid extends Component {
                                     this.props.filterInputs.map(input => {
                                         if (input.type == "text") {
                                             if (input.mask === undefined)
-                                                return <TextField value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                                return <TextField key={input.column} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                             else
                                                 return (
-                                                    <FormControl style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} >
+                                                    <FormControl key={input.column} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} >
                                                         <InputLabel htmlFor="formatted-text-mask-input">{input.label}</InputLabel>
                                                         <Input
                                                             value={this.state.filters[input.column] ?? ""}
@@ -420,9 +420,9 @@ class LDataGrid extends Component {
                                                 </FormControl>
                                             )
                                         } else if (input.type == "select") {
-                                            return (<SelectInput json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: input.flexBasis ?? '22%' }} onBlur={onChangeInputs} />)
+                                            return (<SelectInput key={input.column} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} onBlur={onChangeInputs} />)
                                         } else if (input.type == "decimal" || input.type == "percent") {
-                                            return <MaskedDecimalInput name={input.column} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '30%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
+                                            return <MaskedDecimalInput key={input.column} name={input.column} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         }
                                     })
                                 }

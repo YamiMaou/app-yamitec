@@ -927,7 +927,10 @@ export const getApiReportFileS = async (rel, ext,params = '') => {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   }
   }).then(function(response) {
-    console.log(response);
+    if(response.status == 203){
+      alert('Nenhum registro encontrado');
+      return response.status
+    }
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -935,7 +938,7 @@ export const getApiReportFileS = async (rel, ext,params = '') => {
     document.body.appendChild(link);
     link.click();
     //revokeObjectURL(url)
-
+    return response.status;
   }).catch((error) => {
     console.log('Whoops! Houve um erro.', error.message || error)
     return { data: {  data: [], success: false, message: "problema ao se conectar com o servidor!" } }

@@ -233,7 +233,7 @@ class ReportController extends Controller {
                 return Storage::download($this->publicStorege.$filename);
             }
 
-            return response()->json(["success"=> false, "type" => "error", "message" => "Nenhum fornecedor encontrado."]);
+            return response('false', 203);
 
         } catch(\Exception $error) {
             echo $error->getTraceAsString();
@@ -292,7 +292,7 @@ class ReportController extends Controller {
                 $spreadsheet = new Spreadsheet();
                 $sheet = $spreadsheet->getActiveSheet();
                 
-                $sheet->setTitle(__('Relatório de Fornecedores'));
+                $sheet->setTitle(__('Relatório de Vendas'));
 
                 $sheet->getStyle('A1:B1')->getBorders()->getAllBorders()->setBorderStyle(true);
                 $sheet->getStyle('A1:B1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('e2efd9');
@@ -497,7 +497,7 @@ class ReportController extends Controller {
                 //return response()->json(array_filter($clients->toArray()));
                 $rank = $rank->whereIn('id', array_filter($clients->toArray()));
             }else{
-                return response(false);
+                return response('false', 203);
             }
         }
         
@@ -586,14 +586,15 @@ class ReportController extends Controller {
             }
             $account_manager = \App\Models\AccountManager::with('clients')->whereBetween('launch_date', [$request->from." 00:00:00", $request->to." 23:59:59"])->get();
             if($account_manager->pluck('providers')->count() > 0 ){
-                    $providers = $account_manager->pluck('clients')->map(function($providers){
+                    $providers = $account_manager->pluck('providers')->map(function($providers){
                     return $providers->count() > 0 ? $providers->pluck('id')[0]: null;
                 });
                 $rank = $rank->whereIn('id', array_filter($providers->toArray()));
             }else{
-                return response('false');
+                return response('false', 203);
             }
         }
+        
         $rank = $rank->get()->map(function($item) {
             $data = [];
             if(count($item->account_managers_detached) > 0){

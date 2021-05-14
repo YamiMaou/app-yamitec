@@ -117,7 +117,7 @@ class Reports extends Component {
                             ///console.log(type[params.type_rank]);
                             ///console.log(params.type_rank);
                             if(type[params.type_rank] != undefined){
-                               let report = await  getApiReportFileS(type[params.type_rank],'xlsx',params)
+                                const report = await getApiReportFileS(type[params.type_rank],'xlsx',params)
                                 console.log(report);
                             }else{
                                 this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatorio"});
