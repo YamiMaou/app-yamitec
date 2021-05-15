@@ -107,6 +107,11 @@ class ClientsController extends ControllersExtends
         }
         $user = User::where('email', $resquest->email)->first();
         $is = \App\Models\Client::findOrFail($id);
+
+        if((Client::where('cpf', $resquest->cpf)->count() > 0) && ($is->cpf != $resquest->cpf)){
+            return response()->json(["success" => false, "message" => "O CPF informado já está cadastrado."]);
+        }
+
         if($is && $user && $user->id != $is->user_id){
             return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
         }
