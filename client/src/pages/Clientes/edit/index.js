@@ -75,7 +75,7 @@ class EditContributors extends Component {
                 }
                 this.setState({ ...this.state, loading: false });
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, messages});
+                this.props.setSnackbar({ open: true, message: messages});
             }
 
         }

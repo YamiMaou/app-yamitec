@@ -160,20 +160,24 @@ class EditContributors extends Component {
                 this.setState({ ...this.state, loading: false });
                 this.props.history.goBack();
             } else {
-                let { errors, message } = response.data.error.response.data
+                console.log(response)
+                let errors = response.data ?? undefined;
+
+                //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
-                console.log(errors)
-                if (errors !== undefined) {
-                    Object.keys(errors).map(err => {
+                if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
+                    Object.keys(errors.error.response.data.errors).map(err => {
                         console.log(err);
-                        messages += `O campo ${err.toUpperCase()} : ${errors[err][0]} \r`;
-                    });
-                } else {
-                    messages = 'Houve um problema em sua requisição!'
+                        let field = err == "file" ? "Anexo" : err
+                        messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
+                    })
+                } else{
+                    messages = errors.message ?? 'Houve um problema em sua requisição!'
                 }
-                this.setState({ ...this.state, loading: false });
                 //response.data.error.response.data.errors
-                this.props.setSnackbar({ open: true, messages });
+                //this.props.enqueueSnackbar( message, { variant: 'error' });
+                this.setState({ ...this.state, loading: false });
+                this.props.setSnackbar({ open: true, message: messages});
             }
 
         }

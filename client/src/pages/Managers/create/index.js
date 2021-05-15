@@ -136,6 +136,7 @@ class CreateManagers extends Component {
                 console.log(response)
                 let errors = response.data ?? undefined;
 
+                //let { errors } = response.data.error.response.data ?? {error: undefined}
                 let messages = '';
                 if(errors !== undefined && errors.error !== undefined && errors.error.response && errors.error.response.data !== undefined && errors.error.response.data.errors !== undefined){
                     Object.keys(errors.error.response.data.errors).map(err => {
@@ -144,13 +145,10 @@ class CreateManagers extends Component {
                         messages += `O ${field.toUpperCase()} ${errors.error.response.data.errors[err][0]} \n`;
                     })
                 } else{
-                    if(errors.success == false){
-                        messages = errors.message;
-                    }else{
-                        messages = 'Houve um problema em sua requisição!'
-                    }
-                    
+                    messages = errors.message ?? 'Houve um problema em sua requisição!'
                 }
+                //response.data.error.response.data.errors
+                //this.props.enqueueSnackbar( message, { variant: 'error' });
                 this.setState({ ...this.state, loading: false });
                 this.props.setSnackbar({ open: true, message: messages});
             }
