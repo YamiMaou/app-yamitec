@@ -41,7 +41,7 @@ function Sidebar(props) {
       {url: "/funcoes", label: 'Perfis', icon: <PeopleIcon fontSize="small" />},
       {url: "/perfis", label: 'Permissões', icon: <PeopleIcon fontSize="small" />},
       {url: "/auditoria", label: 'Auditoria', icon: <PeopleIcon fontSize="small" />},
-      {url: "/relatorios", label: 'Relatorios', icon: <PeopleIcon fontSize="small" />},
+      {url: "/relatorios", label: 'Relatórios', icon: <PeopleIcon fontSize="small" />},
       //{url: "/Fornecedores", label: 'Fornecedores', icon: <PeopleIcon fontSize="small" />},
     ]
     if(authData === null) return ('');

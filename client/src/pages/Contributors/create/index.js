@@ -78,6 +78,21 @@ class CreateContributors extends Component {
                 v.fields.reverse().map((v1,k1)=>{
                         let value = values[v1.column];
                         if (v1.validate !== undefined) {
+                            if(v1.validate.filetype !== undefined){
+                                if (!v1.validate.filetype.includes(value.name.split('.')[value.name.split('.').length-1].toLowerCase())){
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, é incompativo com o(s) tipo(s) suportado(s) (${v1.validate.filetype.join(',')}).` };
+                                }
+                                //value.name.split('.')[file.name.split('.').length-1]
+                            }
+    
+                            if(v1.validate.filesize !== undefined){
+                                if (v1.validate.filesize < ((value.size/1024)/1024).toFixed(2)){
+                                    console.log(`${v1.validate.filesize} ${((value.size/1024)/1024).toFixed(2)}`)
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, deve ser no máximo (${v1.validate.filesize} MB).` };
+                                }
+                                //value.name.split('.')[file.name.split('.').length-1]
+                            }
+
                             if (v1.validate.number !== undefined) {
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
@@ -92,7 +107,6 @@ class CreateContributors extends Component {
                                 if (value.length < v1.validate.min)
                                     campo = {id: v1.column, message: `O Campo ${v1.label}, tamanho minimo de ${v1.validate.min} caracteres.` };
                             }
-
                             if (v1.validate.required !== undefined) {
                                 if (value.length == 0)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é obrigatório` };
@@ -136,7 +150,7 @@ class CreateContributors extends Component {
                         validate: {required: true },
                         flexBasis, style:{width: '220px'}
                     },
-                    { column: 'file', label: 'Anexar Documento', type: 'file', validate: {required: true}, flexBasis },
+                    { column: 'file', label: 'Anexar Documento', type: 'file', validate: {filesize: 10.0, filetype: ['jpeg', 'jpg', 'png','bmp','pdf','doc', 'docx'], required: true}, flexBasis },
                     //
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]

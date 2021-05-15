@@ -87,6 +87,20 @@ class EditContributors extends Component {
                     if (values[v1.column] !== undefined) {
                         let value = values[v1.column];
                         if (v1.validate !== undefined) {
+                            if(v1.validate.filetype !== undefined){
+                                if (!v1.validate.filetype.includes(value.name.split('.')[value.name.split('.').length-1].toLowerCase())){
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, é incompativo com o(s) tipo(s) suportado(s) (${v1.validate.filetype.join(',')}).` };
+                                }
+                                //value.name.split('.')[file.name.split('.').length-1]
+                            }
+    
+                            if(v1.validate.filesize !== undefined){
+                                if (!v1.validate.filesize < ((value.size/1024)/1024).toFixed(2)){
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, deve ser no máximo (${v1.validate.filesize} MB).` };
+                                }
+                                //value.name.split('.')[file.name.split('.').length-1]
+                            }
+
                             if (v1.validate.number !== undefined) {
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é somente números ` }
@@ -152,7 +166,7 @@ class EditContributors extends Component {
                         validate: {required: true },
                         flexBasis
                     },
-                    { column: 'file', label: 'Anexar Documento', file: this.state.data['file'] ? this.state.data['file'].name : '', type: 'file', flexBasis:'15%' },
+                    { column: 'file', label: 'Anexar Documento', validate: {filesize: 10, filetype: ['jpeg', 'jpg', 'png','bmp','pdf','doc', 'docx'], required: true}, file: this.state.data['file'] ? this.state.data['file'].name : '', type: 'file', flexBasis:'15%' },
                 ]
             },
             {

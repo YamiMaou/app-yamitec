@@ -374,7 +374,7 @@ class EditProviders extends Component {
     }
     render() {
         const closeSnack = (event, reason) => {
-            if (reason === 'clickaway') {
+            if (reason === 'clickaway'){
                 return;
             }
             this.props.setSnackbar({ open: false, message: "" });
@@ -449,6 +449,19 @@ class EditProviders extends Component {
                                     campo = { id: v1.column, message: `O Campo ${v1.label} é somente números ` }
                             }
                             if (v1.validate.depends !== undefined) {
+                                if(v1.validate.filetype !== undefined){
+                                    if (!v1.validate.filetype.includes(value.name.split('.')[value.name.split('.').length-1].toLowerCase())){
+                                        campo = {id: v1.column, message: `O Campo ${v1.label}, é incompativo com o(s) tipo(s) suportado(s) (${v1.validate.filetype.join(',')}).` };
+                                    }
+                                    //value.name.split('.')[file.name.split('.').length-1]
+                                }
+        
+                                if(v1.validate.filesize !== undefined){
+                                    if (v1.validate.filesize < ((value.size/1024)/1024).toFixed(2)){
+                                        campo = {id: v1.column, message: `O Campo ${v1.label}, deve ser no máximo (${v1.validate.filesize} MB).` };
+                                    }
+                                    //value.name.split('.')[file.name.split('.').length-1]
+                                }
                                 let val = values[v1.validate.depends.column];
                                 //console.log(v1.validate.depends.value);
                                 //return false;
@@ -551,8 +564,8 @@ class EditProviders extends Component {
                     },
                     { column: 'company_name', label: 'Razão Social', type: 'text', value: this.state.data['company_name'], validate: { max: 50, required: true }, flexBasis: '25%' },
                     { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', value: this.state.data['fantasy_name'], validate: { max: 50, required: true }, flexBasis: '25%' },
-                    { column: 'file_anexo', label: 'Documento', type: 'file', file: this.state.data['file_anexo'] ? this.state.data['file_anexo'].name : '', flexBasis },
-                    { column: 'file_logo', label: 'Logo marca', type: 'file', file: this.state.data['file_logo'] ? this.state.data['file_logo'].name : '', validate: { required: true }, flexBasis },
+                    { column: 'file_anexo', label: 'Documento', type: 'file', file: this.state.data['file_anexo'] ? this.state.data['file_anexo'].name : '', flexBasis, validate: {filesize: 10, filetype: ['jpeg', 'jpg', 'png','bmp', 'pdf', 'doc', 'docx']} },
+                    { column: 'file_logo', label: 'Logo marca', type: 'file', file: this.state.data['file_logo'] ? this.state.data['file_logo'].name : '', validate: {filesize: 10, filetype: ['jpeg', 'jpg', 'png','bmp'], required: true}, flexBasis },
 
                 ]
             },
@@ -940,7 +953,7 @@ class EditProviders extends Component {
                                                     json={true}
                                                     valueLabel={'company_name'}
                                                     key={`input-${15019}`} id={"provider"} label={"Filial"} name={"provider"}
-                                                    values={this.state.filials}
+                                                    values={this.state.filials.filter(x => x.providertype_id == this.state.fields['providertype_id'])}
                                                     style={{ flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }}
                                                     onChange={(e) => {
                                                         this.setState({ ...this.state, provider: e.target.value });

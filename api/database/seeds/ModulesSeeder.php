@@ -16,8 +16,7 @@ class ModulesSeeder extends Seeder
         DB::table('modules')->insert([
             [
                 'name' => "Colaboradores",
-            ],
-            [
+            ],[
                 'name' => "Clientes",
             ],[
                 'name' => "Responsáveis",
@@ -31,6 +30,10 @@ class ModulesSeeder extends Seeder
                 'name' => "Permissões",
             ],[
                 'name' => "Auditoria",
+            ],[
+                'name' => "Perfis",
+            ],[
+                'name' => "Relatorios",
             ],
         ]);
         //factory(User::class, 2)->create();

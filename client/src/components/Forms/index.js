@@ -265,10 +265,15 @@ const CheckBoxInput = (props) => {
 
 // File Input
 const FileInput = (props) => {
+    const [imgSrc, setimgSrc] = useState(undefined);
+    const [fileType ,setfileType] = useState(undefined);
     const [value, setValue] = useState(props.value ?? undefined);
     const [file, setFile] = useState(props.file ?? undefined);
     const [replace, setReplace] = useState(!props.file ?? true);
     const [error, setError] = useState(false);
+    const types = [
+        'jpeg', 'jpg', 'png', 'bmp'
+    ];
     function handleChange(e) {
         const { value, id } = e.target;
         if (props.validate !== undefined) {
@@ -278,7 +283,16 @@ const FileInput = (props) => {
                 setError(true)
             }
         }
+        // Assuming only image
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        var url = reader.readAsDataURL(file);
 
+        reader.onloadend = function (e) {
+            setimgSrc([reader.result]);
+        }.bind(this);
+        setfileType(file.name.split('.')[file.name.split('.').length-1]);
+        // TODO: concat files
         props.onChange({ target: { id, value: e.target.files[0], type: 'file' } })
         setValue(e.target.value);
         setFile(e.target.file);
@@ -298,9 +312,16 @@ const FileInput = (props) => {
                             />
                         </Button> :
                          <div style={{ display: 'flex', marginRight: 10 }}>
-                            <Button style={props.style} variant="outlined" component="label">
-                                {value.split(/(\\|\/)/g).pop().substring(0, 7) + '...'}
-                            </Button>
+                                {
+                                    types.includes(fileType.toLowerCase()) ? (
+                                        <img style={{...props.style, width: '64px', height: '60px'}} src={imgSrc} />
+                                    ) : 
+                                (
+                                <Button style={props.style} variant="outlined" component="label">
+                                    {value.split(/(\\|\/)/g).pop().substring(0, 7) + '...'}
+                                </Button>
+                                    )
+                                }
                             <Button style={{ marginTop: 25, height: 60 }} variant="outlined" size="small"
                             >
                                 <Icon name="remove" size={16} color="red" onClick={() => {

@@ -398,6 +398,20 @@ class CreateProviders extends Component {
                 v.fields.reverse().map((v1,k1)=>{
                         let value = values[v1.column];
                         if (v1.validate !== undefined) {
+                            if(v1.validate.filetype !== undefined){
+                                if (!v1.validate.filetype.includes(value.name.split('.')[value.name.split('.').length-1].toLowerCase())){
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, é incompativo com o(s) tipo(s) suportado(s) (${v1.validate.filetype.join(',')}).` };
+                                }
+                                //value.name.split('.')[file.name.split('.').length-1]
+                            }
+    
+                            if(v1.validate.filesize !== undefined){
+                                if (v1.validate.filesize < ((value.size/1024)/1024).toFixed(2)){
+                                    campo = {id: v1.column, message: `O Campo ${v1.label}, deve ser no máximo (${v1.validate.filesize} MB).` };
+                                }
+                                //value.name.split('.')[file.name.split('.').length-1]
+                            }
+
                             if (v1.validate.number !== undefined) {
                                 if (/^[-]?\d+$/.test(value) == false)
                                     campo = {id: v1.column, message: `O Campo ${v1.label} é somente números ` }
@@ -485,8 +499,8 @@ class CreateProviders extends Component {
                     },
                     { column: 'company_name', label: 'Razão Social', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
                     { column: 'fantasy_name', label: 'Nome Fantasia', type: 'text', validate: {max: 50, required: true}, flexBasis:'25%' },
-                    { column: 'anexo', label: 'Documento', type: 'file', flexBasis },
-                    { column: 'logo', label: 'Logo marca', type: 'file', validate: {required: true}, flexBasis },
+                    { column: 'anexo', label: 'Documento', type: 'file', flexBasis, validate: {filesize: 10, filetype: ['jpeg', 'jpg', 'png','bmp','pdf','doc', 'docx']} },
+                    { column: 'logo', label: 'Logo marca', type: 'file', validate: {filesize: 10, filetype: ['jpeg', 'jpg', 'png','bmp'], required: true}, flexBasis },
                     //
                     //{ column: 'created_at', label: 'Data', type: 'date' },
                 ]
@@ -851,7 +865,7 @@ class CreateProviders extends Component {
                                         json={true} 
                                         valueLabel={'company_name'}
                                         key={`input-${15019}`} id={"providers"} label={"Filial"} name={"providers"} 
-                                        values={this.state.filials} 
+                                        values={this.state.filials.filter(x => x.providertype_id == this.state.fields['providertype_id'])} 
                                         style={{flexBasis: window.innerWidth < 768 ? '75%' : '75%', marginBottom: 15 }} 
                                         onChange={(e) => {
                                             console.log(e.target.value)

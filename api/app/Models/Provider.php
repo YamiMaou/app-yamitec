@@ -68,6 +68,11 @@ class Provider extends Model
         return $this->belongsTo(Provider::class);
     }
 
+    public function matrizData()
+    {
+        return $this->hasOne(Provider::class, 'id', 'matriz_id');
+    }
+
     public function filials()
     {
         return $this->hasMany(Provider::class, 'matriz_id', 'id')->with(['contact', 'address']);

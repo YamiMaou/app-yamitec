@@ -75,6 +75,20 @@ class PermissionSeeder extends Seeder
                 'read' => 1,
                 'update' => 1,
                 'delete' => 1
+            ],[
+                'module_id' => 9,
+                'profile_id' => 1,
+                'create' => 1,
+                'read' => 1,
+                'update' => 1,
+                'delete' => 1
+            ],[
+                'module_id' => 10,
+                'profile_id' => 1,
+                'create' => 1,
+                'read' => 1,
+                'update' => 1,
+                'delete' => 1
             ],
         ]);
         //factory(User::class, 2)->create();

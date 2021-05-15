@@ -61,7 +61,8 @@ class Reports extends Component {
             { column: 'company_name', label: 'Razão Social', type: 'text', flexBasis : window.innerWidth > 720 ? '35%' : '100%'},
             { 
                 column: 'type_rel', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '22%' : '100%' , grow:0,
-                values: ['Fornecedor', 'Vendas']
+                values: ['Fornecedor', 'Vendas'],
+                defaultLabel: 'Selecione'
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
@@ -71,7 +72,8 @@ class Reports extends Component {
             { column: 'to', label: 'Até', type: 'date', flexBasis, grow: 0 },
             { 
                 column: 'type_rank', label: 'Tipo', type: 'select', flexBasis : window.innerWidth > 720 ? '14%' : '100%', grow: 0 ,
-                values: ['Cliente', 'Fornecedor']
+                values: ['Cliente', 'Fornecedor'],
+                defaultLabel: 'Selecione'
             },
             //{ column: 'created_at', label: 'Data', type: 'date' },
         ]
@@ -99,7 +101,7 @@ class Reports extends Component {
                                 let report = await getApiReportFileS(type[params.type_rel],'xlsx',params)
                                 console.log(report);
                             }else{
-                                this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatorio"});
+                                this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatório"});
                             }
                             
                     }} />
@@ -120,7 +122,7 @@ class Reports extends Component {
                                 const report = await getApiReportFileS(type[params.type_rank],'xlsx',params)
                                 console.log(report);
                             }else{
-                                this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatorio"});
+                                this.props.setSnackbar({open: true, message: "Selecione um Tipo de relatório"});
                             }
                     }} />
                     

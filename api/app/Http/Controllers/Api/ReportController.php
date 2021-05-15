@@ -138,33 +138,34 @@ class ReportController extends Controller {
                 $sheet->setCellValue('A3', __('Qtd inativas'));
 
                 $sheet->setCellValue('A5', __('Situação'));
-                $sheet->setCellValue('B5', __('Fornecedor'));
-                $sheet->setCellValue('C5', __('Tipo'));
-                $sheet->setCellValue('D5', __('CNPJ'));
-                $sheet->setCellValue('E5', __('Razão Social'));
-                $sheet->setCellValue('F5', __('Nome Fantasia'));
-                $sheet->setCellValue('G5', __('Qtd Clientes Compradores'));
-                $sheet->setCellValue('H5', __('Data de adesão'));
-                $sheet->setCellValue('I5', __('Data de finalização'));
-                $sheet->setCellValue('J5', __('Taxa de adesão'));
-                $sheet->setCellValue('K5', __('Vendedor'));
-                $sheet->setCellValue('L5', __('CEP'));
-                $sheet->setCellValue('M5', __('Endereço'));
-                $sheet->setCellValue('N5', __('Complemento'));
-                $sheet->setCellValue('O5', __('Contato 01'));
-                $sheet->setCellValue('P5', __('Contato 02'));
-                $sheet->setCellValue('Q5', __('E-mail'));
-                $sheet->setCellValue('R5', __('Site'));
-                $sheet->setCellValue('S5', __('LinkedIn'));
-                $sheet->setCellValue('T5', __('Facebook'));
-                $sheet->setCellValue('U5', __('Instagram'));
-                $sheet->setCellValue('V5', __('Nome Resp'));
-                $sheet->setCellValue('W5', __('Telefone Resp'));
-                $sheet->setCellValue('X5', __('E-mail Resp'));
-                $sheet->setCellValue('Y5', __('Função Resp'));
-                $sheet->setCellValue('Z5', __('Data de cadastro'));
-                $sheet->setCellValue('AA5', __('Última alteração'));
-                $sheet->setCellValue('AB5', __('Cadastrante'));
+                $sheet->setCellValue('B5', __('Tipo Fornecedor'));
+                $sheet->setCellValue('C5', __('Tipo Empresa'));
+                $sheet->setCellValue('D5', __('Matriz'));
+                $sheet->setCellValue('E5', __('CNPJ'));
+                $sheet->setCellValue('F5', __('Razão Social'));
+                $sheet->setCellValue('G5', __('Nome Fantasia'));
+                $sheet->setCellValue('H5', __('Qtd Clientes Compradores'));
+                $sheet->setCellValue('I5', __('Data de adesão'));
+                $sheet->setCellValue('J5', __('Data de finalização'));
+                $sheet->setCellValue('K5', __('Taxa de adesão'));
+                $sheet->setCellValue('L5', __('Vendedor'));
+                $sheet->setCellValue('M5', __('CEP'));
+                $sheet->setCellValue('N5', __('Endereço'));
+                $sheet->setCellValue('O5', __('Complemento'));
+                $sheet->setCellValue('P5', __('Contato 01'));
+                $sheet->setCellValue('Q5', __('Contato 02'));
+                $sheet->setCellValue('R5', __('E-mail'));
+                $sheet->setCellValue('S5', __('Site'));
+                $sheet->setCellValue('T5', __('LinkedIn'));
+                $sheet->setCellValue('U5', __('Facebook'));
+                $sheet->setCellValue('V5', __('Instagram'));
+                $sheet->setCellValue('W5', __('Nome Resp'));
+                $sheet->setCellValue('X5', __('Telefone Resp'));
+                $sheet->setCellValue('Y5', __('E-mail Resp'));
+                $sheet->setCellValue('Z5', __('Função Resp'));
+                $sheet->setCellValue('AA5', __('Data de cadastro'));
+                $sheet->setCellValue('AB5', __('Última alteração'));
+                $sheet->setCellValue('AC5', __('Cadastrante'));
 
                 $qtyTotal = count($this->providersList); 
                 $qttyActive = count($this->providersList->where('active', 1));
@@ -177,52 +178,53 @@ class ReportController extends Controller {
                 $line = 6;
 
                 foreach ($this->providersList as $key => $provider) {
+                    foreach($provider->managers as $km => $manager){
+                        $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
+                        $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
+                        $created_at = date('d/m/Y', strtotime($provider->created_at));
+                        $updated_at = date('d/m/Y', strtotime($provider->updated_at));
+                        $accession_date = date('d/m/Y', strtotime($provider->contracts[0]->accession_date));
+                        $end_date = date('d/m/Y', strtotime($provider->contracts[0]->end_date));
+                        $rate = number_format($provider->contracts[0]->rate, 2, ',', '.');
+                        $additional = ($provider->addresses->additional != 'null') ? $provider->addresses->additional : '';
+                        $phone2 = ($provider->contacts->phone2 != 'null') ? $provider->contacts->phone2 : '';
+                        $site = ($provider->contacts->site != 'null') ? $provider->contacts->site : '';
+                        $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
+                        $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
+                        $facebook = ($provider->contacts->facebook != 'null') ? $provider->contacts->facebook : '';
+                        $instagram = ($provider->contacts->instagram != 'null') ? $provider->contacts->instagram : '';
 
-                    $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
-                    $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
-                    $created_at = date('d/m/Y', strtotime($provider->created_at));
-                    $updated_at = date('d/m/Y', strtotime($provider->updated_at));
-                    $accession_date = date('d/m/Y', strtotime($provider->contracts[0]->accession_date));
-                    $end_date = date('d/m/Y', strtotime($provider->contracts[0]->end_date));
-                    $rate = number_format($provider->contracts[0]->rate, 2, ',', '.');
-                    $additional = ($provider->addresses->additional != 'null') ? $provider->addresses->additional : '';
-                    $phone2 = ($provider->contacts->phone2 != 'null') ? $provider->contacts->phone2 : '';
-                    $site = ($provider->contacts->site != 'null') ? $provider->contacts->site : '';
-                    $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
-                    $linkedin = ($provider->contacts->linkedin != 'null') ? $provider->contacts->linkedin : '';
-                    $facebook = ($provider->contacts->facebook != 'null') ? $provider->contacts->facebook : '';
-                    $instagram = ($provider->contacts->instagram != 'null') ? $provider->contacts->instagram : '';
-
-                    $sheet->setCellValueByColumnAndRow(1, $line, $active);
-                    $sheet->setCellValueByColumnAndRow(2, $line, $provider->providertype->name);
-                    $sheet->setCellValueByColumnAndRow(3, $line, $type);
-                    $sheet->setCellValueByColumnAndRow(4, $line, "{$provider->cnpj} ");
-                    $sheet->setCellValueByColumnAndRow(5, $line, $provider->company_name);
-                    $sheet->setCellValueByColumnAndRow(6, $line, $provider->fantasy_name);
-                    $sheet->setCellValueByColumnAndRow(7, $line, ' ');
-                    $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
-                    $sheet->setCellValueByColumnAndRow(9, $line, $end_date);
-                    $sheet->setCellValueByColumnAndRow(10, $line, $rate);
-                    $sheet->setCellValueByColumnAndRow(11, $line, $provider->contracts[0]->contributors->name);
-                    $sheet->setCellValueByColumnAndRow(12, $line, $provider->addresses->zipcode);
-                    $sheet->setCellValueByColumnAndRow(13, $line, $provider->addresses->street);
-                    $sheet->setCellValueByColumnAndRow(14, $line, $additional);
-                    $sheet->setCellValueByColumnAndRow(15, $line, $provider->contacts->phone1);
-                    $sheet->setCellValueByColumnAndRow(16, $line, $phone2);
-                    $sheet->setCellValueByColumnAndRow(17, $line, $provider->contacts->email);
-                    $sheet->setCellValueByColumnAndRow(18, $line, $site);
-                    $sheet->setCellValueByColumnAndRow(19, $line, $linkedin);
-                    $sheet->setCellValueByColumnAndRow(20, $line, $facebook);
-                    $sheet->setCellValueByColumnAndRow(21, $line, $instagram);
-                    $sheet->setCellValueByColumnAndRow(22, $line, $provider->managers[0]->name);
-                    $sheet->setCellValueByColumnAndRow(23, $line, $provider->managers[0]->contacts->phone1);
-                    $sheet->setCellValueByColumnAndRow(24, $line, $provider->managers[0]->contacts->email);
-                    $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
-                    $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
-                    $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
-                    $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom() != null ? $provider->burnFrom()->user->email : "");
-
-                    $line++;
+                        $sheet->setCellValueByColumnAndRow(1, $line, $active);
+                        $sheet->setCellValueByColumnAndRow(2, $line, $provider->providertype->name);
+                        $sheet->setCellValueByColumnAndRow(3, $line, $type);
+                        $sheet->setCellValueByColumnAndRow(4, $line, $provider->matrizData != null ? $provider->matrizData->company_name : "");
+                        $sheet->setCellValueByColumnAndRow(5, $line, "{$provider->cnpj} ");
+                        $sheet->setCellValueByColumnAndRow(6, $line, $provider->company_name);
+                        $sheet->setCellValueByColumnAndRow(7, $line, $provider->fantasy_name);
+                        $sheet->setCellValueByColumnAndRow(8, $line, ' ');
+                        $sheet->setCellValueByColumnAndRow(9, $line, $accession_date);
+                        $sheet->setCellValueByColumnAndRow(10, $line, $end_date);
+                        $sheet->setCellValueByColumnAndRow(11, $line, $rate);
+                        $sheet->setCellValueByColumnAndRow(12, $line, $provider->contracts[0]->contributors->name);
+                        $sheet->setCellValueByColumnAndRow(13, $line, $provider->addresses->zipcode);
+                        $sheet->setCellValueByColumnAndRow(14, $line, $provider->addresses->street);
+                        $sheet->setCellValueByColumnAndRow(15, $line, $additional);
+                        $sheet->setCellValueByColumnAndRow(16, $line, $provider->contacts->phone1);
+                        $sheet->setCellValueByColumnAndRow(17, $line, $phone2);
+                        $sheet->setCellValueByColumnAndRow(18, $line, $provider->contacts->email);
+                        $sheet->setCellValueByColumnAndRow(19, $line, $site);
+                        $sheet->setCellValueByColumnAndRow(20, $line, $linkedin);
+                        $sheet->setCellValueByColumnAndRow(21, $line, $facebook);
+                        $sheet->setCellValueByColumnAndRow(22, $line, $instagram);
+                        $sheet->setCellValueByColumnAndRow(23, $line, $manager->name);
+                        $sheet->setCellValueByColumnAndRow(24, $line, $manager->contacts->phone1);
+                        $sheet->setCellValueByColumnAndRow(25, $line, $manager->contacts->email);
+                        $sheet->setCellValueByColumnAndRow(26, $line, $manager->function);
+                        $sheet->setCellValueByColumnAndRow(27, $line, $created_at);
+                        $sheet->setCellValueByColumnAndRow(28, $line, $updated_at);
+                        $sheet->setCellValueByColumnAndRow(29, $line, $provider->burnFrom() != null ? $provider->burnFrom()->user->email : "");
+                        $line++;
+                    }
                 }
 
                 $writer = new Xlsx($spreadsheet);
@@ -339,15 +341,16 @@ class ReportController extends Controller {
                 $sheet->setCellValue('C5', __('Cidade'));
                 $sheet->setCellValue('D5', __('Situação'));
                 $sheet->setCellValue('E5', __('CNPJ'));
-                $sheet->setCellValue('F5', __('Razão Social'));
-                $sheet->setCellValue('G5', __('Nome Fantasia'));
-                $sheet->setCellValue('H5', __('Data de adesão'));
+                $sheet->setCellValue('F5', __('Data de Cadastro'));
+                $sheet->setCellValue('G5', __('Razão Social'));
+                $sheet->setCellValue('H5', __('Nome Fantasia'));
+                $sheet->setCellValue('I5', __('Data de adesão'));
                 $sheet->setCellValue('J5', __('Taxa de adesão'));
-                $sheet->setCellValue('I5', __('Data de finalização'));
-                $sheet->setCellValue('K5', __('Responsável Empresa'));
-                $sheet->setCellValue('L5', __('Telefone Resp'));
-                $sheet->setCellValue('M5', __('E-mail Resp'));
-                $sheet->setCellValue('N5', __('Função Resp'));
+                $sheet->setCellValue('K5', __('Data de finalização'));
+                $sheet->setCellValue('L5', __('Responsável Empresa'));
+                $sheet->setCellValue('M5', __('Telefone Resp'));
+                $sheet->setCellValue('N5', __('E-mail Resp'));
+                $sheet->setCellValue('O5', __('Função Resp'));
 
                 $qtyTotal = count($this->providersList); 
                 $qttyActive = count($this->providersList->where('active', 1));
@@ -361,7 +364,6 @@ class ReportController extends Controller {
 
                 foreach ($this->providersList as $key => $provider) {
                     foreach($provider->managers as $km => $manager){
-
                         $type = ($provider->type == 1) ? 'Matriz' : 'Filial';
                         $active = ($provider->active == 1) ? 'Ativo' : 'Desativado';
                         $created_at = date('d/m/Y', strtotime($provider->created_at));
@@ -375,29 +377,16 @@ class ReportController extends Controller {
                         $sheet->setCellValueByColumnAndRow(3, $line, $provider->contracts[0]->contributors->addresses->city);
                         $sheet->setCellValueByColumnAndRow(4, $line, $provider->contracts[0]->contributors->active == 1 ? "Ativo" : "Inativo");
                         $sheet->setCellValueByColumnAndRow(5, $line, "{$provider->cnpj} ");
-                        $sheet->setCellValueByColumnAndRow(6, $line, $provider->company_name);
-                        $sheet->setCellValueByColumnAndRow(7, $line, $provider->fantasy_name);
-                        $sheet->setCellValueByColumnAndRow(8, $line, $accession_date);
-                        $sheet->setCellValueByColumnAndRow(9, $line, $rate);
-                        $sheet->setCellValueByColumnAndRow(10, $line, $end_date);
-                        $sheet->setCellValueByColumnAndRow(11, $line, $manager->name);
-                        $sheet->setCellValueByColumnAndRow(12, $line, $manager->contacts->phone1);
-                        $sheet->setCellValueByColumnAndRow(13, $line, $manager->contacts->email);
-                        $sheet->setCellValueByColumnAndRow(14, $line, $manager->function);
-                        /*$sheet->setCellValueByColumnAndRow(15, $line, $provider->contacts->phone1);
-                        $sheet->setCellValueByColumnAndRow(16, $line, $phone2);
-                        $sheet->setCellValueByColumnAndRow(17, $line, $provider->contacts->email);
-                        $sheet->setCellValueByColumnAndRow(18, $line, $site);
-                        $sheet->setCellValueByColumnAndRow(19, $line, $linkedin);
-                        $sheet->setCellValueByColumnAndRow(20, $line, $facebook);
-                        $sheet->setCellValueByColumnAndRow(21, $line, $instagram);
-                        $sheet->setCellValueByColumnAndRow(22, $line, $provider->managers[0]->name);
-                        $sheet->setCellValueByColumnAndRow(23, $line, $provider->managers[0]->contacts->phone1);
-                        $sheet->setCellValueByColumnAndRow(24, $line, $provider->managers[0]->contacts->email);
-                        $sheet->setCellValueByColumnAndRow(25, $line, $provider->managers[0]->function);
-                        $sheet->setCellValueByColumnAndRow(26, $line, $created_at);
-                        $sheet->setCellValueByColumnAndRow(27, $line, $updated_at);
-                        $sheet->setCellValueByColumnAndRow(28, $line, $provider->burnFrom()->user->email);*/
+                        $sheet->setCellValueByColumnAndRow(6, $line, date('d/m/Y', strtotime($provider->created_at)));
+                        $sheet->setCellValueByColumnAndRow(7, $line, $provider->company_name);
+                        $sheet->setCellValueByColumnAndRow(8, $line, $provider->fantasy_name);
+                        $sheet->setCellValueByColumnAndRow(9, $line, $accession_date);
+                        $sheet->setCellValueByColumnAndRow(10, $line, $rate);
+                        $sheet->setCellValueByColumnAndRow(11, $line, $end_date);
+                        $sheet->setCellValueByColumnAndRow(12, $line, $manager->name);
+                        $sheet->setCellValueByColumnAndRow(13, $line, $manager->contacts->phone1);
+                        $sheet->setCellValueByColumnAndRow(14, $line, $manager->contacts->email);
+                        $sheet->setCellValueByColumnAndRow(15, $line, $manager->function);
 
                         $line++;
                     }
@@ -432,7 +421,7 @@ class ReportController extends Controller {
                         'id' => $item->id,
                         'name' => $item->name,
                         'amount' => array_sum(array_column($accs->toArray(), 'amount')),
-                        'type' => "Plataforma",
+                        'type' => "Lançamento Manual",
                     ];
                 }
             });
@@ -526,7 +515,7 @@ class ReportController extends Controller {
                         'id' => $item->id,
                         'name' => $item->name,
                         'amount' => array_sum(array_column($accs->toArray(), 'amount')),
-                        'type' => "Plataforma",
+                        'type' => "Lançamento Manual",
                     ];
                 }
                 //dd($data);

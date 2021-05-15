@@ -199,7 +199,7 @@ const SelectInput = (props) => {
                 onChange={handleChange}
                 onBlur={handleChange}
             >
-                <MenuItem key={`input-00-1`} value="Todos">Todos</MenuItem>
+                <MenuItem key={`input-00-1`} value={props.defaultLabel}>{props.defaultLabel}</MenuItem>
                 {props.json ? (
                     props.values.map((val, ind) => {
                         return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
@@ -420,7 +420,7 @@ class LDataGrid extends Component {
                                                 </FormControl>
                                             )
                                         } else if (input.type == "select") {
-                                            return (<SelectInput key={input.column} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} onBlur={onChangeInputs} />)
+                                            return (<SelectInput defaultLabel={input.defaultLabel ?? "Todos"} key={input.column} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} onBlur={onChangeInputs} />)
                                         } else if (input.type == "decimal" || input.type == "percent") {
                                             return <MaskedDecimalInput key={input.column} name={input.column} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: input.flexBasis ?? '22%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                         }

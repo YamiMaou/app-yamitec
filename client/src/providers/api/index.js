@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   apiHost = hostname;
 }
-//apiHost = hostname;
+apiHost = hostname;
 let token = localStorage.getItem("token");
 export const Api = () => {
   return axios.create({
@@ -914,7 +914,13 @@ export const getApiAudits = async (params = '',id = undefined) => {
 }
 //Download Report
 export const getApiReportFileS = async (rel, ext,params = '') => {
-  localStorage.setItem("sessionTime", 900)
+  localStorage.setItem("sessionTime", 900);
+  let names = {
+    'reports/sales' : 'venda',
+    'reports/providers' : 'fornecedor',
+    'reports/client-ranking': 'Rank-Cliente' ,
+    'reports/provider-ranking': 'Rank-fornecedor' 
+  };
   const data = Object.entries(params)
     .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
     .join('&');
@@ -923,7 +929,7 @@ export const getApiReportFileS = async (rel, ext,params = '') => {
     url: `${apiHost}/${rel}/?${data}`,
     responseType: 'arraybuffer',
     headers: {
-      'Content-Disposition': `attachment; filename=${rel}.${ext}`,
+      'Content-Disposition': `attachment; filename=${names[rel] ?? 'Relatorio'}.${ext}`,
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   }
   }).then(function(response) {
@@ -934,7 +940,7 @@ export const getApiReportFileS = async (rel, ext,params = '') => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${rel}.${ext}`);
+    link.setAttribute('download', `${names[rel] ?? 'Relatorio'}.${ext}`);
     document.body.appendChild(link);
     link.click();
     //revokeObjectURL(url)

@@ -174,7 +174,7 @@ const SelectInput = (props) => {
                 onChange={handleChange}
                 onBlur={handleChange}
             >
-                <MenuItem key={`input-00-1`} value="Todos">Todos</MenuItem>
+                <MenuItem key={`input-00-1`} value={props.defaultLabel}>{props.defaultLabel}</MenuItem>
                 {props.json ? (
                     props.values.map((val, ind) => {
                         return <MenuItem key={`input-${ind}`} value={val.id}>{val[props.valueLabel]}</MenuItem>
@@ -391,7 +391,7 @@ class LCardGrid extends Component {
                                     } else if (input.type == "decimal" || input.type == "percent") {
                                         return <MaskedDecimalInput key={`field_${input.column}`} percent={input.type == "percent"} decimal={input.type == "decimal"} value={this.state.filters[input.column] ?? ""} style={{ ...classes.m5, flexGrow: input.grow ?? 0, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%' }} id={input.column} label={input.label} onChange={onChangeInputs} onBlur={onChangeInputs} />
                                     } else if (input.type == "select") {
-                                        return (<SelectInput key={`field_${input.column}`} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%'}} onBlur={onChangeInputs} />)
+                                        return (<SelectInput defaultLabel={input.defaultLabel ?? "Todos"} key={`field_${input.column}`} json={input.json ?? undefined} valueLabel={input.valueLabel} id={input.column} label={input.label} name={input.column} value={this.state.filters[input.column] ?? ""} values={input.values} style={{ ...classes.m5, flexGrow: input.grow ?? 1, flexBasis: window.innerWidth > 720 ? input.flexBasis ?? '30%' : '100%'}} onBlur={onChangeInputs} />)
                                     }
                                 })
                             }

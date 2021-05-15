@@ -103,6 +103,10 @@ class Home extends Component {
                     <div>
                     <Bar width={window.innerWidth > 720 ? 100 : 50} height={window.innerWidth > 720 ? 35 : 35} data={data} options={options} />
                     </div>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                        Caso o mesmo CPF esteja cadastrado em outros módulos, o lançamento é computado para o primeiro módulo seguindo a sequência:
+                        cliente, responsável  e por último colaboradores.
+                    </Typography>
                     </CardContent>
                     <CardActionArea>
                     </CardActionArea>
