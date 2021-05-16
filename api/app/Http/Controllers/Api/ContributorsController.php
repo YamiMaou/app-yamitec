@@ -41,6 +41,11 @@ class ContributorsController extends ControllersExtends
         }
         $user = User::where('email', $request->email)->first();
         $is = \App\Models\Contributor::findOrFail($id);
+
+        if((Contributor::where('cpf', $request->cpf)->count() > 0) && ($is->cpf != $request->cpf)){
+            return response()->json(["success" => false, "message" => "O CPF informado já está cadastrado."]);
+        }
+
         if($is && $user && $user->id != $is->user_id){
             return response()->json(["success" => false, "message" => "O E-mail informado já está cadastrado."]);
         }
