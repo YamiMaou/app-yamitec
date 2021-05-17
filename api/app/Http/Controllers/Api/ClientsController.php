@@ -56,7 +56,7 @@ class ClientsController extends ControllersExtends
                 'password' => Hash::make($request->cpf),
             ];
     
-            $user = User::create($data_user);
+            $user = User::create($data_user);             
     
             $data_client = [
                 'name' => $request->name,
@@ -68,6 +68,11 @@ class ClientsController extends ControllersExtends
             ];
     
             $client = Client::create($data_client);
+
+            if (!$client->id) {
+                $user->delete();
+                return response()->json(["success"=> false, "type" => "store", "message" => "Problema ao cadastrar."]);
+            }
     
             $data_address = [
                 'zipcode' => $request->zipcode,
@@ -78,7 +83,13 @@ class ClientsController extends ControllersExtends
                 'client_id' => $client->id,
             ];
             
-            Address::create($data_address);
+            $address = Address::create($data_address);
+
+            if (!$address->id) {
+                $user->delete();
+                $client->delete();
+                return response()->json(["success"=> false, "type" => "store", "message" => "Problema ao cadastrar."]);
+            }
     
             $data_address = [
                 'phone1' => $request->phone1,
